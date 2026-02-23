@@ -1,0 +1,967 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Monitoramento de RALs</title>
+  <style>
+    :root{
+      /* ====== Dark (default) ====== */
+      --bg:#0f1221;
+      --text:#e9edf5;
+      --muted:#9aa3b2;
+      --line: rgba(255,255,255,.10);
+      --card1: rgba(255,255,255,.03);
+      --card2: rgba(255,255,255,.02);
+      --shadow: rgba(0,0,0,.25);
+      --accent: rgba(122,162,255,.35);
+
+      /* Manchester palette */
+      --m-red:    #e53935;
+      --m-orange: #fb8c00;
+      --m-yellow: #fdd835;
+      --m-green:  #43a047;
+      --m-blue:   #1e88e5;
+
+      --btn-bg: rgba(255,255,255,.06);
+      --btn-bg2: rgba(255,255,255,.04);
+      --btn-border: rgba(255,255,255,.10);
+
+      --head-bg: rgba(15,18,33,.92);
+    }
+
+    /* ====== Light (clean) ====== */
+    body[data-theme="light"]{
+      --bg:#f6f7fb;
+      --text:#0d1321;
+      --muted:#5b6472;
+      --line: rgba(13,19,33,.12);
+      --card1: rgba(255,255,255,.85);
+      --card2: rgba(255,255,255,.75);
+      --shadow: rgba(20,25,35,.10);
+      --accent: rgba(30,136,229,.22);
+
+      --btn-bg: rgba(13,19,33,.06);
+      --btn-bg2: rgba(13,19,33,.04);
+      --btn-border: rgba(13,19,33,.12);
+
+      --head-bg: rgba(246,247,251,.92);
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0; padding:18px;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial;
+      background:
+        radial-gradient(1200px 700px at 10% 10%, rgba(122,162,255,.18), transparent 60%),
+        radial-gradient(1200px 700px at 90% 20%, rgba(67,160,71,.12), transparent 60%),
+        var(--bg);
+      color:var(--text);
+    }
+    body[data-theme="light"]{
+      background:
+        radial-gradient(1200px 700px at 10% 10%, rgba(30,136,229,.12), transparent 60%),
+        radial-gradient(1200px 700px at 90% 20%, rgba(67,160,71,.10), transparent 60%),
+        var(--bg);
+    }
+
+    .wrap{ max-width:1280px; margin:0 auto; }
+    header{ display:flex; flex-wrap:wrap; gap:14px; justify-content:space-between; align-items:flex-start; margin-bottom:14px; }
+    h1{ margin:0; font-size:20px; }
+    .sub{ margin-top:6px; color:var(--muted); font-size:13px; line-height:1.35; }
+
+    .pill{
+      display:inline-flex; gap:8px; align-items:center;
+      background: var(--btn-bg2);
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:8px 10px;
+      color:var(--muted);
+      font-size:12px;
+      white-space:nowrap;
+    }
+
+    .card{
+      background: linear-gradient(180deg, var(--card1), var(--card2));
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:14px;
+      box-shadow: 0 10px 30px var(--shadow);
+    }
+
+    .grid{ display:grid; grid-template-columns: 1.2fr .8fr; gap:14px; }
+    @media (max-width: 980px){ .grid{ grid-template-columns: 1fr; } }
+
+    label{ display:block; font-size:12px; color:var(--muted); margin-bottom:6px; }
+    textarea, input{
+      width:100%;
+      background: var(--btn-bg2);
+      border:1px solid var(--line);
+      color:var(--text);
+      border-radius:10px;
+      padding:10px;
+      outline:none;
+    }
+    textarea:focus, input:focus{ border-color: var(--accent); }
+    textarea{
+      min-height: 150px; resize: vertical;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+    }
+
+    .actions{ display:flex; flex-wrap:wrap; gap:10px; margin-top:10px; }
+    button{
+      border:1px solid var(--btn-border);
+      background: var(--btn-bg);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:10px;
+      cursor:pointer;
+      font-weight:800;
+      letter-spacing:.2px;
+    }
+    button:hover{ border-color: rgba(255,255,255,.22); }
+    body[data-theme="light"] button:hover{ border-color: rgba(13,19,33,.22); }
+    button.primary{ border-color: rgba(30,136,229,.40); background: rgba(30,136,229,.16); }
+    button.danger{ border-color: rgba(229,57,53,.40); background: rgba(229,57,53,.12); }
+    button.ghost{ background: transparent; }
+
+    .hint{ margin-top:10px; font-size:12px; color:var(--muted); line-height:1.35; }
+    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    .muted{ color:var(--muted); }
+
+    /* ====== TABLE ====== */
+    .tablewrap{
+      overflow:auto;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      margin-top: 12px;
+    }
+    table{
+      width:100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      min-width: 980px;
+      table-layout: fixed;
+    }
+    colgroup col.col-age { width: 210px; }
+    colgroup col.col-ral { width: 190px; }
+    colgroup col.col-des { width: 420px; }
+    colgroup col.col-cf  { width: auto; }
+    colgroup col.col-act { width: 130px; }
+
+    th, td{
+      border-bottom: 1px solid var(--line);
+      padding: 14px 16px;
+      font-size: 13px;
+      vertical-align: middle;
+    }
+
+    th{
+      position: sticky;
+      top: 0;
+      background: var(--head-bg);
+      backdrop-filter: blur(8px);
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: .35px;
+      z-index: 1;
+      text-align: center;
+    }
+
+    th:not(:last-child), td:not(:last-child){
+      border-right: 1px solid rgba(255,255,255,.06);
+    }
+    body[data-theme="light"] th:not(:last-child), body[data-theme="light"] td:not(:last-child){
+      border-right: 1px solid rgba(13,19,33,.06);
+    }
+
+    tr:hover td{ background: rgba(255,255,255,.03); }
+    body[data-theme="light"] tr:hover td{ background: rgba(13,19,33,.03); }
+
+    td:nth-child(1){ text-align: left; } /* idade */
+    td:nth-child(2){ text-align: left; } /* ral */
+    td:nth-child(3){ text-align: left; } /* designação */
+    td:nth-child(4){ text-align: left; } /* cf */
+    td:nth-child(5){ text-align: center; }/* ação */
+
+    .badge{
+      display:inline-flex; align-items:center; gap:8px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:5px 10px;
+      font-size:12px;
+      white-space:nowrap;
+      font-weight: 900;
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+    }
+    body[data-theme="light"] .badge{ background: rgba(13,19,33,.04); }
+
+    .dot{ width:10px; height:10px; border-radius:999px; display:inline-block; }
+    .ageSub{ margin-top: 6px; font-size: 12px; color: var(--muted); }
+    .small{ padding:8px 10px; font-size:12px; font-weight:900; }
+
+    /* ====== CHART ====== */
+    .chart{
+      display:flex; flex-direction:column; gap:10px;
+    }
+    .barRow{
+      display:grid;
+      grid-template-columns: 220px 1fr 60px;
+      gap:10px;
+      align-items:center;
+    }
+    @media (max-width: 620px){
+      .barRow{ grid-template-columns: 1fr; }
+    }
+    .barBtn{
+      width:100%;
+      border:1px solid var(--line);
+      background: transparent;
+      border-radius:12px;
+      padding:10px;
+      text-align:left;
+      cursor:pointer;
+      display:flex; flex-direction:column; gap:8px;
+    }
+    .barBtn:hover{ border-color: rgba(255,255,255,.22); }
+    body[data-theme="light"] .barBtn:hover{ border-color: rgba(13,19,33,.22); }
+
+    .barLabel{ display:flex; align-items:center; gap:10px; font-weight:900; font-size:12px; color: var(--text); }
+    .barTrack{
+      height:12px;
+      border-radius:999px;
+      background: rgba(255,255,255,.06);
+      overflow:hidden;
+      border:1px solid var(--line);
+    }
+    body[data-theme="light"] .barTrack{ background: rgba(13,19,33,.06); }
+
+    .barFill{
+      height:100%;
+      width:0%;
+      border-radius:999px;
+      background: var(--m-blue);
+    }
+    .barMeta{ font-size:12px; color: var(--muted); }
+
+    .selected{
+      outline: 2px solid rgba(30,136,229,.38);
+      border-color: rgba(30,136,229,.38) !important;
+      background: rgba(30,136,229,.08);
+    }
+
+    /* ====== OUTPUT ====== */
+    .out{
+      margin-top:12px;
+      display:none;
+    }
+    .outHeader{
+      display:flex; gap:10px; flex-wrap:wrap; justify-content:space-between; align-items:center;
+      margin-bottom:8px;
+    }
+    .outActions{ display:flex; gap:10px; flex-wrap:wrap; }
+    .out textarea{ min-height: 120px; }
+  </style>
+</head>
+
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Monitoramento de RALs</h1>
+      <div class="sub">
+        Distribuição por <b>faixa de idade</b> (SLA) usando a <b>data/hora de abertura</b> como base.
+        Gráfico clicável para enxergar e filtrar as <b>ofensoras &gt; 24h</b>.
+      </div>
+    </div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+      <button class="ghost" id="btnTheme" title="Alternar tema">🌓 Modo</button>
+      <span class="pill">📌 Registros: <strong id="count">0</strong></span>
+      <span class="pill">🔎 Visíveis: <strong id="countFiltered">0</strong></span>
+      <span class="pill">🗓️ Coleta: <strong id="rangeColeta" class="mono">-</strong></span>
+      <span class="pill">🎯 Faixa: <strong id="rangeSel">todas</strong></span>
+    </div>
+  </header>
+
+  <div class="grid">
+    <div class="card">
+      <h2 style="margin:0 0 10px 0; font-size:14px; color: var(--muted); font-weight:900;">Dados brutos</h2>
+      <label for="raw">Cole o bloco aqui</label>
+      <textarea id="raw" placeholder="Cole o dump..."></textarea>
+
+      <div class="actions">
+        <button class="primary" id="btnParse">Importar / Parsear</button>
+        <button id="btnTxt">Gerar TXT (na tela)</button>
+        <button id="btnCsv">Gerar CSV (download)</button>
+        <button class="danger" id="btnClear">Limpar tudo</button>
+      </div>
+
+<div class="out" id="outBox">
+        <div class="outHeader">
+          <div class="muted" style="font-weight:900;">TXT gerado (tabulado)</div>
+          <div class="outActions">
+            <button id="btnCopyTxt">Copiar TXT</button>
+            <button id="btnCloseTxt" class="ghost">Fechar</button>
+          </div>
+        </div>
+        <textarea id="outTxt" class="mono" readonly></textarea>
+        <div class="hint">Dica: isso é texto tabulado. Cola no Excel/Sheets que vira coluna bonitinho.</div>
+
+    </div>
+    </div>
+
+    <div class="card">
+      <h2 style="margin:0 0 10px 0; font-size:14px; color: var(--muted); font-weight:900;">Painel de controle</h2>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+        <div>
+          <label for="fDesignacao">Designação</label>
+          <input id="fDesignacao" />
+        </div>
+        <div>
+          <label for="fCF">CF</label>
+          <input id="fCF" />
+        </div>
+      </div>
+      <div style="margin-top:10px;">
+        <label for="fRAL">RAL</label>
+        <input id="fRAL" class="mono" />
+      </div>
+
+      <div class="actions">
+        <button id="btnResetFilters">Limpar filtros</button>
+        <button id="btnClearRange" class="ghost" title="Remove o filtro de faixa do gráfico">Limpar faixa</button>
+      </div>
+
+      <div class="hint">
+        Ordenação: <b>faixa mais crítica primeiro</b>, depois <b>mais velha primeiro</b>.
+      </div>
+
+      <hr style="border:0; border-top:1px solid var(--line); margin:12px 0;" />
+
+      <h2 style="margin:0 0 10px 0; font-size:14px; color: var(--muted); font-weight:900;">Gráfico: RALs por idade</h2>
+      <div class="hint" style="margin-top:-6px; margin-bottom:10px;">
+        Clique em uma barra para filtrar. Clique de novo para soltar.
+      </div>
+      <div class="chart" id="chart"></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:14px;">
+    <h2 style="margin:0 0 10px 0; font-size:14px; color: var(--muted); font-weight:900;">Planilha</h2>
+
+    <div class="tablewrap">
+      <table>
+        <colgroup>
+          <col class="col-age">
+          <col class="col-ral">
+          <col class="col-des">
+          <col class="col-cf">
+          <col class="col-act">
+        </colgroup>
+        <thead>
+          <tr>
+            <th>IDADE</th>
+            <th>RAL</th>
+            <th>DESIGNAÇÃO</th>
+            <th>CF</th>
+            <th>AÇÕES</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const STORAGE_KEY = "monitor_rals_v4_upgrade_2026_02";
+  const THEME_KEY = "monitor_rals_theme";
+  const el = (id) => document.getElementById(id);
+
+  const raw = el("raw");
+  const count = el("count");
+  const countFiltered = el("countFiltered");
+  const rangeColeta = el("rangeColeta");
+  const rangeSel = el("rangeSel");
+
+  const fDesignacao = el("fDesignacao");
+  const fCF = el("fCF");
+  const fRAL = el("fRAL");
+
+  const tbody = el("tbody");
+  const chart = el("chart");
+
+  const outBox = el("outBox");
+  const outTxt = el("outTxt");
+let items = load();
+  let selectedRangeKey = ""; // filtro do gráfico (faixa)
+  initTheme();
+
+  // ====== Faixas (NOVAS) + Manchester ======
+  // Ordem de criticidade (topo primeiro)
+  const AGE_RANGES = [
+    { key: "ACIMA_72", label: "Acima de 72h",  manchester: "red" },
+    { key: "48_72",    label: "Entre 48h–72h", manchester: "red" },
+    { key: "24_48",    label: "Entre 24h–48h", manchester: "red" },
+    { key: "16_24",    label: "Entre 16h–24h", manchester: "orange" },
+    { key: "8_16",     label: "Entre 8h–16h",  manchester: "yellow" },
+    { key: "4_8",      label: "Entre 4h–8h",   manchester: "green" },
+    { key: "ATE_4",    label: "Até 4h",        manchester: "blue" },
+  ];
+
+  function manchesterColor(kind){
+    switch(kind){
+      case "red": return getCss("--m-red");
+      case "orange": return getCss("--m-orange");
+      case "yellow": return getCss("--m-yellow");
+      case "green": return getCss("--m-green");
+      case "blue": return getCss("--m-blue");
+      default: return getCss("--m-blue");
+    }
+  }
+
+  function getCss(varName){
+    return getComputedStyle(document.body).getPropertyValue(varName).trim();
+  }
+
+  function rangeKeyForHours(hours) {
+    if (hours >= 72) return "ACIMA_72";
+    if (hours >= 48) return "48_72";
+    if (hours >= 24) return "24_48";
+    if (hours >= 16) return "16_24";
+    if (hours >= 8)  return "8_16";
+    if (hours >= 4)  return "4_8";
+    return "ATE_4";
+  }
+
+  function rangeMeta(key) {
+    return AGE_RANGES.find(r => r.key === key) || AGE_RANGES[AGE_RANGES.length - 1];
+  }
+
+  function rangeOrderIndex(key) {
+    return AGE_RANGES.findIndex(r => r.key === key);
+  }
+
+  function save() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ items }));
+  }
+
+  function load() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return [];
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed.items) ? parsed.items : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function normalize(s) {
+    return (s ?? "").toString().trim().toLowerCase();
+  }
+
+  function escapeHtml(str) {
+    return (str ?? "").toString()
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function parseAbertura(line) {
+    const m = line.match(/(\d{2}\/\d{2}\/\d{4})\s*-\s*(\d{2}:\d{2})/);
+    if (!m) return null;
+    const [dd, mm, yyyy] = m[1].split("/").map(Number);
+    const [HH, MI] = m[2].split(":").map(Number);
+    return new Date(yyyy, mm - 1, dd, HH, MI, 0, 0);
+  }
+
+  function findRAL(line) {
+    // aceita "RAL-123/2026" e também só "123/2026"
+    const m1 = line.match(/\bRAL-\d+\/\d{4}\b/);
+    if (m1) return m1[0];
+    const m2 = line.match(/\b\d+\/\d{4}\b/);
+    return m2 ? `RAL-${m2[0]}` : null;
+  }
+
+  function detectType(line) {
+    if (line.includes("ACESSO CLIENTE")) return "ACESSO CLIENTE";
+    if (line.includes("COLETOR")) return "COLETOR";
+    return "";
+  }
+
+  function extractDesignacao(line, typeFound) {
+    if (!typeFound) return line.trim();
+    const idx = line.indexOf(typeFound);
+    if (idx <= 0) return "";
+    return line.slice(0, idx).trim();
+  }
+
+  function ageMs(dt) { return Date.now() - dt.getTime(); }
+
+  function ageHuman(dt) {
+    const ms = Math.max(0, ageMs(dt));
+    const totalMinutes = Math.floor(ms / 60000);
+    const days = Math.floor(totalMinutes / (60 * 24));
+    const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
+    const minutes = totalMinutes % 60;
+    const totalHours = ms / 3600000;
+    return { days, hours, minutes, totalHours };
+  }
+
+  function formatAgeShort(a) { return `${a.days}d ${a.hours}h ${a.minutes}m`; }
+
+  function normalizeCFPath(cf) {
+    return (cf ?? "")
+      .toString()
+      .trim()
+      .replace(/\s*\/\s*/g, "/")
+      .replace(/\s{2,}/g, " ");
+  }
+
+  function extractCF(line) {
+    if (line.includes("\t")) {
+      const cols = line.split("\t").map(c => c.trim()).filter(Boolean);
+      const ralIdx = cols.findIndex(c => /\bRAL-\d+\/\d{4}\b/.test(c) || /\b\d+\/\d{4}\b/.test(c));
+      if (ralIdx >= 0) {
+        const cfIdx = ralIdx + 4;
+        if (cols[cfIdx] && cols[cfIdx].includes("/")) return normalizeCFPath(cols[cfIdx]);
+      }
+      const candidate = cols.find(c => c.includes("/") && /[A-Z]{2}\//.test(c));
+      return candidate ? normalizeCFPath(candidate) : "";
+    }
+
+    const m = line.match(/\b\d+\b\s+([A-Z]{2}\/[A-Z0-9]+(?:\s*\/\s*[A-Z0-9]+)*)/);
+    if (m) return normalizeCFPath(m[1]);
+
+    const m2 = line.match(/([A-Z]{2}\/[A-Z0-9]+(?:\s*\/\s*[A-Z0-9]+)*)/);
+    return m2 ? normalizeCFPath(m2[1]) : "";
+  }
+
+  function parseLines(text) {
+    const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+    const parsed = [];
+    const errors = [];
+
+    for (const line of lines) {
+      if (/^E\s*-\s*C$/i.test(line)) continue;
+
+      const ralFound = findRAL(line);
+      if (!ralFound) { errors.push({ line, reason: "Sem RAL" }); continue; }
+
+      const dt = parseAbertura(line);
+      if (!dt) { errors.push({ line, reason: "Sem data/hora" }); continue; }
+
+      const typeFound = detectType(line);
+      const design = extractDesignacao(line, typeFound);
+
+      const cfFound = extractCF(line);
+      if (!cfFound) { errors.push({ line, reason: "Sem CF (path) detectado" }); continue; }
+
+      parsed.push({
+        id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2),
+        ral: ralFound,
+        aberturaISO: dt.toISOString(),
+        designacao: design,
+        cf: cfFound
+      });
+    }
+
+    return { parsed, errors };
+  }
+
+  function mergeNoDuplicates(newItems) {
+    const existing = new Set(items.map(x => normalize(x.ral)));
+    let added = 0;
+    for (const n of newItems) {
+      const key = normalize(n.ral);
+      if (existing.has(key)) continue;
+      items.push(n);
+      existing.add(key);
+      added++;
+    }
+    return added;
+  }
+
+  function applyFilters(list) {
+    const fd = normalize(fDesignacao.value);
+    const fc = normalize(fCF.value);
+    const fr = normalize(fRAL.value);
+
+    return list.filter(x => {
+      const d = normalize(x.designacao);
+      const c = normalize(x.cf);
+      const r = normalize(x.ral);
+
+      if (selectedRangeKey) {
+        const dt = new Date(x.aberturaISO);
+        const a = ageHuman(dt);
+        const key = rangeKeyForHours(a.totalHours);
+        if (key !== selectedRangeKey) return false;
+      }
+
+      return (!fd || d.includes(fd)) && (!fc || c.includes(fc)) && (!fr || r.includes(fr));
+    });
+  }
+
+  function removeItem(id) {
+    if (!confirm("Remover este registro?")) return;
+    items = items.filter(x => x.id !== id);
+    save();
+    render();
+  }
+
+  function clearAll() {
+    if (!confirm("Apagar TUDO?")) return;
+
+    // limpa entrada (dados brutos)
+    el("raw").value = "";
+
+    // limpa filtros
+    fDesignacao.value = "";
+    fCF.value = "";
+    fRAL.value = "";
+
+    // limpa saídas (TXT)
+    outTxt.value = "";
+    outBox.style.display = "none";
+
+    // reseta dataset e seleção
+    items = [];
+    selectedRangeKey = "";
+    save();
+    render();
+  }
+  function downloadFile(content, mime, filename) {
+    const blob = new Blob([content], { type: mime });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.download = filename;
+    a.href = url;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  function stampName(prefix, ext) {
+    const d = new Date();
+    const pad = (n) => String(n).padStart(2,"0");
+    return `${prefix}_${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}.${ext}`;
+  }
+
+  function fmtBR(dt){
+    const pad = (n) => String(n).padStart(2,"0");
+    return `${pad(dt.getDate())}/${pad(dt.getMonth()+1)}/${dt.getFullYear()} - ${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
+  }
+
+  function updateColetaPill(list){
+    if (!list.length) { rangeColeta.textContent = "-"; return; }
+    const dts = list.map(x => new Date(x.aberturaISO)).sort((a,b)=>a-b);
+    rangeColeta.textContent = `${fmtBR(dts[0])} → ${fmtBR(dts[dts.length-1])}`;
+  }
+
+  // TXT NA TELA (hierarquia: IDADE | RAL | CF)
+  function buildTxtAligned() {
+  const filtered = applyFilters(items);
+
+  const rows = filtered.map(x => {
+    const dt = new Date(x.aberturaISO);
+    const a = ageHuman(dt);
+    const key = rangeKeyForHours(a.totalHours);
+    const meta = rangeMeta(key);
+    return { x, a, key, meta, ageMs: ageMs(dt) };
+  });
+
+  rows.sort((p,q) => {
+    const byRange = rangeOrderIndex(p.key) - rangeOrderIndex(q.key);
+    if (byRange !== 0) return byRange;
+    return q.ageMs - p.ageMs;
+  });
+
+  // Alinhamento visual (spaces) para ficar bonito na tela.
+  // Para Excel/Sheets use a "Tabela (TSV)".
+  const ageW = Math.max(5, ...rows.map(r => r.meta.label.length));
+  const ralW = Math.max(3, ...rows.map(r => (r.x.ral||"").length));
+  const cfW  = Math.max(2, ...rows.map(r => (r.x.cf||"").length));
+
+  const pad = (s,w) => (s ?? "").toString().padEnd(w, " ");
+
+  const lines = [];
+  lines.push(pad("IDADE", ageW) + "  " + pad("RAL", ralW) + "  " + pad("CF", cfW));
+  for (const r of rows) {
+    lines.push(
+      pad(r.meta.label, ageW) + "  " +
+      pad(r.x.ral, ralW) + "  " +
+      pad(r.x.cf, cfW)
+    );
+  }
+  return lines.join("\n");
+}
+
+  function showTxt(){
+    const filtered = applyFilters(items);
+    if (!filtered.length) {
+      alert("Nada para gerar (não há RALs visíveis com os filtros atuais).");
+      return;
+    }
+    outTxt.value = buildTxtAligned();
+    outBox.style.display = "block";
+    // garante que o usuário veja o resultado
+    outTxt.scrollTop = 0;
+  }
+
+
+  function csvEscape(value) {
+    const s = (value ?? "").toString();
+    if (/[",\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+    return s;
+  }
+
+  function exportCsv() {
+    const filtered = applyFilters(items);
+
+    const rows = filtered.map(x => {
+      const dt = new Date(x.aberturaISO);
+      const a = ageHuman(dt);
+      const key = rangeKeyForHours(a.totalHours);
+      const meta = rangeMeta(key);
+      return { x, a, key, meta, ageMs: ageMs(dt) };
+    });
+
+    rows.sort((p,q) => {
+      const byRange = rangeOrderIndex(p.key) - rangeOrderIndex(q.key);
+      if (byRange !== 0) return byRange;
+      return q.ageMs - p.ageMs;
+    });
+
+    const lines = [];
+    lines.push("IDADE,RAL,DESIGNACAO,CF");
+    for (const r of rows) {
+      lines.push([
+        csvEscape(r.meta.label),
+        csvEscape(r.x.ral),
+        csvEscape(r.x.designacao),
+        csvEscape(r.x.cf),
+      ].join(","));
+    }
+    downloadFile(lines.join("\n"), "text/csv;charset=utf-8", stampName("rals", "csv"));
+  }
+
+  function renderChart(rows){
+    // rows já vem filtrado (sem filtro de faixa), porque o chart deve mostrar o "mapa inteiro"
+    const counts = {};
+    AGE_RANGES.forEach(r => counts[r.key] = 0);
+    for (const r of rows){
+      counts[r.key] = (counts[r.key] || 0) + 1;
+    }
+    const max = Math.max(1, ...Object.values(counts));
+
+    chart.innerHTML = "";
+    for (const range of AGE_RANGES){
+      const n = counts[range.key] || 0;
+      const pct = Math.round((n / max) * 100);
+
+      const row = document.createElement("div");
+      row.className = "barRow";
+
+      const btn = document.createElement("button");
+      btn.className = "barBtn";
+      if (selectedRangeKey === range.key) btn.classList.add("selected");
+      btn.setAttribute("data-range", range.key);
+
+      const label = document.createElement("div");
+      label.className = "barLabel";
+      label.innerHTML = `<span class="dot" style="background:${manchesterColor(range.manchester)}"></span>${escapeHtml(range.label)}`;
+
+      const track = document.createElement("div");
+      track.className = "barTrack";
+
+      const fill = document.createElement("div");
+      fill.className = "barFill";
+      fill.style.width = `${pct}%`;
+      fill.style.background = manchesterColor(range.manchester);
+      track.appendChild(fill);
+
+      const meta = document.createElement("div");
+      meta.className = "barMeta";
+      meta.textContent = n === 1 ? "1 RAL" : `${n} RALs`;
+
+      btn.appendChild(label);
+      btn.appendChild(track);
+      btn.appendChild(meta);
+
+      const right = document.createElement("div");
+      right.className = "mono";
+      right.style.textAlign = "right";
+      right.textContent = String(n);
+
+      row.appendChild(btn);
+      row.appendChild(document.createElement("div")); // spacer
+      row.appendChild(right);
+      chart.appendChild(row);
+
+      btn.addEventListener("click", () => {
+        const key = btn.getAttribute("data-range");
+        selectedRangeKey = (selectedRangeKey === key) ? "" : key;
+        render();
+      });
+    }
+  }
+
+  function render() {
+    count.textContent = String(items.length);
+
+    // Coleta é sobre o conjunto total (não filtrado), como você pediu
+    updateColetaPill(items);
+
+    const filtered = applyFilters(items);
+    countFiltered.textContent = String(filtered.length);
+
+    rangeSel.textContent = selectedRangeKey ? rangeMeta(selectedRangeKey).label : "todas";
+
+    // Chart deve ignorar o filtro de faixa (senão ele vira "espelho" do próprio clique)
+    const chartBase = items.map(x => {
+      const dt = new Date(x.aberturaISO);
+      const a = ageHuman(dt);
+      const key = rangeKeyForHours(a.totalHours);
+      const meta = rangeMeta(key);
+      return { x, a, key, meta, ageMs: ageMs(dt) };
+    });
+    renderChart(chartBase);
+
+    // Table
+    const rows = filtered.map(x => {
+      const dt = new Date(x.aberturaISO);
+      const a = ageHuman(dt);
+      const key = rangeKeyForHours(a.totalHours);
+      const meta = rangeMeta(key);
+      return { x, a, key, meta, ageMs: ageMs(dt) };
+    });
+
+    rows.sort((p,q) => {
+      const byRange = rangeOrderIndex(p.key) - rangeOrderIndex(q.key);
+      if (byRange !== 0) return byRange;
+      return q.ageMs - p.ageMs;
+    });
+
+    tbody.innerHTML = "";
+    if (rows.length === 0) {
+      const tr = document.createElement("tr");
+      const td = document.createElement("td");
+      td.colSpan = 5;
+      td.className = "muted";
+      td.style.padding = "14px";
+      td.textContent = "Sem registros para mostrar (ou filtros apertaram demais).";
+      tr.appendChild(td);
+      tbody.appendChild(tr);
+      return;
+    }
+
+    for (const r of rows) {
+      const dotColor = manchesterColor(r.meta.manchester);
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>
+          <span class="badge">
+            <span class="dot" style="background:${dotColor}"></span>
+            ${escapeHtml(r.meta.label)}
+          </span>
+          <div class="ageSub mono">${escapeHtml(formatAgeShort(r.a))}</div>
+        </td>
+        <td class="mono">${escapeHtml(r.x.ral)}</td>
+        <td>${escapeHtml(r.x.designacao)}</td>
+        <td class="mono">${escapeHtml(r.x.cf)}</td>
+        <td><button class="danger small" data-del="${r.x.id}">Remover</button></td>
+      `;
+      tbody.appendChild(tr);
+    }
+
+    tbody.querySelectorAll("button[data-del]").forEach(btn => {
+      btn.addEventListener("click", () => removeItem(btn.getAttribute("data-del")));
+    });
+  }
+
+  // ====== Theme ======
+  function initTheme(){
+    const saved = localStorage.getItem(THEME_KEY);
+    const theme = (saved === "light" || saved === "dark") ? saved : "dark";
+    document.body.setAttribute("data-theme", theme === "light" ? "light" : "dark");
+  }
+
+  function toggleTheme(){
+    const current = document.body.getAttribute("data-theme") === "light" ? "light" : "dark";
+    const next = current === "light" ? "dark" : "light";
+    document.body.setAttribute("data-theme", next);
+    localStorage.setItem(THEME_KEY, next);
+    render(); // refaz cores do chart
+  }
+
+  el("btnTheme").addEventListener("click", toggleTheme);
+
+  // ====== Events ======
+  el("btnParse").addEventListener("click", () => {
+    const text = raw.value || "";
+    if (!text.trim()) { alert("Cole os dados brutos primeiro."); return; }
+
+    const { parsed, errors } = parseLines(text);
+    const added = mergeNoDuplicates(parsed);
+
+    save();
+    render();
+
+    const msg = [];
+    msg.push("Importação concluída.");
+    msg.push(`Adicionados: ${added}`);
+    msg.push(`Ignorados (duplicados): ${parsed.length - added}`);
+    msg.push(`Linhas ignoradas (erro): ${errors.length}`);
+
+    if (errors.length) {
+      msg.push("");
+      msg.push("Amostra (até 5):");
+      errors.slice(0,5).forEach(e => msg.push(`- ${e.reason}: ${e.line}`));
+    }
+    alert(msg.join("\n"));
+  });
+
+  el("btnTxt").addEventListener("click", showTxt);
+  el("btnCsv").addEventListener("click", exportCsv);
+  el("btnCopyTxt").addEventListener("click", async () => {
+    try{
+      await navigator.clipboard.writeText(outTxt.value || "");
+      alert("TXT copiado.");
+    }catch{
+      alert("Não consegui acessar a área de transferência. Selecione e copie manualmente.");
+    }
+  });
+
+  el("btnCloseTxt").addEventListener("click", () => {
+    outBox.style.display = "none";
+  });
+  el("btnClear").addEventListener("click", clearAll);
+
+  el("btnResetFilters").addEventListener("click", () => {
+    fDesignacao.value = "";
+    fCF.value = "";
+    fRAL.value = "";
+    render();
+  });
+
+  el("btnClearRange").addEventListener("click", () => {
+    selectedRangeKey = "";
+    render();
+  });
+
+  [fDesignacao, fCF, fRAL].forEach(inp => inp.addEventListener("input", render));
+
+  render();
+})();
+</script>
+</body>
+</html>
