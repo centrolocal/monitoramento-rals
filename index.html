@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Monitoramento de RALs</title>
+  <title>RALSCOPE</title>
   <style>
     :root{
       /* ====== Dark (default) ====== */
@@ -22,6 +22,13 @@
       --m-yellow: #fdd835;
       --m-green:  #43a047;
       --m-blue:   #1e88e5;
+      --m-black:  #000000;
+
+      /* SLA highlight (corporativo) */
+      --sla24-bg: rgba(253,216,53,.10);
+      --sla48-bg: rgba(251,140,0,.10);
+      --sla72-bg: rgba(229,57,53,.10);
+
 
       --btn-bg: rgba(255,255,255,.06);
       --btn-bg2: rgba(255,255,255,.04);
@@ -44,6 +51,11 @@
       --btn-bg: rgba(13,19,33,.06);
       --btn-bg2: rgba(13,19,33,.04);
       --btn-border: rgba(13,19,33,.12);
+
+      /* SLA highlight (corporativo) */
+      --sla24-bg: rgba(253,216,53,.18);
+      --sla48-bg: rgba(251,140,0,.18);
+      --sla72-bg: rgba(229,57,53,.16);
 
       --head-bg: rgba(246,247,251,.92);
     }
@@ -263,14 +275,56 @@
     }
     .outActions{ display:flex; gap:10px; flex-wrap:wrap; }
     .out textarea{ min-height: 120px; }
-  </style>
+
+    /* Saída TXT/TSV: não quebrar linha (pra colunas ficarem alinhadas) */
+    .out textarea{
+      min-height: 220px;
+      white-space: pre;
+      overflow: auto;
+      overflow-x: auto;
+      font-variant-ligatures: none;
+    }
+    /* Tabela/planilha na tela: compacta e com quebra dentro da célula */
+    #outTable{
+      table-layout: fixed;
+      width: 100%;
+      min-width: 860px;
+    }
+    #outTable th, #outTable td{
+      padding: 8px 10px;
+      font-size: 12px;
+      line-height: 1.15;
+      text-align: left;
+      vertical-align: top;
+    }
+    #outTable td{
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+  
+  /* Saída (Planilha) mais compacta e UF estreita */
+  #outTable { font-size: 12px; }
+  #outTable th, #outTable td { padding: 6px 8px; vertical-align: top; }
+  #outTable td.ufCol, #outTable th.ufCol { width: 44px; max-width: 44px; white-space: nowrap; }
+  #outTable td.cfCol { max-width: 320px; }
+  #outTable td { overflow-wrap: anywhere; word-break: break-word; }
+  select.statusSel { font-size: 12px; padding: 4px 6px; }
+
+  /* Destaque corporativo: ABERTAS acima de 24h (barra lateral + fundo suave) */
+  #outTable tr.sla24{ box-shadow: inset 4px 0 0 var(--m-red); }
+  #outTable tr.sla48{ box-shadow: inset 4px 0 0 var(--m-red); }
+  #outTable tr.sla72{ box-shadow: inset 4px 0 0 var(--m-black); }
+
+
+</style>
 </head>
 
 <body>
 <div class="wrap">
   <header>
     <div>
-      <h1>Monitoramento de RALs</h1>
+      <h1>RALSCOPE</h1>
       <div class="sub">
         Distribuição por <b>faixa de idade</b> (SLA) usando a <b>data/hora de abertura</b> como base.
         Gráfico clicável para enxergar e filtrar as <b>ofensoras &gt; 24h</b>.
@@ -280,6 +334,9 @@
       <button class="ghost" id="btnTheme" title="Alternar tema">🌓 Modo</button>
       <span class="pill">📌 Registros: <strong id="count">0</strong></span>
       <span class="pill">🔎 Visíveis: <strong id="countFiltered">0</strong></span>
+      <span class="pill">⏱️ ABERTAS ≥24h: <strong id="open24">0</strong></span>
+      <span class="pill">🟠 48–72h: <strong id="open48">0</strong></span>
+      <span class="pill">🔴 >72h: <strong id="open72">0</strong></span>
       <span class="pill">🗓️ Coleta: <strong id="rangeColeta" class="mono">-</strong></span>
       <span class="pill">🎯 Faixa: <strong id="rangeSel">todas</strong></span>
     </div>
@@ -289,25 +346,49 @@
     <div class="card">
       <h2 style="margin:0 0 10px 0; font-size:14px; color: var(--muted); font-weight:900;">Dados brutos</h2>
       <label for="raw">Cole o bloco aqui</label>
-      <textarea id="raw" placeholder="Cole o dump..."></textarea>
+      <textarea id="raw" placeholder=""></textarea>
 
       <div class="actions">
         <button class="primary" id="btnParse">Importar / Parsear</button>
         <button id="btnTxt">Gerar TXT (na tela)</button>
+        <button id="btnXls">Gerar Planilha Excel</button>
         <button id="btnCsv">Gerar CSV (download)</button>
         <button class="danger" id="btnClear">Limpar tudo</button>
+        <button class="danger" id="btnResetStatus">Resetar status salvos</button>
       </div>
 
 <div class="out" id="outBox">
         <div class="outHeader">
-          <div class="muted" style="font-weight:900;">TXT gerado (tabulado)</div>
+          <div class="muted" id="outTitle" style="font-weight:900;">Saída</div>
           <div class="outActions">
-            <button id="btnCopyTxt">Copiar TXT</button>
-            <button id="btnCloseTxt" class="ghost">Fechar</button>
+            <button id="btnCopyOut">Copiar</button>
+            <button id="btnDownloadXls" title="Baixar como .xls (Excel abre)">Baixar XLS</button>
+            <button id="btnCloseOut" class="ghost">Fechar</button>
           </div>
         </div>
-        <textarea id="outTxt" class="mono" readonly></textarea>
-        <div class="hint">Dica: isso é texto tabulado. Cola no Excel/Sheets que vira coluna bonitinho.</div>
+
+        <!-- TXT/TSV -->
+        <textarea id="outTxt" class="mono" readonly wrap="off"></textarea>
+
+        <!-- Tabela (visual) -->
+        <div class="tablewrap" id="outTableWrap" style="display:none; margin-top:10px;">
+          <table id="outTable">
+            <thead>
+              <tr>
+                <th>RAL</th>
+                <th>PIRÂMIDE</th>
+                <th class="ufCol">UF</th>
+                <th class="cfCol">CF</th>
+                <th>FAIXA DE IDADE</th>
+                <th>RESPONSÁVEL</th>                <th>STATUS</th>
+              </tr>
+            </thead>
+            <tbody id="outTbody"></tbody>
+          </table>
+        </div>
+
+        <div class="hint" id="outHint">Dica: o TXT é TSV (tabulado). Cola no Excel/Sheets que vira coluna na hora.</div>
+    </div>
 
     </div>
     </div>
@@ -366,7 +447,7 @@
             <th>IDADE</th>
             <th>RAL</th>
             <th>DESIGNAÇÃO</th>
-            <th>CF</th>
+            <th class="cfCol">CF</th>
             <th>AÇÕES</th>
           </tr>
         </thead>
@@ -377,6 +458,7 @@
 </div>
 
 <script>
+
 (() => {
   const STORAGE_KEY = "monitor_rals_v4_upgrade_2026_02";
   const THEME_KEY = "monitor_rals_theme";
@@ -385,8 +467,47 @@
   const raw = el("raw");
   const count = el("count");
   const countFiltered = el("countFiltered");
+  const open24El = el("open24");
+  const open48El = el("open48");
+  const open72El = el("open72");
   const rangeColeta = el("rangeColeta");
   const rangeSel = el("rangeSel");
+
+  // Status editável (usado na planilha visual e refletido nas exportações)
+  const statusByRal = new Map(); // key: "RAL-12345/2026" -> "ABERTA"|"FECHADA"|"NORMALIZADA"
+  const LS_STATUS_KEY = "monral_status_v1";
+
+  function loadStatusMap(){
+    try{
+      const raw = localStorage.getItem(LS_STATUS_KEY);
+      if(!raw) return;
+      const obj = JSON.parse(raw);
+      if(obj && typeof obj === "object"){
+        Object.entries(obj).forEach(([k,v])=>{
+          if(typeof k === "string"){
+            statusByRal.set(k, (v === "FECHADA") ? "FECHADA" : "ABERTA");
+          }
+        });
+      }
+    }catch(_e){}
+  }
+
+  function persistStatusMap(){
+    try{
+      const obj = Object.fromEntries(statusByRal.entries());
+      localStorage.setItem(LS_STATUS_KEY, JSON.stringify(obj));
+    }catch(_e){}
+  }
+
+  function getStatusForRal(ral){
+    return statusByRal.get(ral) || "ABERTA";
+  }
+
+  function setStatusForRal(ral, val){
+    statusByRal.set(ral, (val === "FECHADA") ? "FECHADA" : "ABERTA");
+    persistStatusMap();
+  }
+
 
   const fDesignacao = el("fDesignacao");
   const fCF = el("fCF");
@@ -398,6 +519,7 @@
   const outBox = el("outBox");
   const outTxt = el("outTxt");
 let items = load();
+  loadStatusMap();
   let selectedRangeKey = ""; // filtro do gráfico (faixa)
   initTheme();
 
@@ -472,6 +594,11 @@ let items = load();
       .replaceAll(">", "&gt;")
       .replaceAll('"', "&quot;")
       .replaceAll("'", "&#039;");
+  }
+
+  // RAL "compacta" para planilha (93056/2026)
+  function ralNumeric(ral){
+    return (ral ?? "").toString().trim().replace(/^RAL\s*-\s*/i, "");
   }
 
   function parseAbertura(line) {
@@ -551,6 +678,9 @@ let items = load();
 
     for (const line of lines) {
       if (/^E\s*-\s*C$/i.test(line)) continue;
+
+      // Descarta qualquer RAL de QUALIDADE (regra de negócio)
+      if (/\bQUALIDADE\b/i.test(line)) { errors.push({ line, reason: "Descartada (QUALIDADE)" }); continue; }
 
       const ralFound = findRAL(line);
       if (!ralFound) { errors.push({ line, reason: "Sem RAL" }); continue; }
@@ -667,64 +797,118 @@ let items = load();
     rangeColeta.textContent = `${fmtBR(dts[0])} → ${fmtBR(dts[dts.length-1])}`;
   }
 
-  // TXT NA TELA (hierarquia: IDADE | RAL | CF)
-  function buildTxtAligned() {
-  const filtered = applyFilters(items);
+  // ====== Regras de negócio (CF -> Pirâmide / UF / Responsável) ======
+  function cfNorm(cf){
+    return normalizeCFPath(cf).toUpperCase();
+  }
 
-  const rows = filtered.map(x => {
-    const dt = new Date(x.aberturaISO);
+  function endsWithCBS(cfN){ return cfN.endsWith("/CBS") || cfN.includes("/CBS"); }
+
+  function piramideFromCF(cf){
+    const c = cfNorm(cf);
+
+    // 0) Móvel Agregação (CF final CLA/IP)
+    if (/\/CLA\/IP\/?$/.test(c)) return "MOVEL AGREGAÇÃO";
+
+// Regras específicas solicitadas (prioridade alta)
+if (c.includes("OM/BSA/SGS/DTC/BS")) return "REDE EXTERNA";
+if (c.includes("OM/GNA/QZ/DTC/BS"))  return "REDE EXTERNA";
+
+
+    // 1) Assistência Técnica
+    if (c.startsWith("PR/")) return "ASSISTÊNCIA TÉCNICA";
+
+    // 2) Swap
+    if (c.includes("/SW")) return "SWAP";
+
+    // 3) Infraestrutura
+    if (c.includes("/EN") || c.includes("/AC") || c.includes("/INF")) return "INFRAESTRUTURA";
+
+    // 4) Rede interna
+    if (c.startsWith("TT/")) return "REDE INTERNA";
+    if (c.includes("BKB/TX") || c.includes("BKB/CD") || c.includes("BKB/MT") || c.includes("RED/MT") || c.endsWith("RED") || c.endsWith("/RED") || c.endsWith("/RED/")) return "REDE INTERNA";
+
+    // 5) Rede externa
+    if (c.includes("CO/NET/FO") || c.includes("CBS")) return "REDE EXTERNA";
+
+    return "N/D";
+  }
+
+  function ufFromCF(cf){
+    const c = cfNorm(cf);
+
+    // Ordem conforme solicitado (primeiro que bater, levou)
+    if (c.includes("CPE") || c.includes("DOS") || c.includes("TLS")) return "MS";
+    if (c.includes("BSA")) return "DF";
+    if (c.includes("PMJ") || c.includes("GUR") || c.includes("ARN")) return "TO";
+    if (c.includes("CBA") || c.includes("ROI") || c.includes("SNO") || c.includes("BAG") || c.includes("CCS")) return "MT";
+    if (c.includes("GNA") || c.includes("ANS") || c.includes("RVD") || c.includes("JTI")) return "GO";
+    if (c.includes("PVO") || c.includes("JIP")) return "RO";
+    if (c.includes("RBO")) return "AC";
+    return "";
+  }
+
+  function responsavelFromCF(cf){
+    const c = cfNorm(cf);
+    const isCBS = endsWithCBS(c);
+
+// Regras específicas solicitadas (prioridade máxima)
+if (c.includes("AT/CBA/MC/CLA/IP")) return "Albino Júnior";
+if (/\/SW$/.test(c)) return "Fábio Torres / Francisco Manuel";
+if (c.includes("OM/BSA/SGS/DTC/BS")) return "Dennys Rezende";
+if (c.includes("OM/GNA/QZ/DTC/BS"))  return "Márcio Dias";
+
+    // Mais específicos primeiro
+    if (c.includes("AT/GNA/RD/CLA/IP")) return "Ulysses Antônio";
+    if (c.includes("BSA/CO/NET/FO")) return "Mario da Costa";
+
+    if (c.includes("CPE/CO/NET/FO") || c.includes("DOS/CO/NET/FO") || c.includes("TLS/CO/NET/FO")) return "Romildo Longuinho";
+
+    if (c.includes("CBA/CO/NET/FO") || c.includes("BAG/CO/NET/FO") || c.includes("CCS/CO/NET/FO") || c.includes("ROI/CO/NET/FO") || c.includes("SNO/CO/NET/FO")) return "Gilson Nogueira";
+
+    if (c.includes("GNA/CO/NET/FO") || c.includes("ANS/CO/NET/FO") || c.includes("RVD/CO/NET/FO") || c.includes("JTI/CO/NET/FO")) return "Wendell Felippe";
+
+    if (c.includes("PMJ/CO/NET/FO") || c.includes("ARN/CO/NET/FO") || c.includes("GUR/CO/NET/FO")) return "Alessandro Marques";
+
+    if (c.includes("RBO/CO/NET/FO") || c.includes("PVO/CO/NET/FO") || c.includes("JIP/CO/NET/FO")) return "Joacyr Alencar";
+
+    // Regras com exceção CBS
+    if (!isCBS && (c.includes("OM/CPE") || c.includes("PR/CPE") || c.includes("OM/DOS") || c.includes("PR/DOS") || c.includes("OM/TLS") || c.includes("PR/TLS"))) return "Edmar Castro";
+
+    if (!isCBS && (c.startsWith("OM/BSA/") || c.startsWith("PR/BSA"))) return "Edgar Filho";
+
+    if (!isCBS && (c.startsWith("OM/CBA") || c.startsWith("OM/BAG") || c.startsWith("OM/CCS") || c.startsWith("OM/ROI") || c.startsWith("OM/SNO") ||
+                   c.startsWith("TT/CBA") || c.startsWith("TT/BAG") || c.startsWith("TT/CCS") || c.startsWith("TT/ROI") || c.startsWith("TT/SNO"))) return "Danielson Jose";
+
+    if (!isCBS && (c.includes("OM/GNA") || c.includes("OM/ANS") || c.includes("OM/RVD") || c.includes("OM/JTI") ||
+                   c.includes("TT/GNA") || c.includes("TT/ANS") || c.includes("TT/RVD") || c.includes("TT/JTI"))) return "Márcio Humberto/Edgar";
+
+    if (c.includes("OM/PMJ") || c.includes("IM/PMJ") || c.includes("OM/ARN") || c.includes("OM/GUR") || c.includes("TT/PMJ") || c.includes("TT/ARN") || c.includes("TT/GUR")) return "Ajax Barbosa";
+
+    if (!isCBS && (c.includes("OM/RBO") || c.includes("TT/RBO") || c.includes("OM/PVO") || c.includes("TT/PVO") || c.includes("JIP/PVO"))) return "Adriano Campigotto";
+
+    if (c.includes("/EN") || c.includes("/AC") || c.includes("/INF")) return "Angelo Fraianeli";
+
+    return "";
+  }
+
+  function prazoDefault(){
+    // Não veio no dump. Mantive padrão (ajusta se você tiver a regra real).
+    return "24h";
+  }
+
+  function statusDefault(){
+    // Não veio no dump. Padrão “ABERTA”.
+    return "ABERTA";
+  }
+
+  function faixaIdadeLabelFromISO(iso){
+    const dt = new Date(iso);
     const a = ageHuman(dt);
-    const key = rangeKeyForHours(a.totalHours);
-    const meta = rangeMeta(key);
-    return { x, a, key, meta, ageMs: ageMs(dt) };
-  });
-
-  rows.sort((p,q) => {
-    const byRange = rangeOrderIndex(p.key) - rangeOrderIndex(q.key);
-    if (byRange !== 0) return byRange;
-    return q.ageMs - p.ageMs;
-  });
-
-  // Alinhamento visual (spaces) para ficar bonito na tela.
-  // Para Excel/Sheets use a "Tabela (TSV)".
-  const ageW = Math.max(5, ...rows.map(r => r.meta.label.length));
-  const ralW = Math.max(3, ...rows.map(r => (r.x.ral||"").length));
-  const cfW  = Math.max(2, ...rows.map(r => (r.x.cf||"").length));
-
-  const pad = (s,w) => (s ?? "").toString().padEnd(w, " ");
-
-  const lines = [];
-  lines.push(pad("IDADE", ageW) + "  " + pad("RAL", ralW) + "  " + pad("CF", cfW));
-  for (const r of rows) {
-    lines.push(
-      pad(r.meta.label, ageW) + "  " +
-      pad(r.x.ral, ralW) + "  " +
-      pad(r.x.cf, cfW)
-    );
-  }
-  return lines.join("\n");
-}
-
-  function showTxt(){
-    const filtered = applyFilters(items);
-    if (!filtered.length) {
-      alert("Nada para gerar (não há RALs visíveis com os filtros atuais).");
-      return;
-    }
-    outTxt.value = buildTxtAligned();
-    outBox.style.display = "block";
-    // garante que o usuário veja o resultado
-    outTxt.scrollTop = 0;
+    return rangeMeta(rangeKeyForHours(a.totalHours)).label;
   }
 
-
-  function csvEscape(value) {
-    const s = (value ?? "").toString();
-    if (/[",\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
-    return s;
-  }
-
-  function exportCsv() {
+  function buildDerivedRows(){
     const filtered = applyFilters(items);
 
     const rows = filtered.map(x => {
@@ -732,7 +916,17 @@ let items = load();
       const a = ageHuman(dt);
       const key = rangeKeyForHours(a.totalHours);
       const meta = rangeMeta(key);
-      return { x, a, key, meta, ageMs: ageMs(dt) };
+      return {
+        x,
+        key,
+        meta,
+        ageMs: ageMs(dt),
+        faixa: meta.label,
+        piramide: piramideFromCF(x.cf),
+        uf: ufFromCF(x.cf),
+        responsavel: responsavelFromCF(x.cf),
+        status: getStatusForRal(x.ral),
+      };
     });
 
     rows.sort((p,q) => {
@@ -741,14 +935,177 @@ let items = load();
       return q.ageMs - p.ageMs;
     });
 
+    return rows;
+  }
+
+  // ====== TXT (alinhado) NA TELA (7 colunas, sem PRAZO) ======
+  function buildTxtAligned(){
+    const rows = buildDerivedRows();
+
+    const head = ["RAL","PIRÂMIDE","UF","CF","FAIXA DE IDADE","RESPONSÁVEL","STATUS"];
+    const cols = [];
+    cols.push(head);
+    for (const r of rows){
+      cols.push([
+        r.x.ral,
+        r.piramide,
+        r.uf,
+        r.x.cf,
+        r.faixa,
+        r.responsavel,
+        r.status
+      ]);
+    }
+
+    // calcula larguras (monoespaçado) para alinhar cabeçalho com os valores
+    const widths = head.map((_,i)=>0);
+    for (const row of cols){
+      row.forEach((v,i)=>{
+        const s = (v ?? "").toString();
+        widths[i] = Math.max(widths[i], s.length);
+      });
+    }
+
+    const pad = (s,n) => (s ?? "").toString().padEnd(n, " ");
+    const lines = cols.map(row => row.map((v,i)=>pad(v,widths[i])).join("  "));
+    return lines.join("\n");
+  }
+
+
+  function showOutTxt(){
+    const rows = buildDerivedRows();
+    if (!rows.length) { alert("Nada para gerar (não há RALs visíveis com os filtros atuais)."); return; }
+
+    el("outTitle").textContent = "TXT (alinhado) gerado";
+    el("outHint").textContent = "Texto alinhado em colunas (monoespaçado). Se quiser colunas no Excel, use Gerar CSV ou Baixar XLS.";
+    outTxt.style.display = "block";
+    el("outTableWrap").style.display = "none";
+
+    outTxt.value = buildTxtAligned();
+    outBox.style.display = "block";
+    outTxt.scrollTop = 0;
+  }
+
+  // ====== “Excel na tela” ======
+
+  function applySlaHighlight(tr, ageKey, status){
+    tr.classList.remove("sla24","sla48","sla72");
+    if (status !== "ABERTA") return;
+    if (ageKey === "24_48") tr.classList.add("sla24");
+    else if (ageKey === "48_72") tr.classList.add("sla48");
+    else if (ageKey === "ACIMA_72") tr.classList.add("sla72");
+  }
+
+  function showOutExcel(){
+    const rows = buildDerivedRows();
+    if (!rows.length) { alert("Nada para gerar (não há RALs visíveis com os filtros atuais)."); return; }
+
+    el("outTitle").textContent = "Planilha (visual)";
+    el("outHint").textContent = "Dica: se quiser abrir no Excel mesmo, use o botão Baixar XLS (abre direto).";
+
+    outTxt.style.display = "none";
+    el("outTableWrap").style.display = "block";
+
+    const outTbody = el("outTbody");
+    outTbody.innerHTML = "";
+    for (const r of rows){
+      const tr = document.createElement("tr");
+      tr.setAttribute("data-ral", r.x.ral);
+      tr.setAttribute("data-agekey", r.key);
+      applySlaHighlight(tr, r.key, r.status);
+      tr.innerHTML = `
+        <td class="mono">${escapeHtml(ralNumeric(r.x.ral))}</td>
+        <td>${escapeHtml(r.piramide)}</td>
+        <td class="mono ufCol">${escapeHtml(r.uf)}</td>
+        <td class="mono cfCol">${escapeHtml(r.x.cf)}</td>
+        <td>${escapeHtml(r.faixa)}</td>
+        <td>${escapeHtml(r.responsavel)}</td>
+        <td>
+          <select class="statusSel" data-ral="${escapeHtml(r.x.ral)}">
+            <option value="ABERTA"${r.status==="ABERTA"?" selected":""}>ABERTA</option>
+            <option value="FECHADA"${r.status==="FECHADA"?" selected":""}>FECHADA</option>
+            <option value="NORMALIZADA"${r.status==="NORMALIZADA"?" selected":""}>NORMALIZADA</option>
+          </select>
+        </td>
+      `;
+      outTbody.appendChild(tr);
+    }
+
+    // Status: dropdown na célula (reflete nas exportações)
+    outTbody.querySelectorAll(".statusSel").forEach(sel => {
+      sel.addEventListener("change", (e) => {
+        const ral = sel.getAttribute("data-ral");
+        setStatusForRal(ral, sel.value);
+        const tr = sel.closest("tr");
+        const ageKey = tr ? tr.getAttribute("data-agekey") : "";
+        if (tr) applySlaHighlight(tr, ageKey, sel.value);
+        render();
+      });
+    });
+    outBox.style.display = "block";
+  }
+
+  function buildExcelHtmlTable(){
+    // Excel abre HTML como planilha, sem drama.
+    const rows = buildDerivedRows();
+    const head = ["RAL","PIRÂMIDE","UF","CF","FAIXA DE IDADE","RESPONSÁVEL","STATUS"];
+    const escape = (s)=> (s??"").toString()
+      .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");
+
+    let h = '<html><head><meta charset="utf-8"><style>table{border-collapse:collapse;font-family:Calibri,Arial,sans-serif;font-size:10pt;}th,td{padding:6px 8px;vertical-align:top;}td{white-space:normal;word-break:break-word;}</style></head><body>';
+    h += '<table border="1"><thead><tr>' + head.map(c=>`<th>${escape(c)}</th>`).join("") + '</tr></thead><tbody>';
+    for (const r of rows){
+      const cols = [ralNumeric(r.x.ral),r.piramide,r.uf,r.x.cf,r.faixa,r.responsavel,getStatusForRal(r.x.ral)];
+      h += "<tr>" + cols.map(v=>`<td>${escape(v)}</td>`).join("") + "</tr>";
+    }
+    h += '</tbody></table></body></html>';
+    return h;
+  }
+
+  function downloadXls(){
+    const rows = buildDerivedRows();
+    if (!rows.length) { alert("Nada para baixar."); return; }
+    const htmlTable = buildExcelHtmlTable();
+    downloadFile(htmlTable, "application/vnd.ms-excel;charset=utf-8", stampName("rals_planilha", "xls"));
+  }
+
+  function copyOut(){
+    const isTxt = outTxt.style.display !== "none";
+    if (isTxt){
+      navigator.clipboard.writeText(outTxt.value || "")
+        .then(()=>alert("Copiado."))
+        .catch(()=>alert("Não consegui acessar a área de transferência. Copie manualmente."));
+    }else{
+      // copia TSV (mais útil)
+      const tsv = buildTsv8();
+      navigator.clipboard.writeText(tsv)
+        .then(()=>alert("Copiado (TSV)."))
+        .catch(()=>alert("Não consegui acessar a área de transferência. Copie manualmente."));
+    }
+  }
+
+  // ====== CSV (download) agora com 8 colunas também ======
+  function csvEscape(value) {
+    const s = (value ?? "").toString();
+    if (/[",\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+    return s;
+  }
+
+  function exportCsv() {
+    const rows = buildDerivedRows();
+    if (!rows.length) { alert("Nada para exportar."); return; }
+
     const lines = [];
-    lines.push("IDADE,RAL,DESIGNACAO,CF");
+    lines.push("RAL,PIRÂMIDE,UF,CF,FAIXA DE IDADE,RESPONSÁVEL,STATUS");
     for (const r of rows) {
       lines.push([
-        csvEscape(r.meta.label),
         csvEscape(r.x.ral),
-        csvEscape(r.x.designacao),
+        csvEscape(r.piramide),
+        csvEscape(r.uf),
         csvEscape(r.x.cf),
+        csvEscape(r.faixa),
+        csvEscape(r.responsavel),
+        csvEscape(getStatusForRal(r.x.ral)),
       ].join(","));
     }
     downloadFile(lines.join("\n"), "text/csv;charset=utf-8", stampName("rals", "csv"));
@@ -824,6 +1181,23 @@ let items = load();
     const filtered = applyFilters(items);
     countFiltered.textContent = String(filtered.length);
 
+    // Contadores (apenas ABERTAS >= 24h) - padrão corporativo, sem poluição visual
+    let o24 = 0, o48 = 0, o72 = 0;
+    for (const x of filtered){
+      const st = getStatusForRal(x.ral);
+      if (st !== "ABERTA") continue;
+      const dt = new Date(x.aberturaISO);
+      const a = ageHuman(dt);
+      if (a.totalHours <= 24) continue;
+      const k = rangeKeyForHours(a.totalHours);
+      if (k === "ACIMA_72") o72++;
+      else if (k === "48_72") o48++;
+      else if (k === "24_48") o24++;
+    }
+    open24El.textContent = String(o24 + o48 + o72);
+    open48El.textContent = String(o48);
+    open72El.textContent = String(o72);
+
     rangeSel.textContent = selectedRangeKey ? rangeMeta(selectedRangeKey).label : "todas";
 
     // Chart deve ignorar o filtro de faixa (senão ele vira "espelho" do próprio clique)
@@ -875,7 +1249,7 @@ let items = load();
           </span>
           <div class="ageSub mono">${escapeHtml(formatAgeShort(r.a))}</div>
         </td>
-        <td class="mono">${escapeHtml(r.x.ral)}</td>
+        <td class="mono">${escapeHtml(ralNumeric(r.x.ral))}</td>
         <td>${escapeHtml(r.x.designacao)}</td>
         <td class="mono">${escapeHtml(r.x.cf)}</td>
         <td><button class="danger small" data-del="${r.x.id}">Remover</button></td>
@@ -930,21 +1304,24 @@ let items = load();
     alert(msg.join("\n"));
   });
 
-  el("btnTxt").addEventListener("click", showTxt);
+  el("btnTxt").addEventListener("click", showOutTxt);
+  el("btnXls").addEventListener("click", showOutExcel);
   el("btnCsv").addEventListener("click", exportCsv);
-  el("btnCopyTxt").addEventListener("click", async () => {
-    try{
-      await navigator.clipboard.writeText(outTxt.value || "");
-      alert("TXT copiado.");
-    }catch{
-      alert("Não consegui acessar a área de transferência. Selecione e copie manualmente.");
-    }
-  });
 
-  el("btnCloseTxt").addEventListener("click", () => {
-    outBox.style.display = "none";
-  });
+  el("btnCopyOut").addEventListener("click", copyOut);
+  el("btnDownloadXls").addEventListener("click", downloadXls);
+  el("btnCloseOut").addEventListener("click", () => { outBox.style.display = "none"; });
+
   el("btnClear").addEventListener("click", clearAll);
+
+  el("btnResetStatus").addEventListener("click", () => {
+    const ok = confirm("Isso vai apagar todos os STATUS salvos (localStorage) e voltar tudo para ABERTA. Confirma?");
+    if(!ok) return;
+    try{ localStorage.removeItem(LS_STATUS_KEY); }catch(e){}
+    statusByRal.clear();
+    // Atualiza UI atual (se houver tabela aberta)
+    document.querySelectorAll(".statusSel").forEach(sel => { sel.value = "ABERTA"; });
+  });
 
   el("btnResetFilters").addEventListener("click", () => {
     fDesignacao.value = "";
@@ -962,6 +1339,7 @@ let items = load();
 
   render();
 })();
+
 </script>
 </body>
 </html>
