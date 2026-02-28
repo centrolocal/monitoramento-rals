@@ -7,13 +7,13 @@
   <style>
     :root{
       /* ====== Dark (default) ====== */
-      --bg:#0f1221;
-      --text:#e9edf5;
-      --muted:#9aa3b2;
-      --line: rgba(255,255,255,.10);
-      --card1: rgba(255,255,255,.03);
-      --card2: rgba(255,255,255,.02);
-      --shadow: rgba(0,0,0,.25);
+      --bg:#0b0b0b;
+      --text:#e5e7eb;
+      --muted:#9ca3af;
+      --line:#2a2a2a;
+      --card1:#141414;
+      --card2:#101010;
+      --shadow: rgba(0,0,0,.60);
       --accent: rgba(122,162,255,.35);
 
       /* Manchester palette */
@@ -65,8 +65,8 @@
       margin:0; padding:18px;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial;
       background:
-        radial-gradient(1200px 700px at 10% 10%, rgba(122,162,255,.18), transparent 60%),
-        radial-gradient(1200px 700px at 90% 20%, rgba(67,160,71,.12), transparent 60%),
+        radial-gradient(1200px 700px at 10% 10%, rgba(255,255,255,.04), transparent 60%),
+        radial-gradient(1200px 700px at 90% 20%, rgba(255,255,255,.03), transparent 60%),
         var(--bg);
       color:var(--text);
     }
@@ -77,7 +77,7 @@
         var(--bg);
     }
 
-    .wrap{ max-width:1280px; margin:0 auto; }
+    .wrap{ max-width:1500px; margin:0 auto; }
     header{ display:flex; flex-wrap:wrap; gap:14px; justify-content:space-between; align-items:flex-start; margin-bottom:14px; }
     h1{ margin:0; font-size:20px; }
     .sub{ margin-top:6px; color:var(--muted); font-size:13px; line-height:1.35; }
@@ -101,8 +101,19 @@
       box-shadow: 0 10px 30px var(--shadow);
     }
 
-    .grid{ display:grid; grid-template-columns: 1.2fr .8fr; gap:14px; }
-    @media (max-width: 980px){ .grid{ grid-template-columns: 1fr; } }
+    .grid{ display:grid; grid-template-columns: 1fr; gap:14px; align-items:start; }
+    
+    /* ====== RAW + CHART SPLIT ====== */
+    .rawSplit{
+      display:grid;
+      grid-template-columns: minmax(0, 1fr) 420px;
+      gap:14px;
+      align-items:start;
+    }
+    @media (max-width: 980px){
+      .rawSplit{ grid-template-columns: 1fr; }
+    }
+@media (max-width: 980px){ .grid{ grid-template-columns: 1fr; } }
 
     label{ display:block; font-size:12px; color:var(--muted); margin-bottom:6px; }
     textarea, input{
@@ -153,18 +164,18 @@
       width:100%;
       border-collapse: separate;
       border-spacing: 0;
-      min-width: 980px;
-      table-layout: fixed;
+      min-width: 0;
+      table-layout: auto;
     }
-    colgroup col.col-age { width: 210px; }
-    colgroup col.col-ral { width: 190px; }
-    colgroup col.col-des { width: 420px; }
-    colgroup col.col-cf  { width: auto; }
-    colgroup col.col-act { width: 130px; }
+    colgroup col.col-age { width: 18%; }
+    colgroup col.col-ral { width: 16%; }
+    colgroup col.col-des { width: 34%; }
+    colgroup col.col-cf  { width: 20%; }
+    colgroup col.col-act { width: 12%; }
 
     th, td{
       border-bottom: 1px solid var(--line);
-      padding: 14px 16px;
+      padding: 10px 12px;
       font-size: 13px;
       vertical-align: middle;
     }
@@ -216,12 +227,12 @@
 
     /* ====== CHART ====== */
     .chart{
-      display:flex; flex-direction:column; gap:10px;
+      display:flex; flex-direction:column; gap:6px;
     }
     .barRow{
       display:grid;
-      grid-template-columns: 220px 1fr 60px;
-      gap:10px;
+      grid-template-columns: 160px 1fr 40px;
+      gap:6px;
       align-items:center;
     }
     @media (max-width: 620px){
@@ -242,7 +253,7 @@
 
     .barLabel{ display:flex; align-items:center; gap:10px; font-weight:900; font-size:12px; color: var(--text); }
     .barTrack{
-      height:12px;
+      height:8px;
       border-radius:999px;
       background: rgba(255,255,255,.06);
       overflow:hidden;
@@ -288,7 +299,7 @@
     #outTable{
       table-layout: fixed;
       width: 100%;
-      min-width: 860px;
+      min-width: 0;
     }
     #outTable th, #outTable td{
       padding: 8px 10px;
@@ -311,10 +322,101 @@
   #outTable td { overflow-wrap: anywhere; word-break: break-word; }
   select.statusSel { font-size: 12px; padding: 4px 6px; }
 
-  /* Destaque corporativo: ABERTAS acima de 24h (barra lateral + fundo suave) */
+  
+
+  /* PRAZO/STATUS: evitar sobreposição em telas menores */
+  #outTable td input.prazoInput, #outTable td select.statusSel{
+    width: 100%;
+    min-width: 110px;
+  }
+  #outTable td{ overflow: hidden; }
+  #outTable td.prazoCell{ overflow: visible; }
+/* Destaque corporativo: ABERTAS acima de 24h (barra lateral + fundo suave) */
   #outTable tr.sla24{ box-shadow: inset 4px 0 0 var(--m-red); }
   #outTable tr.sla48{ box-shadow: inset 4px 0 0 var(--m-red); }
   #outTable tr.sla72{ box-shadow: inset 4px 0 0 var(--m-black); }
+
+
+
+
+/* ====== PRAZO (data) ====== */
+/* Objetivo: caber sem esconder o botão do calendário (mesmo com coluna estreita) */
+.prazoWrap{ display:flex; align-items:center; min-width: 120px; width:100%; }
+.prazoField{ position:relative; flex:1; min-width: 110px; }
+
+/* O botão é o "visual" da célula */
+.prazoBtn{
+  width:100%;
+  min-height:30px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  border:1px solid var(--btn-border);
+  background: var(--btn-bg2);
+  color: var(--text);
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:900;
+  padding:6px 8px;
+  font-size:12px;
+  line-height:1.2;  position:relative;
+  z-index:2;
+  pointer-events:auto;
+}
+
+.prazoBtn:hover{ border-color: rgba(255,255,255,.22); }
+body[data-theme="light"] .prazoBtn:hover{ border-color: rgba(13,19,33,.22); }
+
+/* O input fica por cima (transparente) para abrir o calendário nativo ao clicar */
+.prazoField input[type="date"]{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  opacity:0;
+  cursor:pointer;
+  z-index:1;
+  pointer-events:none;
+}
+
+/* Texto do botão */
+.prazoBtnText{ font-weight:800; opacity:.95; }
+.prazoBtnEmpty{ opacity:.70; font-weight:800; }
+
+
+@media (max-width: 1100px){ }
+.rawRight{ border:1px solid var(--line); border-radius:14px; padding:12px; background: rgba(255,255,255,.02); }
+body[data-theme="light"] .rawRight{ background: rgba(13,19,33,.02); }
+.chart.compact{ gap:6px; }
+.chart.compact .barRow{ grid-template-columns: 160px 1fr 40px; gap:6px; }
+.chart.compact .barTrack{ height:8px; }
+
+
+/* ====== Painel de controle compacto (1 linha) ====== */
+.controlBar{ padding:12px 14px; margin-top:12px; }
+
+.controlBarInner{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+.controlTitle{ font-weight:900; letter-spacing:.2px; }
+.controlBarInner input{
+  flex: 1 1 220px;
+  min-width: 180px;
+  height: 38px;
+}
+.controlActions{
+  margin-left:auto;
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+.controlActions button{
+  padding:8px 10px;
+  font-size:12px;
+}
 
 
 </style>
@@ -333,18 +435,15 @@
     <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
       <button class="ghost" id="btnTheme" title="Alternar tema">🌓 Modo</button>
       <span class="pill">📌 Registros: <strong id="count">0</strong></span>
-      <span class="pill">🔎 Visíveis: <strong id="countFiltered">0</strong></span>
-      <span class="pill">⏱️ ABERTAS ≥24h: <strong id="open24">0</strong></span>
-      <span class="pill">🟠 48–72h: <strong id="open48">0</strong></span>
-      <span class="pill">🔴 >72h: <strong id="open72">0</strong></span>
       <span class="pill">🗓️ Coleta: <strong id="rangeColeta" class="mono">-</strong></span>
-      <span class="pill">🎯 Faixa: <strong id="rangeSel">todas</strong></span>
     </div>
   </header>
 
   <div class="grid">
     <div class="card">
       <h2 style="margin:0 0 10px 0; font-size:14px; color: var(--muted); font-weight:900;">Dados brutos</h2>
+      <div class="rawSplit">
+      <div class="rawLeft">
       <label for="raw">Cole o bloco aqui</label>
       <textarea id="raw" placeholder=""></textarea>
 
@@ -380,7 +479,9 @@
                 <th class="ufCol">UF</th>
                 <th class="cfCol">CF</th>
                 <th>FAIXA DE IDADE</th>
-                <th>RESPONSÁVEL</th>                <th>STATUS</th>
+                <th>RESPONSÁVEL</th>
+                <th>PRAZO</th>
+                <th>STATUS</th>
               </tr>
             </thead>
             <tbody id="outTbody"></tbody>
@@ -389,48 +490,35 @@
 
         <div class="hint" id="outHint">Dica: o TXT é TSV (tabulado). Cola no Excel/Sheets que vira coluna na hora.</div>
     </div>
+      </div><!-- /rawLeft -->
+      <div class="rawRight">
+        <h2 style="margin:0 0 10px 0; font-size:14px; color: var(--muted); font-weight:900;">Gráfico: RALs por idade</h2>
+        <div class="hint" style="margin-top:-6px; margin-bottom:10px;">Clique em uma barra para filtrar. Clique de novo para soltar.</div>
+        <div class="chart compact" id="chart"></div>
+      </div><!-- /rawRight -->
+      </div><!-- /rawSplit -->
+
 
     </div>
-    </div>
+  </div>
 
-    <div class="card">
-      <h2 style="margin:0 0 10px 0; font-size:14px; color: var(--muted); font-weight:900;">Painel de controle</h2>
+  <div class="card controlBar">
+    <div class="controlBarInner">
+      <div class="controlTitle muted">Filtros</div>
 
-      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-        <div>
-          <label for="fDesignacao">Designação</label>
-          <input id="fDesignacao" />
-        </div>
-        <div>
-          <label for="fCF">CF</label>
-          <input id="fCF" />
-        </div>
-      </div>
-      <div style="margin-top:10px;">
-        <label for="fRAL">RAL</label>
-        <input id="fRAL" class="mono" />
-      </div>
+      <input id="fDesignacao" placeholder="Designação" aria-label="Designação" />
+      <input id="fCF" placeholder="CF" aria-label="CF" />
+      <input id="fRAL" class="mono" placeholder="RAL" aria-label="RAL" />
 
-      <div class="actions">
+      <div class="controlActions">
         <button id="btnResetFilters">Limpar filtros</button>
         <button id="btnClearRange" class="ghost" title="Remove o filtro de faixa do gráfico">Limpar faixa</button>
       </div>
-
-      <div class="hint">
-        Ordenação: <b>faixa mais crítica primeiro</b>, depois <b>mais velha primeiro</b>.
-      </div>
-
-      <hr style="border:0; border-top:1px solid var(--line); margin:12px 0;" />
-
-      <h2 style="margin:0 0 10px 0; font-size:14px; color: var(--muted); font-weight:900;">Gráfico: RALs por idade</h2>
-      <div class="hint" style="margin-top:-6px; margin-bottom:10px;">
-        Clique em uma barra para filtrar. Clique de novo para soltar.
-      </div>
-      <div class="chart" id="chart"></div>
     </div>
   </div>
 
   <div class="card" style="margin-top:14px;">
+
     <h2 style="margin:0 0 10px 0; font-size:14px; color: var(--muted); font-weight:900;">Planilha</h2>
 
     <div class="tablewrap">
@@ -466,12 +554,7 @@
 
   const raw = el("raw");
   const count = el("count");
-  const countFiltered = el("countFiltered");
-  const open24El = el("open24");
-  const open48El = el("open48");
-  const open72El = el("open72");
   const rangeColeta = el("rangeColeta");
-  const rangeSel = el("rangeSel");
 
   // Status editável (usado na planilha visual e refletido nas exportações)
   const statusByRal = new Map(); // key: "RAL-12345/2026" -> "ABERTA"|"FECHADA"|"NORMALIZADA"
@@ -485,7 +568,7 @@
       if(obj && typeof obj === "object"){
         Object.entries(obj).forEach(([k,v])=>{
           if(typeof k === "string"){
-            statusByRal.set(k, (v === "FECHADA") ? "FECHADA" : "ABERTA");
+            statusByRal.set(k, (v === "FECHADA" || v === "NORMALIZADA") ? v : "ABERTA");
           }
         });
       }
@@ -504,12 +587,59 @@
   }
 
   function setStatusForRal(ral, val){
-    statusByRal.set(ral, (val === "FECHADA") ? "FECHADA" : "ABERTA");
+    statusByRal.set(ral, (val === "FECHADA" || val === "NORMALIZADA") ? val : "ABERTA");
     persistStatusMap();
   }
 
 
-  const fDesignacao = el("fDesignacao");
+  
+
+// ====== PRAZO (data prevista de normalização) ======
+const prazoByRal = new Map(); // key: "RAL-123/2026" -> "YYYY-MM-DD"
+const LS_PRAZO_KEY = "monral_prazo_v1";
+
+function loadPrazoMap(){
+  try{
+    const raw = localStorage.getItem(LS_PRAZO_KEY);
+    if(!raw) return;
+    const obj = JSON.parse(raw);
+    if(obj && typeof obj === "object"){
+      Object.entries(obj).forEach(([k,v])=>{
+        if(typeof k === "string" && typeof v === "string"){
+          prazoByRal.set(k, v);
+        }
+      });
+    }
+  }catch(_e){}
+}
+
+function persistPrazoMap(){
+  try{
+    const obj = Object.fromEntries(prazoByRal.entries());
+    localStorage.setItem(LS_PRAZO_KEY, JSON.stringify(obj));
+  }catch(_e){}
+}
+
+function getPrazoForRal(ral){
+  return prazoByRal.get(ral) || "";
+}
+
+function setPrazoForRal(ral, val){
+  if(!ral) return;
+  if(!val){
+    prazoByRal.delete(ral);
+  }else{
+    prazoByRal.set(ral, val);
+  }
+  persistPrazoMap();
+}
+
+function clearPrazoAll(){
+  try{ localStorage.removeItem(LS_PRAZO_KEY); }catch(_e){}
+  prazoByRal.clear();
+}
+
+const fDesignacao = el("fDesignacao");
   const fCF = el("fCF");
   const fRAL = el("fRAL");
 
@@ -520,6 +650,7 @@
   const outTxt = el("outTxt");
 let items = load();
   loadStatusMap();
+  loadPrazoMap();
   let selectedRangeKey = ""; // filtro do gráfico (faixa)
   initTheme();
 
@@ -750,6 +881,10 @@ let items = load();
   function clearAll() {
     if (!confirm("Apagar TUDO?")) return;
 
+
+    // PRAZO (módulo): limpa todas as datas salvas (inclusive relatórios antigos)
+    clearPrazoAll();
+
     // limpa entrada (dados brutos)
     el("raw").value = "";
 
@@ -789,6 +924,14 @@ let items = load();
   function fmtBR(dt){
     const pad = (n) => String(n).padStart(2,"0");
     return `${pad(dt.getDate())}/${pad(dt.getMonth()+1)}/${dt.getFullYear()} - ${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
+  }
+
+  // PRAZO em PT-BR (exibição): 2026-02-28 -> 28/02/2026
+  function fmtPrazoBR(isoDate){
+    const s = (isoDate || "").toString().trim();
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(s)) return "";
+    const [y,m,d] = s.split("-");
+    return `${d}/${m}/${y}`;
   }
 
   function updateColetaPill(list){
@@ -851,6 +994,14 @@ if (c.includes("OM/GNA/QZ/DTC/BS"))  return "REDE EXTERNA";
   function responsavelFromCF(cf){
     const c = cfNorm(cf);
     const isCBS = endsWithCBS(c);
+
+// Regras AT/*/XXX/CLA/IP (prioridade máxima)
+if (/AT\/CPE\/.+\/CLA\/IP/.test(c)) return "Edmar Almeida";
+if (/AT\/GNA\/.+\/CLA\/IP/.test(c)) return "Valdir Donizetti";
+if (/AT\/PVO\/.+\/CLA\/IP/.test(c)) return "Rodrigo Mozart";
+if (/AT\/PMJ\/.+\/CLA\/IP/.test(c)) return "Atanagildo José";
+if (/AT\/BSA\/.+\/CLA\/IP/.test(c)) return "Joaquim Ferreira";
+if (/AT\/RBO\/.+\/CLA\/IP/.test(c)) return "Rodrigo Mozart";
 
 // Regras específicas solicitadas (prioridade máxima)
 if (c.includes("AT/CBA/MC/CLA/IP")) return "Albino Júnior";
@@ -942,7 +1093,7 @@ if (c.includes("OM/GNA/QZ/DTC/BS"))  return "Márcio Dias";
   function buildTxtAligned(){
     const rows = buildDerivedRows();
 
-    const head = ["RAL","PIRÂMIDE","UF","CF","FAIXA DE IDADE","RESPONSÁVEL","STATUS"];
+    const head = ["RAL","PIRÂMIDE","UF","CF","FAIXA DE IDADE","RESPONSÁVEL","PRAZO","STATUS"];
     const cols = [];
     cols.push(head);
     for (const r of rows){
@@ -953,6 +1104,7 @@ if (c.includes("OM/GNA/QZ/DTC/BS"))  return "Márcio Dias";
         r.x.cf,
         r.faixa,
         r.responsavel,
+        getPrazoForRal(r.x.ral),
         r.status
       ]);
     }
@@ -984,6 +1136,7 @@ if (c.includes("OM/GNA/QZ/DTC/BS"))  return "Márcio Dias";
     outTxt.value = buildTxtAligned();
     outBox.style.display = "block";
     outTxt.scrollTop = 0;
+    try{ outBox.scrollIntoView({behavior:"smooth", block:"start"}); }catch(_e){}
   }
 
   // ====== “Excel na tela” ======
@@ -1020,8 +1173,19 @@ if (c.includes("OM/GNA/QZ/DTC/BS"))  return "Márcio Dias";
         <td class="mono cfCol">${escapeHtml(r.x.cf)}</td>
         <td>${escapeHtml(r.faixa)}</td>
         <td>${escapeHtml(r.responsavel)}</td>
+        <td class="prazoCell">
+          <div class="prazoWrap">
+            <div class="prazoField">
+              <input type="date" class="prazoInput" data-ral="${escapeHtml(r.x.ral)}" value="${escapeHtml(getPrazoForRal(r.x.ral))}">
+              <button type="button" class="prazoBtn" title="Selecionar data" aria-label="Selecionar data">
+                <span aria-hidden="true">📅</span>
+                <span class="prazoBtnText">${escapeHtml(fmtPrazoBR(getPrazoForRal(r.x.ral))) || ""}</span>
+              </button>
+            </div>
+          </div>
+        </td>
         <td>
-          <select class="statusSel" data-ral="${escapeHtml(r.x.ral)}">
+          <select class=\"statusSel\" data-ral="${escapeHtml(r.x.ral)}">
             <option value="ABERTA"${r.status==="ABERTA"?" selected":""}>ABERTA</option>
             <option value="FECHADA"${r.status==="FECHADA"?" selected":""}>FECHADA</option>
             <option value="NORMALIZADA"${r.status==="NORMALIZADA"?" selected":""}>NORMALIZADA</option>
@@ -1042,20 +1206,67 @@ if (c.includes("OM/GNA/QZ/DTC/BS"))  return "Márcio Dias";
         render();
       });
     });
-    outBox.style.display = "block";
+    
+
+// PRAZO: calendário (módulo isolado) — input[type=date] por cima de um botão 📅 (persistido em localStorage)
+(function bindPrazoControls(scope){
+  scope.querySelectorAll(".prazoField").forEach(field=>{
+    const inp = field.querySelector(".prazoInput");
+    const btn = field.querySelector(".prazoBtn");
+    const txtEl = field.querySelector(".prazoBtnText");
+    if(!inp || !btn) return;
+
+    const setBtnLabel = () => {
+      const label = fmtPrazoBR(inp.value || "");
+      if(txtEl){
+        txtEl.textContent = label || "";
+        if(!label){
+          txtEl.classList.add("prazoBtnEmpty");
+        }else{
+          txtEl.classList.remove("prazoBtnEmpty");
+        }
+      }
+    };
+
+    const openPicker = () => {
+      try{ if(typeof inp.showPicker === "function") inp.showPicker(); }catch(_e){}
+      inp.focus();
+      inp.click();
+    };
+
+    // Clique no botão ou na célula abre o calendário
+    btn.addEventListener("click", openPicker);
+    field.addEventListener("click", (e)=>{
+      // evita duplo-disparo quando clicar no próprio botão
+      if(e.target && (e.target.closest && e.target.closest(".prazoBtn"))) return;
+      openPicker();
+    });
+
+    inp.addEventListener("change", () => {
+      const ral = inp.getAttribute("data-ral");
+      setPrazoForRal(ral, inp.value || "");
+      setBtnLabel();
+    });
+
+    setBtnLabel();
+  });
+})(outTbody);
+
+outBox.style.display = "block";
+    try{ outBox.scrollIntoView({behavior:"smooth", block:"start"}); }catch(_e){}
   }
 
   function buildExcelHtmlTable(){
     // Excel abre HTML como planilha, sem drama.
     const rows = buildDerivedRows();
-    const head = ["RAL","PIRÂMIDE","UF","CF","FAIXA DE IDADE","RESPONSÁVEL","STATUS"];
+    const head = ["RAL","PIRÂMIDE","UF","CF","FAIXA DE IDADE","RESPONSÁVEL","PRAZO","STATUS"];
     const escape = (s)=> (s??"").toString()
       .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");
 
     let h = '<html><head><meta charset="utf-8"><style>table{border-collapse:collapse;font-family:Calibri,Arial,sans-serif;font-size:10pt;}th,td{padding:6px 8px;vertical-align:top;}td{white-space:normal;word-break:break-word;}</style></head><body>';
     h += '<table border="1"><thead><tr>' + head.map(c=>`<th>${escape(c)}</th>`).join("") + '</tr></thead><tbody>';
     for (const r of rows){
-      const cols = [ralNumeric(r.x.ral),r.piramide,r.uf,r.x.cf,r.faixa,r.responsavel,getStatusForRal(r.x.ral)];
+      const cols = [ralNumeric(r.x.ral),r.piramide,r.uf,r.x.cf,r.faixa,r.responsavel,getPrazoForRal(r.x.ral),getStatusForRal(r.x.ral)];
       h += "<tr>" + cols.map(v=>`<td>${escape(v)}</td>`).join("") + "</tr>";
     }
     h += '</tbody></table></body></html>';
@@ -1084,7 +1295,36 @@ if (c.includes("OM/GNA/QZ/DTC/BS"))  return "Márcio Dias";
     }
   }
 
-  // ====== CSV (download) agora com 8 colunas também ======
+  
+
+// ====== TSV (para copiar/colar no Excel) ======
+function tsvEscape(v){
+  const s = (v ?? "").toString();
+  // Excel/Sheets: tab separa colunas; remove tabs internas pra não bagunçar
+  return s.replace(/\t/g, " ").replace(/\r?\n/g, " ");
+}
+
+function buildTsv8(){
+  const rows = buildDerivedRows();
+  const head = ["RAL","PIRÂMIDE","UF","CF","FAIXA DE IDADE","RESPONSÁVEL","PRAZO","STATUS"];
+  const lines = [];
+  lines.push(head.join("\t"));
+  for(const r of rows){
+    lines.push([
+      ralNumeric(r.x.ral),
+      r.piramide,
+      r.uf,
+      r.x.cf,
+      r.faixa,
+      r.responsavel,
+      getPrazoForRal(r.x.ral),
+      getStatusForRal(r.x.ral),
+    ].map(tsvEscape).join("\t"));
+  }
+  return lines.join("\n");
+}
+
+// ====== CSV (download) agora com 8 colunas também ======
   function csvEscape(value) {
     const s = (value ?? "").toString();
     if (/[",\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
@@ -1096,7 +1336,7 @@ if (c.includes("OM/GNA/QZ/DTC/BS"))  return "Márcio Dias";
     if (!rows.length) { alert("Nada para exportar."); return; }
 
     const lines = [];
-    lines.push("RAL,PIRÂMIDE,UF,CF,FAIXA DE IDADE,RESPONSÁVEL,STATUS");
+    lines.push("RAL,PIRÂMIDE,UF,CF,FAIXA DE IDADE,RESPONSÁVEL,PRAZO,STATUS");
     for (const r of rows) {
       lines.push([
         csvEscape(r.x.ral),
@@ -1105,6 +1345,7 @@ if (c.includes("OM/GNA/QZ/DTC/BS"))  return "Márcio Dias";
         csvEscape(r.x.cf),
         csvEscape(r.faixa),
         csvEscape(r.responsavel),
+        csvEscape(getPrazoForRal(r.x.ral)),
         csvEscape(getStatusForRal(r.x.ral)),
       ].join(","));
     }
@@ -1179,26 +1420,10 @@ if (c.includes("OM/GNA/QZ/DTC/BS"))  return "Márcio Dias";
     updateColetaPill(items);
 
     const filtered = applyFilters(items);
-    countFiltered.textContent = String(filtered.length);
 
-    // Contadores (apenas ABERTAS >= 24h) - padrão corporativo, sem poluição visual
-    let o24 = 0, o48 = 0, o72 = 0;
-    for (const x of filtered){
-      const st = getStatusForRal(x.ral);
-      if (st !== "ABERTA") continue;
-      const dt = new Date(x.aberturaISO);
-      const a = ageHuman(dt);
-      if (a.totalHours <= 24) continue;
-      const k = rangeKeyForHours(a.totalHours);
-      if (k === "ACIMA_72") o72++;
-      else if (k === "48_72") o48++;
-      else if (k === "24_48") o24++;
-    }
-    open24El.textContent = String(o24 + o48 + o72);
-    open48El.textContent = String(o48);
-    open72El.textContent = String(o72);
+    // Contadores e pílulas extras foram removidos do cabeçalho para deixar a UI mais limpa.
+    // Se quiser reativar KPIs no futuro, é só recolocar os elementos no header e plugar aqui.
 
-    rangeSel.textContent = selectedRangeKey ? rangeMeta(selectedRangeKey).label : "todas";
 
     // Chart deve ignorar o filtro de faixa (senão ele vira "espelho" do próprio clique)
     const chartBase = items.map(x => {
@@ -1305,7 +1530,13 @@ if (c.includes("OM/GNA/QZ/DTC/BS"))  return "Márcio Dias";
   });
 
   el("btnTxt").addEventListener("click", showOutTxt);
-  el("btnXls").addEventListener("click", showOutExcel);
+  el("btnXls").addEventListener("click", () => {
+    try{ showOutExcel(); }
+    catch(e){
+      console.error(e);
+      alert("Erro ao gerar Planilha (visual): " + (e && e.message ? e.message : e));
+    }
+  });
   el("btnCsv").addEventListener("click", exportCsv);
 
   el("btnCopyOut").addEventListener("click", copyOut);
