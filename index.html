@@ -934,6 +934,12 @@ let items = load();
     return `${d}/${m}/${y}`;
   }
 
+
+  // PRAZO: formato de exibição (DD/MM/AAAA) para telas e exports
+  function getPrazoForRalBR(ral){
+    return fmtPrazoBR(getPrazoForRal(ral));
+  }
+
   function updateColetaPill(list){
     if (!list.length) { rangeColeta.textContent = "-"; return; }
     const dts = list.map(x => new Date(x.aberturaISO)).sort((a,b)=>a-b);
@@ -1104,7 +1110,7 @@ if (c.includes("OM/GNA/QZ/DTC/BS"))  return "Márcio Dias";
         r.x.cf,
         r.faixa,
         r.responsavel,
-        getPrazoForRal(r.x.ral),
+        getPrazoForRalBR(r.x.ral),
         r.status
       ]);
     }
@@ -1179,7 +1185,7 @@ if (c.includes("OM/GNA/QZ/DTC/BS"))  return "Márcio Dias";
               <input type="date" class="prazoInput" data-ral="${escapeHtml(r.x.ral)}" value="${escapeHtml(getPrazoForRal(r.x.ral))}">
               <button type="button" class="prazoBtn" title="Selecionar data" aria-label="Selecionar data">
                 <span aria-hidden="true">📅</span>
-                <span class="prazoBtnText">${escapeHtml(fmtPrazoBR(getPrazoForRal(r.x.ral))) || ""}</span>
+                <span class="prazoBtnText">${escapeHtml(fmtPrazoBR(getPrazoForRalBR(r.x.ral))) || ""}</span>
               </button>
             </div>
           </div>
@@ -1266,7 +1272,7 @@ outBox.style.display = "block";
     let h = '<html><head><meta charset="utf-8"><style>table{border-collapse:collapse;font-family:Calibri,Arial,sans-serif;font-size:10pt;}th,td{padding:6px 8px;vertical-align:top;}td{white-space:normal;word-break:break-word;}</style></head><body>';
     h += '<table border="1"><thead><tr>' + head.map(c=>`<th>${escape(c)}</th>`).join("") + '</tr></thead><tbody>';
     for (const r of rows){
-      const cols = [ralNumeric(r.x.ral),r.piramide,r.uf,r.x.cf,r.faixa,r.responsavel,getPrazoForRal(r.x.ral),getStatusForRal(r.x.ral)];
+      const cols = [ralNumeric(r.x.ral),r.piramide,r.uf,r.x.cf,r.faixa,r.responsavel,getPrazoForRalBR(r.x.ral),getStatusForRal(r.x.ral)];
       h += "<tr>" + cols.map(v=>`<td>${escape(v)}</td>`).join("") + "</tr>";
     }
     h += '</tbody></table></body></html>';
@@ -1317,7 +1323,7 @@ function buildTsv8(){
       r.x.cf,
       r.faixa,
       r.responsavel,
-      getPrazoForRal(r.x.ral),
+      getPrazoForRalBR(r.x.ral),
       getStatusForRal(r.x.ral),
     ].map(tsvEscape).join("\t"));
   }
@@ -1345,7 +1351,7 @@ function buildTsv8(){
         csvEscape(r.x.cf),
         csvEscape(r.faixa),
         csvEscape(r.responsavel),
-        csvEscape(getPrazoForRal(r.x.ral)),
+        csvEscape(getPrazoForRalBR(r.x.ral)),
         csvEscape(getStatusForRal(r.x.ral)),
       ].join(","));
     }
