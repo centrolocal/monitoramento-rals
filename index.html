@@ -795,10 +795,10 @@ let items = load();
       return candidate ? normalizeCFPath(candidate) : "";
     }
 
-    const m = line.match(/\b\d+\b\s+([A-Z]{2}\/[A-Z0-9]+(?:\s*\/\s*[A-Z0-9]+)*)/);
+    const m = line.match(/\b\d+\b\s+([A-Z]{2}\/[A-Z0-9]+(?:\s*\/{1,2}\s*[A-Z0-9]+)*)/);
     if (m) return normalizeCFPath(m[1]);
 
-    const m2 = line.match(/([A-Z]{2}\/[A-Z0-9]+(?:\s*\/\s*[A-Z0-9]+)*)/);
+    const m2 = line.match(/([A-Z]{2}\/[A-Z0-9]+(?:\s*\/{1,2}\s*[A-Z0-9]+)*)/);
     return m2 ? normalizeCFPath(m2[1]) : "";
   }
 
@@ -953,8 +953,31 @@ let items = load();
 
   function endsWithCBS(cfN){ return cfN.endsWith("/CBS") || cfN.includes("/CBS"); }
 
+
+  function infraSuffixMatch(cfN){
+  // CF terminado com sufixos de infraestrutura (prioridade máxima)
+  // Ajuste: garantir também os finais exatamente com "//EN", "//AC", "//IN", "//INF"
+  const suf = [
+    "/EN", "/EN/",
+    "//EN",
+    "/AC", "/AC/",
+    "//AC",
+    "/IN", "/IN/",
+    "//IN",
+    "/INF", "/INF/",
+    "//INF"
+  ];
+  for (const s of suf){
+    if (cfN.endsWith(s)) return true;
+  }
+  return false;
+}
+
   function piramideFromCF(cf){
     const c = cfNorm(cf);
+
+    // PRIORIDADE MÁXIMA: sufixos de infraestrutura (CF terminado com EN/AC/IN/INF)
+    if (infraSuffixMatch(c)) return "INFRAESTRUTURA";
 
     // 0) Móvel Agregação (CF final CLA/IP)
     if (/\/CLA\/IP\/?$/.test(c)) return "MOVEL AGREGAÇÃO";
@@ -969,9 +992,6 @@ if (c.includes("OM/GNA/QZ/DTC/BS"))  return "REDE EXTERNA";
 
     // 2) Swap
     if (c.includes("/SW")) return "SWAP";
-
-    // 3) Infraestrutura
-    if (c.includes("/EN") || c.includes("/AC") || c.includes("/INF")) return "INFRAESTRUTURA";
 
     // 4) Rede interna
     if (c.startsWith("TT/")) return "REDE INTERNA";
@@ -1000,6 +1020,10 @@ if (c.includes("OM/GNA/QZ/DTC/BS"))  return "REDE EXTERNA";
   function responsavelFromCF(cf){
     const c = cfNorm(cf);
     const isCBS = endsWithCBS(c);
+
+
+    // PRIORIDADE MÁXIMA: se caiu em INFRAESTRUTURA (CF terminado com EN/AC/IN/INF), responsável é Ângelo
+    if (infraSuffixMatch(c)) return "Ângelo Fraianeli";
 
 // Regras AT/*/XXX/CLA/IP (prioridade máxima)
 if (/AT\/CPE\/.+\/CLA\/IP/.test(c)) return "Edmar Almeida";
@@ -1043,8 +1067,6 @@ if (c.includes("OM/GNA/QZ/DTC/BS"))  return "Márcio Dias";
     if (c.includes("OM/PMJ") || c.includes("IM/PMJ") || c.includes("OM/ARN") || c.includes("OM/GUR") || c.includes("TT/PMJ") || c.includes("TT/ARN") || c.includes("TT/GUR")) return "Ajax Barbosa";
 
     if (!isCBS && (c.includes("OM/RBO") || c.includes("TT/RBO") || c.includes("OM/PVO") || c.includes("TT/PVO") || c.includes("JIP/PVO"))) return "Adriano Campigotto";
-
-    if (c.includes("/EN") || c.includes("/AC") || c.includes("/INF")) return "Angelo Fraianeli";
 
     return "";
   }
