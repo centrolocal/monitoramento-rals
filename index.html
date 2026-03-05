@@ -976,6 +976,9 @@ let items = load();
   function piramideFromCF(cf){
     const c = cfNorm(cf);
 
+
+    // REGRA GLOBAL: qualquer CF contendo DTC vai para REDE EXTERNA (independente de prefixo/sufixo)
+    if (c.includes("DTC")) return "REDE EXTERNA";
     // PRIORIDADE MÁXIMA: sufixos de infraestrutura (CF terminado com EN/AC/IN/INF)
     if (infraSuffixMatch(c)) return "INFRAESTRUTURA";
 
@@ -1022,6 +1025,9 @@ if (c.includes("OM/GNA/QZ/DTC/BS"))  return "REDE EXTERNA";
     const isCBS = endsWithCBS(c);
 
 
+
+    // REGRA GLOBAL: qualquer CF contendo DTC terá responsável Márcio Dias (independente de prefixo/sufixo)
+    if (c.includes("DTC")) return "Márcio Dias";
     // PRIORIDADE MÁXIMA: se caiu em INFRAESTRUTURA (CF terminado com EN/AC/IN/INF), responsável é Ângelo
     if (infraSuffixMatch(c)) return "Ângelo Fraianeli";
 
