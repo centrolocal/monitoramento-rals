@@ -846,7 +846,7 @@ body.excel-visual-mode .smartTableWrap{
     <div>
       <h1>RALSCOPE <span class="version">v8.0 layout otimizado</span></h1>
       <div class="sub">
-        Distribuição por <b>faixa de idade</b> (SLA) · Campo de dados brutos <b>híbrido Nível 2</b>: aceita <b>RAL</b> e <b>REC</b> juntos, inclusive RAL com QUALIDADE
+        Distribuição por <b>faixa de idade</b> (SLA) · Campo de dados brutos <b>híbrido Nível 2</b>: aceita <b>RAL</b> e <b>REC</b> juntos, ignorando RAL do tipo QUALIDADE
         <span style="margin-left:8px; opacity:.6;">· <span class="kbd">Ctrl+I</span> Importar · <span class="kbd">Ctrl+T</span> TXT · <span class="kbd">Ctrl+E</span> Excel · <span class="kbd">Ctrl+P</span> Imprimir</span>
       </div>
     </div>
@@ -1228,12 +1228,20 @@ body.excel-visual-mode .smartTableWrap{
     const [dd,mm,yyyy]=m[1].split('/').map(Number); const [HH,MI]=m[2].split(':').map(Number);
     return new Date(yyyy,mm-1,dd,HH,MI,0,0);
   }
+  function isRALQualidadeLine(line){
+    const txt = line || '';
+    const hasREC = /\bREC-\d+\/\d{4}\b/i.test(txt);
+    const hasRAL = /\bRAL-\d+\/\d{4}\b/i.test(txt) || (!hasREC && /\b\d{5,}\/\d{4}\b/.test(txt));
+    return hasRAL && !hasREC && /\bQUALIDADE\b/i.test(txt);
+  }
+
   function parseRALLines(text){
-    const lines=text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean), parsed=[], errors=[];
+    const lines=text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean), parsed=[], errors=[], ignored=[];
     for(const line of lines){
       if(/^E\s*-\s*C$/i.test(line)) continue;
+      if(isRALQualidadeLine(line)){ ignored.push({line,reason:'RAL tipo QUALIDADE ignorada'}); continue; }
       if(/\bREC-\d+\/\d{4}\b/i.test(line)){ errors.push({line,reason:'Linha REC em modo RAL'}); continue; }
-      // Nível 2: QUALIDADE não derruba mais a RAL. Se houver RAL na linha, ela é importada normalmente.
+      // Regra operacional: RAL do tipo QUALIDADE não entra no relatório.
       const m1=line.match(/\bRAL-\d+\/\d{4}\b/i);
       const m2=!m1 && !/\bREC-\d+\/\d{4}\b/i.test(line) ? line.match(/\b\d+\/\d{4}\b/) : null;
       const ral=m1 ? m1[0].toUpperCase() : (m2 ? `RAL-${m2[0]}` : '');
@@ -1247,7 +1255,7 @@ body.excel-visual-mode .smartTableWrap{
       if(!cf){ errors.push({line,reason:'Sem CF detectado'}); continue; }
       parsed.push({ id: (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())+Math.random().toString(16).slice(2)), mode:'RAL', ral, aberturaISO:dt.toISOString(), designacao:design, cf, cliente:'', statusSrc:'E' });
     }
-    return { parsed, errors };
+    return { parsed, errors, ignored };
   }
   function parseRECLines(text){
     const lines=text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean), parsed=[], errors=[];
@@ -1306,7 +1314,8 @@ body.excel-visual-mode .smartTableWrap{
   }
 
   function parseRALLineLevel2(line){
-    const parsed=[], errors=[];
+    const parsed=[], errors=[], ignored=[];
+    if(isRALQualidadeLine(line)){ ignored.push({line,reason:'RAL tipo QUALIDADE ignorada'}); return {parsed,errors,ignored}; }
     const m1 = line.match(/\bRAL-\d+\/\d{4}\b/i);
     const m2 = !m1 ? line.match(/\b\d{5,}\/\d{4}\b/) : null;
     const ral = m1 ? m1[0].toUpperCase() : (m2 ? `RAL-${m2[0]}` : '');
@@ -1335,7 +1344,7 @@ body.excel-visual-mode .smartTableWrap{
     const designacao = typeFound && before.indexOf(typeFound)>0 ? before.slice(0,before.indexOf(typeFound)).trim() : (before || ral);
 
     parsed.push({ id:(crypto.randomUUID ? crypto.randomUUID() : String(Date.now())+Math.random().toString(16).slice(2)), mode:'RAL', ral, aberturaISO:dt.toISOString(), designacao, cf, cliente:'', statusSrc:'E' });
-    return {parsed,errors};
+    return {parsed,errors,ignored};
   }
 
   function parseRECLineLevel2(line){
@@ -1376,10 +1385,11 @@ body.excel-visual-mode .smartTableWrap{
 
   function parseLines(text){
     // Parser híbrido Nível 2: detecção por padrão, não por botão.
-    // RAL com QUALIDADE, RAL no meio da linha e REC tabulada entram no mesmo funil.
+    // RAL no meio da linha e REC tabulada entram no mesmo funil. RAL tipo QUALIDADE é ignorada.
     const lines = splitLogicalLines(text);
     const allParsed = [];
     const allErrors = [];
+    const allIgnored = [];
     for(const line of lines){
       const hasREC = /\bREC-\d+\/\d{4}\b/i.test(line);
       const hasRAL = /\bRAL-\d+\/\d{4}\b/i.test(line) || (!hasREC && /\b\d{5,}\/\d{4}\b/.test(line));
@@ -1387,10 +1397,11 @@ body.excel-visual-mode .smartTableWrap{
       if(hasREC) r = parseRECLineLevel2(line);
       else if(hasRAL) r = parseRALLineLevel2(line);
       else { allErrors.push({line, reason:'Sem RAL/REC'}); continue; }
-      allParsed.push(...r.parsed);
-      allErrors.push(...r.errors);
+      allParsed.push(...(r.parsed || []));
+      allErrors.push(...(r.errors || []));
+      allIgnored.push(...(r.ignored || []));
     }
-    return { parsed: allParsed, errors: allErrors };
+    return { parsed: allParsed, errors: allErrors, ignored: allIgnored };
   }
   function itemUniqueKey(x){ return `${x.mode || 'RAL'}::${normalize(x.rec || x.ral || '')}`; }
   function mergeNoDuplicates(newItems){ const existing=new Set(items.map(itemUniqueKey)); let added=0; for(const n of newItems){ const k=itemUniqueKey(n); if(existing.has(k)) continue; existing.add(k); items.push(n); added++; } return added; }
@@ -2150,7 +2161,7 @@ function renderKPIs(){
   el('btnParse').addEventListener('click', ()=>{
     const raw=el('raw').value||'';
     if(!raw.trim()){ showToast('warn','Vazio','Cole os dados brutos de RAL e/ou REC primeiro.'); return; }
-    const {parsed,errors}=parseLines(raw);
+    const {parsed,errors,ignored=[]}=parseLines(raw);
     const added=mergeNoDuplicates(parsed);
     save();
     render();
@@ -2159,7 +2170,7 @@ function renderKPIs(){
     const totalRalParsed = parsed.filter(x => (x.mode||'RAL')==='RAL').length;
     const totalRecParsed = parsed.filter(x => (x.mode||'RAL')==='REC').length;
     const ignoredDup = Math.max(0, parsed.length - added);
-    const msg = `Detectadas: ${totalRalParsed} RAL(s) e ${totalRecParsed} REC(s). Duplicadas ignoradas: ${ignoredDup}.`;
+    const msg = `Detectadas: ${totalRalParsed} RAL(s) e ${totalRecParsed} REC(s). RAL QUALIDADE ignoradas: ${ignored.length}. Duplicadas ignoradas: ${ignoredDup}.`;
     showToast('ok', `${added} REGISTRO(S) IMPORTADO(S)`, msg, 4200);
     if(errors.length) showParseModal(errors);
   });
