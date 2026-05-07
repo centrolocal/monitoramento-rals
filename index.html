@@ -1004,21 +1004,21 @@ body.excel-visual-mode .smartTableWrap{
 
   const AGE_RANGES_BY_MODE = {
     RAL: [
-      { key:"ACIMA_72", label:"Acima de 72h", manchester:"red" },
-      { key:"48_72", label:"48h – 72h", manchester:"red" },
-      { key:"24_48", label:"24h – 48h", manchester:"red" },
-      { key:"16_24", label:"16h – 24h", manchester:"orange" },
-      { key:"8_16", label:"8h – 16h", manchester:"yellow" },
-      { key:"4_8", label:"4h – 8h", manchester:"green" },
+      { key:"ACIMA_72", label:">72h", manchester:"red" },
+      { key:"48_72", label:"48h-72h", manchester:"red" },
+      { key:"24_48", label:"24h-48h", manchester:"red" },
+      { key:"16_24", label:"16h-24h", manchester:"orange" },
+      { key:"8_16", label:"8h-16h", manchester:"yellow" },
+      { key:"4_8", label:"4h-8h", manchester:"green" },
       { key:"ATE_4", label:"Até 4h", manchester:"blue" }
     ],
     REC: [
       { key:"ACIMA_24", label:"> 24h", manchester:"black" },
-      { key:"16_24", label:"16h – 24h", manchester:"red" },
-      { key:"8_16", label:"8h – 16h", manchester:"orange" },
-      { key:"4_8", label:"4h – 8h", manchester:"yellow" },
-      { key:"2_4", label:"2h – 4h", manchester:"green" },
-      { key:"1_2", label:"1h – 2h", manchester:"blue" }
+      { key:"16_24", label:"16h-24h", manchester:"red" },
+      { key:"8_16", label:"8h-16h", manchester:"orange" },
+      { key:"4_8", label:"4h-8h", manchester:"yellow" },
+      { key:"2_4", label:"2h-4h", manchester:"green" },
+      { key:"1_2", label:"1h-2h", manchester:"blue" }
     ]
   };
 
@@ -1037,14 +1037,14 @@ body.excel-visual-mode .smartTableWrap{
 
   function getAgeRanges(){
     return [
-      { key:"ACIMA_72", label:"Acima de 72h", manchester:"red" },
-      { key:"48_72", label:"48h – 72h", manchester:"red" },
-      { key:"24_48", label:"24h – 48h", manchester:"red" },
-      { key:"16_24", label:"16h – 24h", manchester:"orange" },
-      { key:"8_16", label:"8h – 16h", manchester:"yellow" },
-      { key:"4_8", label:"4h – 8h", manchester:"green" },
-      { key:"2_4", label:"2h – 4h", manchester:"green" },
-      { key:"1_2", label:"1h – 2h", manchester:"blue" },
+      { key:"ACIMA_72", label:">72h", manchester:"red" },
+      { key:"48_72", label:"48h-72h", manchester:"red" },
+      { key:"24_48", label:"24h-48h", manchester:"red" },
+      { key:"16_24", label:"16h-24h", manchester:"orange" },
+      { key:"8_16", label:"8h-16h", manchester:"yellow" },
+      { key:"4_8", label:"4h-8h", manchester:"green" },
+      { key:"2_4", label:"2h-4h", manchester:"green" },
+      { key:"1_2", label:"1h-2h", manchester:"blue" },
       { key:"ATE_1", label:"Até 1h", manchester:"blue" }
     ];
   }
@@ -1071,7 +1071,11 @@ body.excel-visual-mode .smartTableWrap{
   function downloadFile(content,mime,filename){ const blob=new Blob([content],{type:mime}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.download=filename; a.href=url; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); }
   function ageMs(dt){ return Date.now() - dt.getTime(); }
   function ageHuman(dt){ const ms=Math.max(0, ageMs(dt)); const tm=Math.floor(ms/60000); return { days:Math.floor(tm/1440), hours:Math.floor((tm%1440)/60), minutes:tm%60, totalHours:ms/3600000 }; }
-  function formatAgeShort(a){ return `${a.days}d ${a.hours}h ${a.minutes}m`; }
+  function formatAgeShort(a){
+    // Padroniza a idade exibida/exportada por faixa operacional de SLA.
+    // Evita poluir as 9 planilhas com dias, horas e minutos detalhados.
+    return rangeMeta(rangeKeyForHours(a.totalHours)).label;
+  }
 
   function agoraDetalhado(){
     const d = new Date();
@@ -1808,7 +1812,7 @@ function renderKPIs(){
     function idadeCell(r){
       const dotColor=manchesterColor(r.meta.manchester);
       const pr = priorityInfo(r.a.totalHours, itemMode(r.x));
-      return `<span class="badge"><span class="dot" style="background:${dotColor}"></span>${escapeHtml(r.meta.label)}</span><div class="ageSub mono">${escapeHtml(formatAgeShort(r.a))}</div>${pr?`<div style="margin-top:6px;"><span class="priority-badge ${pr.cls}">${pr.label}</span></div>`:''}`;
+      return `<span class="badge"><span class="dot" style="background:${dotColor}"></span>${escapeHtml(r.meta.label)}</span>${pr?`<div style="margin-top:6px;"><span class="priority-badge ${pr.cls}">${pr.label}</span></div>`:''}`;
     }
 
     function renderRalSection(list){
@@ -1833,7 +1837,7 @@ function renderKPIs(){
               <td class="c-cf" title="${escapeHtml(r.x.cf)}">${escapeHtml(r.x.cf)}</td>
               <td class="c-pir" title="${escapeHtml(r.piramide)}">${escapeHtml(r.piramide)}</td>
               <td class="c-uf">${escapeHtml(r.uf)}</td>
-              <td class="c-idade" title="${escapeHtml(formatAgeShort(r.a))}">${idadeCell(r)}</td>
+              <td class="c-idade" title="${escapeHtml(r.meta.label)}">${idadeCell(r)}</td>
               <td class="c-resp" title="${escapeHtml(r.responsavel || '')}">${escapeHtml(r.responsavel || '')}</td>
               <td class="c-prazo prazoCell">${buildPrazoWidget(r.x.ral)}</td>
               <td class="c-status">${statusHtml}</td>
@@ -1864,7 +1868,7 @@ function renderKPIs(){
               <td class="c-cf" title="${escapeHtml(r.x.cf)}">${escapeHtml(r.x.cf)}</td>
               <td class="c-pir" title="${escapeHtml(r.piramide)}">${escapeHtml(r.piramide)}</td>
               <td class="c-uf">${escapeHtml(r.uf)}</td>
-              <td class="c-idade" title="${escapeHtml(formatAgeShort(r.a))}">${idadeCell(r)}</td>
+              <td class="c-idade" title="${escapeHtml(r.meta.label)}">${idadeCell(r)}</td>
               <td class="c-resp" title="${escapeHtml(r.responsavel || '')}">${escapeHtml(r.responsavel || '')}</td>
               <td class="c-status">${escapeHtml(r.status)}</td>
               <td class="c-act"><button class="danger small" data-del="${escapeHtml(r.x.id)}">✕</button></td>
