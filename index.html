@@ -3,10 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>RALSCOPE</title>
+  <title>RALSCOPE Nível 3 - Layout Inteligente</title>
   <style>
     :root{
-      /* ====== Dark (default) ====== */
       --bg:#0b0b0b;
       --text:#e5e7eb;
       --muted:#9ca3af;
@@ -15,1596 +14,2196 @@
       --card2:#101010;
       --shadow: rgba(0,0,0,.60);
       --accent: rgba(122,162,255,.35);
-
-      /* Manchester palette */
-      --m-red:    #e53935;
-      --m-orange: #fb8c00;
-      --m-yellow: #fdd835;
-      --m-green:  #43a047;
-      --m-blue:   #1e88e5;
-      --m-black:  #000000;
-
-      /* SLA highlight (corporativo) */
-      --sla24-bg: rgba(253,216,53,.10);
-      --sla48-bg: rgba(251,140,0,.10);
-      --sla72-bg: rgba(229,57,53,.10);
-
-
-      --btn-bg: rgba(255,255,255,.06);
-      --btn-bg2: rgba(255,255,255,.04);
-      --btn-border: rgba(255,255,255,.10);
-
-      --head-bg: rgba(15,18,33,.92);
+      --m-red:#e53935;
+      --m-orange:#fb8c00;
+      --m-yellow:#fdd835;
+      --m-green:#43a047;
+      --m-blue:#1e88e5;
+      --m-black:#000000;
+      --sla24-bg:rgba(253,216,53,.10);
+      --sla48-bg:rgba(251,140,0,.10);
+      --sla72-bg:rgba(229,57,53,.10);
+      --btn-bg:rgba(255,255,255,.06);
+      --btn-bg2:rgba(255,255,255,.04);
+      --btn-border:rgba(255,255,255,.10);
+      --head-bg:rgba(15,18,33,.92);
+      --kpi-bg:rgba(255,255,255,.04);
+      --vencido-bg:rgba(229,57,53,.18);
+      --vencido-border:rgba(229,57,53,.55);
     }
-
-    /* ====== Light (clean) ====== */
     body[data-theme="light"]{
       --bg:#f6f7fb;
       --text:#0d1321;
       --muted:#5b6472;
-      --line: rgba(13,19,33,.12);
-      --card1: rgba(255,255,255,.85);
-      --card2: rgba(255,255,255,.75);
-      --shadow: rgba(20,25,35,.10);
-      --accent: rgba(30,136,229,.22);
-
-      --btn-bg: rgba(13,19,33,.06);
-      --btn-bg2: rgba(13,19,33,.04);
-      --btn-border: rgba(13,19,33,.12);
-
-      /* SLA highlight (corporativo) */
-      --sla24-bg: rgba(253,216,53,.18);
-      --sla48-bg: rgba(251,140,0,.18);
-      --sla72-bg: rgba(229,57,53,.16);
-
-      --head-bg: rgba(246,247,251,.92);
+      --line:rgba(13,19,33,.12);
+      --card1:rgba(255,255,255,.85);
+      --card2:rgba(255,255,255,.75);
+      --shadow:rgba(20,25,35,.10);
+      --accent:rgba(30,136,229,.22);
+      --btn-bg:rgba(13,19,33,.06);
+      --btn-bg2:rgba(13,19,33,.04);
+      --btn-border:rgba(13,19,33,.12);
+      --sla24-bg:rgba(253,216,53,.18);
+      --sla48-bg:rgba(251,140,0,.18);
+      --sla72-bg:rgba(229,57,53,.16);
+      --head-bg:rgba(246,247,251,.92);
+      --kpi-bg:rgba(13,19,33,.04);
+      --vencido-bg:rgba(229,57,53,.10);
+      --vencido-border:rgba(229,57,53,.40);
     }
 
     *{ box-sizing:border-box; }
     body{
       margin:0; padding:18px;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial;
       background:
-        radial-gradient(1200px 700px at 10% 10%, rgba(255,255,255,.04), transparent 60%),
-        radial-gradient(1200px 700px at 90% 20%, rgba(255,255,255,.03), transparent 60%),
+        radial-gradient(1200px 700px at 10% 10%,rgba(255,255,255,.04),transparent 60%),
+        radial-gradient(1200px 700px at 90% 20%,rgba(255,255,255,.03),transparent 60%),
         var(--bg);
       color:var(--text);
     }
     body[data-theme="light"]{
       background:
-        radial-gradient(1200px 700px at 10% 10%, rgba(30,136,229,.12), transparent 60%),
-        radial-gradient(1200px 700px at 90% 20%, rgba(67,160,71,.10), transparent 60%),
+        radial-gradient(1200px 700px at 10% 10%,rgba(30,136,229,.12),transparent 60%),
+        radial-gradient(1200px 700px at 90% 20%,rgba(67,160,71,.10),transparent 60%),
         var(--bg);
     }
 
     .wrap{ max-width:1500px; margin:0 auto; }
     header{ display:flex; flex-wrap:wrap; gap:14px; justify-content:space-between; align-items:flex-start; margin-bottom:14px; }
     h1{ margin:0; font-size:20px; }
+    h1 .version{ font-size:11px; font-weight:400; color:var(--muted); margin-left:6px; vertical-align:middle; }
     .sub{ margin-top:6px; color:var(--muted); font-size:13px; line-height:1.35; }
 
     .pill{
       display:inline-flex; gap:8px; align-items:center;
-      background: var(--btn-bg2);
-      border:1px solid var(--line);
-      border-radius:999px;
-      padding:8px 10px;
-      color:var(--muted);
-      font-size:12px;
-      white-space:nowrap;
+      background:var(--btn-bg2); border:1px solid var(--line);
+      border-radius:999px; padding:8px 10px;
+      color:var(--muted); font-size:12px; white-space:nowrap;
     }
+    .pill.alert-pill{ border-color:rgba(229,57,53,.50); color:#e53935; background:rgba(229,57,53,.10); }
 
     .card{
-      background: linear-gradient(180deg, var(--card1), var(--card2));
-      border:1px solid var(--line);
-      border-radius:14px;
-      padding:14px;
-      box-shadow: 0 10px 30px var(--shadow);
+      background:linear-gradient(180deg,var(--card1),var(--card2));
+      border:1px solid var(--line); border-radius:14px;
+      padding:14px; box-shadow:0 10px 30px var(--shadow);
     }
-
-    .grid{ display:grid; grid-template-columns: 1fr; gap:14px; align-items:start; }
-    
-    /* ====== RAW + CHART SPLIT ====== */
-    .rawSplit{
-      display:grid;
-      grid-template-columns: minmax(0, 1fr) 420px;
-      gap:14px;
-      align-items:start;
-    }
-    @media (max-width: 980px){
-      .rawSplit{ grid-template-columns: 1fr; }
-    }
-@media (max-width: 980px){ .grid{ grid-template-columns: 1fr; } }
+    .grid{ display:grid; grid-template-columns:1fr; gap:14px; align-items:start; }
+    .rawSplit{ display:grid; grid-template-columns:minmax(0,1fr) 420px; gap:14px; align-items:start; }
+    @media(max-width:980px){ .rawSplit{ grid-template-columns:1fr; } .grid{ grid-template-columns:1fr; } }
 
     label{ display:block; font-size:12px; color:var(--muted); margin-bottom:6px; }
-    textarea, input{
-      width:100%;
-      background: var(--btn-bg2);
-      border:1px solid var(--line);
-      color:var(--text);
-      border-radius:10px;
-      padding:10px;
-      outline:none;
+    textarea,input,select{
+      width:100%; background:var(--btn-bg2); border:1px solid var(--line);
+      color:var(--text); border-radius:10px; padding:10px; outline:none;
     }
-    textarea:focus, input:focus{ border-color: var(--accent); }
+    textarea:focus,input:focus,select:focus{ border-color:var(--accent); }
     textarea{
-      min-height: 150px; resize: vertical;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size: 12px;
+      min-height:150px; resize:vertical;
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+      font-size:12px;
     }
 
     .actions{ display:flex; flex-wrap:wrap; gap:10px; margin-top:10px; }
     button{
-      border:1px solid var(--btn-border);
-      background: var(--btn-bg);
-      color:var(--text);
-      padding:10px 12px;
-      border-radius:10px;
-      cursor:pointer;
-      font-weight:800;
-      letter-spacing:.2px;
+      border:1px solid var(--btn-border); background:var(--btn-bg);
+      color:var(--text); padding:10px 12px; border-radius:10px;
+      cursor:pointer; font-weight:800; letter-spacing:.2px; transition:border-color .15s;
     }
-    button:hover{ border-color: rgba(255,255,255,.22); }
-    body[data-theme="light"] button:hover{ border-color: rgba(13,19,33,.22); }
-    button.primary{ border-color: rgba(30,136,229,.40); background: rgba(30,136,229,.16); }
-    button.danger{ border-color: rgba(229,57,53,.40); background: rgba(229,57,53,.12); }
-    button.ghost{ background: transparent; }
+    button:hover{ border-color:rgba(255,255,255,.22); }
+    body[data-theme="light"] button:hover{ border-color:rgba(13,19,33,.22); }
+    button.primary{ border-color:rgba(30,136,229,.40); background:rgba(30,136,229,.16); }
+    button.danger{ border-color:rgba(229,57,53,.40); background:rgba(229,57,53,.12); }
+    button.success{ border-color:rgba(67,160,71,.40); background:rgba(67,160,71,.12); }
+    button.ghost{ background:transparent; }
 
     .hint{ margin-top:10px; font-size:12px; color:var(--muted); line-height:1.35; }
-    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    .mono{ font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace; }
     .muted{ color:var(--muted); }
 
+    /* ====== KPI CARDS ====== */
+    .kpiSection{ margin-top:14px; }
+    .kpiGrid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:10px; margin-top:10px; }
+    .kpiCard{
+      background:var(--kpi-bg); border:1px solid var(--line);
+      border-radius:12px; padding:12px 14px;
+      display:flex; flex-direction:column; gap:4px;
+    }
+    .kpiTitle{ font-size:11px; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:.4px; }
+    .kpiValue{ font-size:22px; font-weight:900; line-height:1.1; }
+    .kpiSub{ font-size:11px; color:var(--muted); }
+    .kpiDivider{ border:none; border-top:1px solid var(--line); margin:6px 0; }
+
+    /* ====== RESPONSAVEL / UF RESUMO ====== */
+    .summaryGrid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:14px; }
+    .modeToggle{display:flex;gap:8px;flex-wrap:wrap;margin:0;}
+    .modeBtn.active{border-color:rgba(30,136,229,.45)!important;background:rgba(30,136,229,.16)!important;}
+    .sectionTitleRow{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;}
+    @media(max-width:700px){ .summaryGrid{ grid-template-columns:1fr; } }
+    .summaryPanel{ background:var(--kpi-bg); border:1px solid var(--line); border-radius:12px; padding:12px; min-width:0; }
+    .summaryBars{ display:flex; flex-direction:column; gap:10px; }
+    .sumBarRow{ display:grid; grid-template-columns:minmax(120px, 1.1fr) minmax(120px, 2fr) 44px; gap:10px; align-items:center; }
+    .sumBarLabel{ font-size:12px; font-weight:700; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .sumBarTrack{ height:12px; border-radius:999px; background:rgba(255,255,255,.06); overflow:hidden; border:1px solid rgba(255,255,255,.08); }
+    body[data-theme="light"] .sumBarTrack{ background:rgba(13,19,33,.06); border-color:rgba(13,19,33,.10); }
+    .sumBarFill{ height:100%; border-radius:999px; background:linear-gradient(90deg, rgba(30,136,229,.72), rgba(122,162,255,.98)); min-width:10px; }
+    .sumBarValue{ font-size:12px; font-weight:900; text-align:right; color:var(--muted); }
+    .summaryEmpty{ font-size:12px; color:var(--muted); padding:4px 0; }
+    .summaryTable{ width:100%; border-collapse:collapse; font-size:12px; }
+    .summaryTable th{ color:var(--muted); font-weight:700; text-align:left; padding:5px 8px; border-bottom:1px solid var(--line); font-size:11px; text-transform:uppercase; letter-spacing:.3px; }
+    .summaryTable td{ padding:5px 8px; border-bottom:1px solid var(--line); }
+    .summaryTable tr:last-child td{ border-bottom:none; }
+    .summaryTable .num{ text-align:right; font-weight:900; font-size:13px; }
+    .summaryGroup{ background:var(--kpi-bg); border:1px solid var(--line); border-radius:12px; padding:12px; min-width:0; }
+    .miniChartsGrid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .miniSummaryPanel{ background:rgba(255,255,255,.03); border:1px solid var(--line); border-radius:10px; padding:10px; min-width:0; }
+    body[data-theme="light"] .miniSummaryPanel{ background:rgba(13,19,33,.03); }
+    .miniSummaryTitle{ margin:0 0 8px; font-size:11px; color:var(--muted); font-weight:900; text-transform:uppercase; letter-spacing:.35px; }
+    .summaryBars.compact{ gap:6px; max-height:180px; overflow:auto; padding-right:3px; }
+    .summaryBars.compact .sumBarRow{ grid-template-columns:minmax(78px, 1.05fr) minmax(72px, 1.8fr) 38px; gap:8px; }
+    .summaryBars.compact .sumBarLabel{ font-size:10px; }
+    .summaryBars.compact .sumBarTrack{ height:10px; }
+    .summaryBars.compact .sumBarValue{ font-size:10px; }
+    .sumBarFill.color-blue{ background:linear-gradient(90deg, rgba(30,136,229,.72), rgba(122,162,255,.98)); }
+    .sumBarFill.color-green{ background:linear-gradient(90deg, rgba(67,160,71,.72), rgba(129,199,132,.98)); }
+    .sumBarFill.color-yellow{ background:linear-gradient(90deg, rgba(253,216,53,.82), rgba(255,241,118,.98)); }
+    .sumBarFill.color-orange{ background:linear-gradient(90deg, rgba(251,140,0,.78), rgba(255,183,77,.98)); }
+    .sumBarFill.color-red{ background:linear-gradient(90deg, rgba(229,57,53,.78), rgba(239,83,80,.98)); }
+    .sumBarFill.color-black{ background:linear-gradient(90deg, rgba(22,22,22,.85), rgba(0,0,0,1)); }
+    @media(max-width:980px){ .summaryGrid.rec-layout{ grid-template-columns:1fr; } }
+    @media(max-width:700px){ .miniChartsGrid{ grid-template-columns:1fr; } .summaryBars.compact{ max-height:220px; } }
+
     /* ====== TABLE ====== */
-    .tablewrap{
-      overflow:auto;
-      border-radius: 12px;
-      border: 1px solid var(--line);
-      margin-top: 12px;
-    }
-    table{
-      width:100%;
-      border-collapse: separate;
-      border-spacing: 0;
-      min-width: 0;
-      table-layout: auto;
-    }
-    colgroup col.col-age { width: 18%; }
-    colgroup col.col-ral { width: 16%; }
-    colgroup col.col-des { width: 34%; }
-    colgroup col.col-cf  { width: 20%; }
-    colgroup col.col-act { width: 12%; }
+    .tablewrap{ overflow:auto; border-radius:12px; border:1px solid var(--line); margin-top:12px; }
+    table{ width:100%; border-collapse:separate; border-spacing:0; min-width:0; table-layout:auto; }
+    colgroup col.col-age{ width:15%; }
+    colgroup col.col-ral{ width:13%; }
+    colgroup col.col-des{ width:26%; }
+    colgroup col.col-cf{ width:18%; }
+    colgroup col.col-status{ width:12%; }
+    colgroup col.col-prazo{ width:12%; }
+    colgroup col.col-act{ width:4%; }
 
-    th, td{
-      border-bottom: 1px solid var(--line);
-      padding: 10px 12px;
-      font-size: 13px;
-      vertical-align: middle;
-    }
-
+    th,td{ border-bottom:1px solid var(--line); padding:10px 12px; font-size:13px; vertical-align:middle; }
     th{
-      position: sticky;
-      top: 0;
-      background: var(--head-bg);
-      backdrop-filter: blur(8px);
-      color: var(--muted);
-      font-size: 12px;
-      letter-spacing: .35px;
-      z-index: 1;
-      text-align: center;
+      position:sticky; top:0; background:var(--head-bg);
+      backdrop-filter:blur(8px); color:var(--muted);
+      font-size:12px; letter-spacing:.35px; z-index:1; text-align:center;
     }
-
-    th:not(:last-child), td:not(:last-child){
-      border-right: 1px solid rgba(255,255,255,.06);
-    }
-    body[data-theme="light"] th:not(:last-child), body[data-theme="light"] td:not(:last-child){
-      border-right: 1px solid rgba(13,19,33,.06);
-    }
-
-    tr:hover td{ background: rgba(255,255,255,.03); }
-    body[data-theme="light"] tr:hover td{ background: rgba(13,19,33,.03); }
-
-    td:nth-child(1){ text-align: left; } /* idade */
-    td:nth-child(2){ text-align: left; } /* ral */
-    td:nth-child(3){ text-align: left; } /* designação */
-    td:nth-child(4){ text-align: left; } /* cf */
-    td:nth-child(5){ text-align: center; }/* ação */
+    th:not(:last-child),td:not(:last-child){ border-right:1px solid rgba(255,255,255,.06); }
+    body[data-theme="light"] th:not(:last-child),body[data-theme="light"] td:not(:last-child){ border-right:1px solid rgba(13,19,33,.06); }
+    tr:hover td{ background:rgba(255,255,255,.03); }
+    body[data-theme="light"] tr:hover td{ background:rgba(13,19,33,.03); }
 
     .badge{
       display:inline-flex; align-items:center; gap:8px;
-      border:1px solid var(--line);
-      border-radius:999px;
-      padding:5px 10px;
-      font-size:12px;
-      white-space:nowrap;
-      font-weight: 900;
-      background: rgba(255,255,255,.04);
-      color: var(--text);
+      border:1px solid var(--line); border-radius:999px;
+      padding:5px 10px; font-size:12px; white-space:nowrap;
+      font-weight:900; background:rgba(255,255,255,.04); color:var(--text);
     }
-    body[data-theme="light"] .badge{ background: rgba(13,19,33,.04); }
-
+    body[data-theme="light"] .badge{ background:rgba(13,19,33,.04); }
     .dot{ width:10px; height:10px; border-radius:999px; display:inline-block; }
-    .ageSub{ margin-top: 6px; font-size: 12px; color: var(--muted); }
-    .small{ padding:8px 10px; font-size:12px; font-weight:900; }
+    .ageSub{ margin-top:6px; font-size:12px; color:var(--muted); }
+    .small{ padding:6px 8px; font-size:11px; font-weight:900; }
+
+    /* ====== STATUS inline ====== */
+    select.statusSel{
+      font-size:11px; padding:4px 6px; border-radius:8px; min-width:110px;
+      height:30px; cursor:pointer;
+    }
+    select.statusSel.st-aberta{ border-color:rgba(229,57,53,.40); background:rgba(229,57,53,.10); }
+    select.statusSel.st-fechada{ border-color:rgba(67,160,71,.40); background:rgba(67,160,71,.10); }
+    select.statusSel.st-normalizada{ border-color:rgba(30,136,229,.40); background:rgba(30,136,229,.10); }
+
+    /* ====== PRAZO VENCIDO ====== */
+    tr.prazo-vencido td{ background:var(--vencido-bg) !important; }
+    tr.prazo-vencido{ box-shadow:inset 3px 0 0 var(--m-red); }
+    .vencido-badge{
+      display:inline-flex; align-items:center; gap:4px;
+      font-size:10px; font-weight:900; color:#e53935;
+      background:rgba(229,57,53,.15); border:1px solid rgba(229,57,53,.40);
+      border-radius:999px; padding:2px 6px; margin-left:4px;
+    }
+
+    /* ====== SLA highlight ====== */
+    tr.sla24{ box-shadow:inset 4px 0 0 var(--m-red); }
+    tr.sla48{ box-shadow:inset 4px 0 0 var(--m-red); }
+    tr.sla72{ box-shadow:inset 4px 0 0 var(--m-black); }
 
     /* ====== CHART ====== */
-    .chart{
-      display:flex; flex-direction:column; gap:6px;
-    }
-    .barRow{
-      display:grid;
-      grid-template-columns: 160px 1fr 40px;
-      gap:6px;
-      align-items:center;
-    }
-    @media (max-width: 620px){
-      .barRow{ grid-template-columns: 1fr; }
-    }
+    .chart{ display:flex; flex-direction:column; gap:6px; }
+    .barRow{ display:grid; grid-template-columns:160px 1fr 40px; gap:6px; align-items:center; }
+    @media(max-width:620px){ .barRow{ grid-template-columns:1fr; } }
     .barBtn{
-      width:100%;
-      border:1px solid var(--line);
-      background: transparent;
-      border-radius:12px;
-      padding:10px;
-      text-align:left;
-      cursor:pointer;
-      display:flex; flex-direction:column; gap:8px;
+      width:100%; border:1px solid var(--line); background:transparent;
+      border-radius:12px; padding:10px; text-align:left; cursor:pointer;
+      display:flex; flex-direction:column; gap:8px; transition:border-color .15s;
     }
-    .barBtn:hover{ border-color: rgba(255,255,255,.22); }
-    body[data-theme="light"] .barBtn:hover{ border-color: rgba(13,19,33,.22); }
-
-    .barLabel{ display:flex; align-items:center; gap:10px; font-weight:900; font-size:12px; color: var(--text); }
-    .barTrack{
-      height:8px;
-      border-radius:999px;
-      background: rgba(255,255,255,.06);
-      overflow:hidden;
-      border:1px solid var(--line);
-    }
-    body[data-theme="light"] .barTrack{ background: rgba(13,19,33,.06); }
-
-    .barFill{
-      height:100%;
-      width:0%;
-      border-radius:999px;
-      background: var(--m-blue);
-    }
-    .barMeta{ font-size:12px; color: var(--muted); }
-
-    .selected{
-      outline: 2px solid rgba(30,136,229,.38);
-      border-color: rgba(30,136,229,.38) !important;
-      background: rgba(30,136,229,.08);
-    }
+    .barBtn:hover{ border-color:rgba(255,255,255,.22); }
+    body[data-theme="light"] .barBtn:hover{ border-color:rgba(13,19,33,.22); }
+    .barLabel{ display:flex; align-items:center; gap:10px; font-weight:900; font-size:12px; color:var(--text); }
+    .barTrack{ height:8px; border-radius:999px; background:rgba(255,255,255,.06); overflow:hidden; border:1px solid var(--line); }
+    body[data-theme="light"] .barTrack{ background:rgba(13,19,33,.06); }
+    .barFill{ height:100%; width:0%; border-radius:999px; background:var(--m-blue); transition:width .4s ease; }
+    .barMeta{ font-size:12px; color:var(--muted); }
+    .selected{ outline:2px solid rgba(30,136,229,.38); border-color:rgba(30,136,229,.38)!important; background:rgba(30,136,229,.08); }
 
     /* ====== OUTPUT ====== */
-    .out{
-      margin-top:12px;
-      display:none;
-    }
-    .outHeader{
-      display:flex; gap:10px; flex-wrap:wrap; justify-content:space-between; align-items:center;
-      margin-bottom:8px;
-    }
+    .out{ margin-top:12px; display:none; }
+    .outHeader{ display:flex; gap:10px; flex-wrap:wrap; justify-content:space-between; align-items:center; margin-bottom:8px; }
     .outActions{ display:flex; gap:10px; flex-wrap:wrap; }
-    .out textarea{ min-height: 120px; }
+    .out textarea{ min-height:220px; white-space:pre; overflow:auto; overflow-x:auto; font-variant-ligatures:none; }
+    #outTable{ table-layout:fixed; width:100%; min-width:0; }
+    #outTable th,#outTable td{ padding:6px 8px; font-size:12px; line-height:1.15; text-align:left; vertical-align:top; }
+    #outTable td{ overflow-wrap:anywhere; word-break:break-word; }
+    #outTable td.ufCol,#outTable th.ufCol{ width:44px; max-width:44px; white-space:nowrap; }
+    #outTable td.cfCol{ max-width:320px; }
+    #outTable td{ overflow:hidden; }
+    #outTable td.prazoCell{ overflow:visible; }
+    #outTable tr.sla24{ box-shadow:inset 4px 0 0 var(--m-red); }
+    #outTable tr.sla48{ box-shadow:inset 4px 0 0 var(--m-red); }
+    #outTable tr.sla72{ box-shadow:inset 4px 0 0 var(--m-black); }
+    #outTable tr.age-ate4 td{ background:rgba(30,136,229,.10); }
+    #outTable tr.age-4a8 td{ background:rgba(67,160,71,.10); }
+    #outTable tr.age-8a16 td{ background:rgba(253,216,53,.14); }
+    #outTable tr.age-16a24 td{ background:rgba(251,140,0,.12); }
+    #outTable tr.age-1a2 td{ background:rgba(30,136,229,.10); }
+    #outTable tr.age-2a4 td{ background:rgba(67,160,71,.10); }
+    #outTable tr.age-rec-4a8 td{ background:rgba(253,216,53,.14); }
+    #outTable tr.age-rec-8a16 td{ background:rgba(251,140,0,.12); }
+    #outTable tr.age-rec-16a24 td{ background:rgba(251,140,0,.10); }
 
-    /* Saída TXT/TSV: não quebrar linha (pra colunas ficarem alinhadas) */
-    .out textarea{
-      min-height: 220px;
-      white-space: pre;
-      overflow: auto;
-      overflow-x: auto;
-      font-variant-ligatures: none;
+    /* ====== PRAZO widget ====== */
+    .prazoWrap{ display:flex; align-items:center; min-width:120px; width:100%; }
+    .prazoField{ position:relative; flex:1; min-width:110px; }
+    .prazoBtn{
+      width:100%; min-height:30px; display:inline-flex; align-items:center;
+      justify-content:center; gap:6px; border:1px solid var(--btn-border);
+      background:var(--btn-bg2); color:var(--text); border-radius:10px;
+      cursor:pointer; font-weight:900; padding:5px 8px; font-size:11px; line-height:1.2;
+      position:relative; z-index:2; pointer-events:auto; transition:border-color .15s;
     }
-    /* Tabela/planilha na tela: compacta e com quebra dentro da célula */
-    #outTable{
-      table-layout: fixed;
-      width: 100%;
-      min-width: 0;
+    .prazoBtn:hover{ border-color:rgba(255,255,255,.22); }
+    body[data-theme="light"] .prazoBtn:hover{ border-color:rgba(13,19,33,.22); }
+    .prazoBtn.vencido{ border-color:var(--vencido-border)!important; color:#e53935; }
+    .prazoField input[type="date"]{ position:absolute; inset:0; width:100%; height:100%; opacity:0; cursor:pointer; z-index:1; pointer-events:none; }
+    .prazoBtnText{ font-weight:800; opacity:.95; }
+    .prazoBtnEmpty{ opacity:.60; font-weight:600; }
+
+    /* ====== CONTROL BAR ====== */
+    .controlBar{ padding:12px 14px; margin-top:12px; }
+    .controlBarInner{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    .controlTitle{ font-weight:900; letter-spacing:.2px; }
+    .controlBarInner input{ flex:1 1 180px; min-width:150px; height:38px; }
+    .controlActions{ margin-left:auto; display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .controlActions button{ padding:8px 10px; font-size:12px; }
+
+    .rawRight{ border:1px solid var(--line); border-radius:14px; padding:12px; background:rgba(255,255,255,.02); }
+    body[data-theme="light"] .rawRight{ background:rgba(13,19,33,.02); }
+    .chart.compact .barRow{ grid-template-columns:160px 1fr 40px; gap:6px; }
+    .chart.compact .barTrack{ height:8px; }
+
+
+    /* ====== CHART NÍVEL HARD: compacto, clicável e operacional ====== */
+    .chart.hardChart{
+      display:flex;
+      flex-direction:column;
+      gap:7px;
     }
-    #outTable th, #outTable td{
-      padding: 8px 10px;
-      font-size: 12px;
-      line-height: 1.15;
-      text-align: left;
-      vertical-align: top;
+    .hardChartHeader{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      margin-bottom:4px;
+      padding:8px 10px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:rgba(255,255,255,.035);
     }
-    #outTable td{
-      overflow-wrap: anywhere;
-      word-break: break-word;
+    body[data-theme="light"] .hardChartHeader{ background:rgba(13,19,33,.035); }
+    .hardChartTitle{ font-size:11px; color:var(--muted); font-weight:900; text-transform:uppercase; letter-spacing:.35px; }
+    .hardChartTotal{ font-size:18px; font-weight:950; line-height:1; }
+    .hardRow{
+      width:100%;
+      display:grid;
+      grid-template-columns: 92px minmax(120px, 1fr) 38px;
+      gap:8px;
+      align-items:center;
+      border:1px solid var(--line);
+      border-radius:10px;
+      padding:7px 8px;
+      background:rgba(255,255,255,.018);
+      cursor:pointer;
+      transition:transform .12s ease, border-color .12s ease, background .12s ease;
     }
+    body[data-theme="light"] .hardRow{ background:rgba(13,19,33,.018); }
+    .hardRow:hover{ transform:translateX(2px); border-color:rgba(255,255,255,.22); background:rgba(255,255,255,.045); }
+    body[data-theme="light"] .hardRow:hover{ border-color:rgba(13,19,33,.22); background:rgba(13,19,33,.045); }
+    .hardRow.selected{ outline:2px solid rgba(30,136,229,.42); border-color:rgba(30,136,229,.48)!important; background:rgba(30,136,229,.10); }
+    .hardRow.isZero{ opacity:.48; }
+    .hardRow.isCritical{ box-shadow:inset 3px 0 0 var(--m-red); }
+    .hardLabel{
+      display:flex;
+      align-items:center;
+      gap:7px;
+      min-width:0;
+      color:var(--text);
+      font-size:11px;
+      font-weight:900;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .hardDot{ width:9px; height:9px; border-radius:999px; flex:0 0 auto; }
+    .hardTrack{
+      height:8px;
+      border-radius:999px;
+      background:rgba(255,255,255,.07);
+      border:1px solid rgba(255,255,255,.07);
+      overflow:hidden;
+      position:relative;
+    }
+    body[data-theme="light"] .hardTrack{ background:rgba(13,19,33,.07); border-color:rgba(13,19,33,.08); }
+    .hardFill{
+      height:100%;
+      min-width:0;
+      border-radius:999px;
+      transition:width .35s ease;
+      box-shadow:0 0 14px rgba(229,57,53,.18);
+    }
+    .hardValue{ font-size:12px; font-weight:950; text-align:right; color:var(--text); }
+    .hardLegend{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:8px;
+      margin-top:4px;
+      color:var(--muted);
+      font-size:10px;
+      line-height:1.25;
+    }
+    .hardLegend b{ color:var(--text); }
+    @media(max-width:620px){
+      .hardRow{ grid-template-columns: 86px 1fr 34px; padding:7px; }
+      .hardLabel{ font-size:10px; }
+    }
+
+    /* ====== TOAST NOTIFICATION ====== */
+    #toastContainer{ position:fixed; bottom:24px; right:24px; z-index:9999; display:flex; flex-direction:column; gap:8px; pointer-events:none; }
+    .toast{
+      background:var(--card1); border:1px solid var(--line);
+      border-radius:12px; padding:12px 18px; font-size:13px;
+      box-shadow:0 8px 24px var(--shadow);
+      animation:toastIn .25s ease; pointer-events:auto;
+      max-width:340px; display:flex; align-items:flex-start; gap:10px;
+    }
+    .toast.toast-ok{ border-color:rgba(67,160,71,.40); }
+    .toast.toast-err{ border-color:rgba(229,57,53,.40); }
+    .toast.toast-warn{ border-color:rgba(251,140,0,.40); }
+    .toast-icon{ font-size:16px; flex-shrink:0; }
+    .toast-body{ flex:1; }
+    .toast-title{ font-weight:900; margin-bottom:2px; }
+    .toast-msg{ color:var(--muted); font-size:12px; line-height:1.4; }
+    .toast-close{ background:none; border:none; color:var(--muted); cursor:pointer; padding:0; font-size:16px; line-height:1; margin-left:4px; }
+    @keyframes toastIn{ from{ opacity:0; transform:translateY(10px); } to{ opacity:1; transform:translateY(0); } }
+
+    /* ====== MODAL de erros de parsing ====== */
+    .modal-overlay{
+      position:fixed; inset:0; background:rgba(0,0,0,.55);
+      display:flex; align-items:center; justify-content:center; z-index:8888;
+      backdrop-filter:blur(4px);
+    }
+    .modal-box{
+      background:var(--card1); border:1px solid var(--line);
+      border-radius:16px; padding:24px; max-width:680px; width:90%;
+      max-height:80vh; overflow-y:auto; box-shadow:0 20px 60px var(--shadow);
+    }
+    .modal-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+    .modal-title{ font-size:15px; font-weight:900; }
+    .modal-close{ background:none; border:none; color:var(--muted); font-size:20px; cursor:pointer; }
+    .modal-table{ width:100%; border-collapse:collapse; font-size:12px; }
+    .modal-table th{ color:var(--muted); text-align:left; padding:6px 8px; border-bottom:1px solid var(--line); font-weight:700; }
+    .modal-table td{ padding:6px 8px; border-bottom:1px solid var(--line); }
+    .modal-table td.reason{ color:var(--m-orange); font-weight:700; white-space:nowrap; }
+    .modal-table td.line-cell{ color:var(--muted); font-family:ui-monospace,monospace; word-break:break-all; max-width:400px; }
+
+    /* ====== STORAGE ALERT BAR ====== */
+    #storageBar{ display:none; background:rgba(251,140,0,.12); border:1px solid rgba(251,140,0,.40); border-radius:10px; padding:10px 14px; font-size:12px; color:var(--m-orange); margin-bottom:10px; display:flex; align-items:center; gap:10px; }
+    #storageBar.hidden{ display:none!important; }
+
+
+    .priority-badge{ display:inline-flex; align-items:center; gap:6px; border-radius:999px; padding:3px 8px; font-size:10px; font-weight:900; border:1px solid transparent; }
+    .priority-critica{ color:#e53935; background:rgba(229,57,53,.12); border-color:rgba(229,57,53,.35); }
+    .priority-alta{ color:#fb8c00; background:rgba(251,140,0,.12); border-color:rgba(251,140,0,.35); }
+    .priority-atencao{ color:#b59b00; background:rgba(253,216,53,.12); border-color:rgba(253,216,53,.35); }
+
+
+    /* ====== PAINEL EXECUTIVO: cards de indicadores críticos ====== */
+    .warStrip{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:10px;
+      margin:12px 0 4px;
+    }
+    .warCard{
+      border:1px solid rgba(229,57,53,.38);
+      background:linear-gradient(180deg,rgba(229,57,53,.13),rgba(229,57,53,.055));
+      border-radius:12px;
+      padding:11px 13px;
+      min-width:0;
+    }
+    .warCard.warn{
+      border-color:rgba(251,140,0,.42);
+      background:linear-gradient(180deg,rgba(251,140,0,.13),rgba(251,140,0,.055));
+    }
+    .warLabel{
+      font-size:10px;
+      color:var(--muted);
+      font-weight:950;
+      text-transform:uppercase;
+      letter-spacing:.38px;
+      margin-bottom:5px;
+    }
+    .warValue{
+      font-size:14px;
+      font-weight:950;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .warSub{
+      margin-top:4px;
+      color:var(--muted);
+      font-size:11px;
+    }
+
+    .noc-mode .rawSplit,.noc-mode .controlBar,.noc-mode #outBox,.noc-mode .hint,.noc-mode #storageBar{ display:none!important; }
+    .noc-mode .wrap{ max-width:1800px; }
+    .noc-mode th,.noc-mode td{ font-size:15px; padding:12px 14px; }
+    .noc-mode h1{ font-size:26px; }
+    .noc-mode .sub{ font-size:15px; }
+    #btnNocFloat{ display:none; position:fixed; right:18px; bottom:18px; z-index:9998; box-shadow:0 10px 30px var(--shadow); }
+    .noc-mode #btnNocFloat{ display:inline-flex; align-items:center; gap:8px; }
+
+
+    /* 48h-72h e acima de 72h: classificação crítica visual */
+    .smartTable tr.sla48 td,
+    .smartTable tr.sla72 td,
+    #outTable tr.sla48 td,
+    #outTable tr.sla72 td{
+      box-shadow:inset 0 0 0 9999px rgba(229,57,53,.055);
+    }
+
+    /* ====== PRINT ====== */
+    @media print{
+      body{ background:white!important; color:#000!important; padding:10px; }
+      .rawSplit,.actions,.controlBar,#outBox,.rawRight,button,.kpiSection .card:has(.actions){ display:none!important; }
+      header{ margin-bottom:8px; }
+      .card{ box-shadow:none; border:1px solid #ccc; break-inside:avoid; }
+      table{ font-size:11pt; }
+      th,td{ padding:5px 8px; }
+      .kpiGrid{ grid-template-columns:repeat(4,1fr)!important; }
+      .summaryGrid{ grid-template-columns:1fr 1fr!important; }
+      a[href]::after{ content:" ("attr(href)")"; }
+    }
+
+    /* ====== KEYBOARD SHORTCUT HINT ====== */
+    .kbd{ display:inline-block; background:var(--btn-bg2); border:1px solid var(--line); border-radius:4px; padding:1px 5px; font-size:10px; font-family:monospace; color:var(--muted); }
+    /* ====== LAYOUT INTELIGENTE ====== */
+    .smartTables{ display:flex; flex-direction:column; gap:16px; }
+    .smartSection{ border:1px solid var(--line); border-radius:14px; overflow:hidden; background:rgba(255,255,255,.02); }
+    body[data-theme="light"] .smartSection{ background:rgba(13,19,33,.02); }
+    .smartSectionTitle{ display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 12px; border-bottom:1px solid var(--line); font-size:12px; font-weight:900; color:var(--muted); text-transform:uppercase; letter-spacing:.35px; }
+    .smartSectionTitle strong{ color:var(--text); font-size:13px; }
+    .smartTableWrap{ overflow:auto; }
+    .smartTable{ width:100%; border-collapse:separate; border-spacing:0; table-layout:auto; }
+    .smartTable th,.smartTable td{ padding:9px 10px; font-size:12px; vertical-align:middle; }
+    .smartTable th{ position:sticky; top:0; background:var(--head-bg); color:var(--muted); font-size:11px; text-align:center; z-index:1; }
+    .smartTable td{ border-bottom:1px solid var(--line); }
+    .smartTable tr:last-child td{ border-bottom:none; }
+    .smartTable td.desCol{ min-width:220px; }
+    .smartTable td.cfCol{ min-width:170px; max-width:360px; overflow-wrap:anywhere; }
+    .smartTable td.clienteCol{ min-width:160px; }
+
+    /* ====== PLANILHA VISUAL OTIMIZADA: colunas proporcionais e descanso visual ====== */
+    .smartTable{
+      table-layout:fixed;
+      width:100%;
+      min-width:1180px;
+    }
+    .smartTable th,
+    .smartTable td{
+      padding:7px 9px;
+      font-size:12px;
+      line-height:1.22;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      vertical-align:middle;
+    }
+    .smartTable th{
+      font-size:11px;
+      letter-spacing:.25px;
+      white-space:nowrap;
+    }
+    .smartTable tr:nth-child(even) td{ background:rgba(255,255,255,.018); }
+    body[data-theme="light"] .smartTable tr:nth-child(even) td{ background:rgba(13,19,33,.018); }
+    .smartTable .c-ral,
+    .smartTable .c-rec{ width:132px; min-width:132px; font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace; }
+    .smartTable .c-des{ width:250px; min-width:250px; }
+    .smartTable .c-cliente{ width:155px; min-width:155px; }
+    .smartTable .c-cf{ width:220px; min-width:220px; font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace; }
+    .smartTable .c-pir{ width:150px; min-width:150px; }
+    .smartTable .c-uf{ width:46px; min-width:46px; text-align:center; font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace; }
+    .smartTable .c-idade{ width:104px; min-width:104px; font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace; }
+    .smartTable .c-resp{ width:172px; min-width:172px; }
+    .smartTable .c-prazo{ width:90px; min-width:90px; text-align:center; }
+    .smartTable .c-status{ width:90px; min-width:90px; text-align:center; }
+    .smartTable .c-act{ width:54px; min-width:54px; text-align:center; }
+    .smartTable .badge{ padding:3px 7px; font-size:11px; }
+    .smartTable .ageSub{ margin-top:3px; font-size:11px; }
+    .smartTable select.statusSel{ min-width:74px; width:74px; height:27px; padding:3px 5px; font-size:10px; }
+    .smartTable .prazoWrap{ min-width:74px; }
+    .smartTable .prazoField{ min-width:74px; }
+    .smartTable .prazoBtn{ min-height:27px; padding:3px 5px; font-size:10px; }
+    .smartTableWrap{ scrollbar-width:thin; }
+    .smartHint{ font-size:11px; color:var(--muted); font-weight:700; text-transform:none; letter-spacing:0; }
 
   
-  /* Saída (Planilha) mais compacta e UF estreita */
-  #outTable { font-size: 12px; }
-  #outTable th, #outTable td { padding: 6px 8px; vertical-align: top; }
-  #outTable td.ufCol, #outTable th.ufCol { width: 44px; max-width: 44px; white-space: nowrap; }
-  #outTable td.cfCol { max-width: 320px; }
-  #outTable td { overflow-wrap: anywhere; word-break: break-word; }
-  select.statusSel { font-size: 12px; padding: 4px 6px; }
+/* ====== PATCH SEGURO: TOPO COMPACTO + ÁREA ÚTIL ====== */
 
-  
-
-  /* PRAZO/STATUS: evitar sobreposição em telas menores */
-  #outTable td input.prazoInput, #outTable td select.statusSel{
-    width: 100%;
-    min-width: 110px;
-  }
-  #outTable td{ overflow: hidden; }
-  #outTable td.prazoCell{ overflow: visible; }
-/* Destaque corporativo: ABERTAS acima de 24h (barra lateral + fundo suave) */
-  #outTable tr.sla24{ box-shadow: inset 4px 0 0 var(--m-red); }
-  #outTable tr.sla48{ box-shadow: inset 4px 0 0 var(--m-red); }
-  #outTable tr.sla72{ box-shadow: inset 4px 0 0 var(--m-black); }
-
-
-
-
-/* ====== PRAZO (data) ====== */
-/* Objetivo: caber sem esconder o botão do calendário (mesmo com coluna estreita) */
-.prazoWrap{ display:flex; align-items:center; min-width: 120px; width:100%; }
-.prazoField{ position:relative; flex:1; min-width: 110px; }
-
-/* O botão é o "visual" da célula */
-.prazoBtn{
-  width:100%;
-  min-height:30px;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-  border:1px solid var(--btn-border);
-  background: var(--btn-bg2);
-  color: var(--text);
-  border-radius:10px;
-  cursor:pointer;
-  font-weight:900;
-  padding:6px 8px;
-  font-size:12px;
-  line-height:1.2;  position:relative;
-  z-index:2;
-  pointer-events:auto;
+/* Remove legenda longa do cabeçalho */
+header .sub{
+  display:none !important;
 }
 
-.prazoBtn:hover{ border-color: rgba(255,255,255,.22); }
-body[data-theme="light"] .prazoBtn:hover{ border-color: rgba(13,19,33,.22); }
-
-/* O input fica por cima (transparente) para abrir o calendário nativo ao clicar */
-.prazoField input[type="date"]{
-  position:absolute; inset:0;
-  width:100%; height:100%;
-  opacity:0;
-  cursor:pointer;
-  z-index:1;
-  pointer-events:none;
+/* Compacta topo sem mexer na estrutura original */
+header{
+  margin-bottom:8px !important;
+  align-items:center !important;
 }
 
-/* Texto do botão */
-.prazoBtnText{ font-weight:800; opacity:.95; }
-.prazoBtnEmpty{ opacity:.70; font-weight:800; }
-
-
-@media (max-width: 1100px){ }
-.rawRight{ border:1px solid var(--line); border-radius:14px; padding:12px; background: rgba(255,255,255,.02); }
-body[data-theme="light"] .rawRight{ background: rgba(13,19,33,.02); }
-.chart.compact{ gap:6px; }
-.chart.compact .barRow{ grid-template-columns: 160px 1fr 40px; gap:6px; }
-.chart.compact .barTrack{ height:8px; }
-
-
-/* ====== Painel de controle compacto (1 linha) ====== */
-.controlBar{ padding:12px 14px; margin-top:12px; }
-
-.controlBarInner{
-  display:flex;
-  gap:10px;
-  align-items:center;
-  flex-wrap:wrap;
-}
-.controlTitle{ font-weight:900; letter-spacing:.2px; }
-.controlBarInner input{
-  flex: 1 1 220px;
-  min-width: 180px;
-  height: 38px;
-}
-.controlActions{
-  margin-left:auto;
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  align-items:center;
-}
-.controlActions button{
-  padding:8px 10px;
-  font-size:12px;
+header h1{
+  margin:0 !important;
+  font-size:20px !important;
 }
 
+header h1 .version{
+  display:none !important;
+}
+
+header > div:last-child{
+  display:flex !important;
+  gap:8px !important;
+  align-items:center !important;
+  flex-wrap:wrap !important;
+}
+
+header button,
+header .pill{
+  padding:7px 10px !important;
+  min-height:34px !important;
+}
+
+/* Remove badge/pill vazio do campo híbrido, se existir */
+.rawRight .pill:empty,
+.rawRight .hybridBadge,
+.rawRight .campoHibrido,
+#hybridBadge,
+#campoHibrido{
+  display:none !important;
+}
+
+/* Sobe área de dados brutos e gráfico */
+.grid{
+  gap:8px !important;
+}
+
+.card{
+  padding:12px !important;
+}
+
+.rawSplit{
+  align-items:start !important;
+  gap:12px !important;
+  grid-template-columns:minmax(0,1fr) 390px !important;
+}
+
+.rawRight{
+  margin-top:0 !important;
+  padding:10px 12px !important;
+}
+
+.rawRight h2,
+#chartTitleText{
+  margin-top:0 !important;
+}
+
+.rawRight .hint{
+  margin-top:0 !important;
+  margin-bottom:8px !important;
+}
+
+/* Placeholder central no textarea: usa o placeholder nativo, sem criar campo extra */
+#raw::placeholder{
+  text-align:center;
+  color:var(--muted);
+  opacity:.75;
+  font-weight:800;
+}
+
+/* Campo bruto mais compacto */
+#raw{
+  min-height:135px !important;
+  height:145px !important;
+}
+
+/* Botões mais compactos */
+.actions{
+  gap:8px !important;
+  margin-top:8px !important;
+}
+
+.actions button{
+  padding:8px 10px !important;
+  font-size:12px !important;
+}
+
+/* Garante que não apareça box de saída vazio antes de gerar TXT/Planilha */
+#outBox{
+  display:none;
+}
+
+/* Planilha visual gerada mais larga e sem scroll vertical interno quando couber */
+#outTableWrap{
+  max-height:none !important;
+}
+
+#outTable{
+  table-layout:fixed !important;
+  width:100% !important;
+}
+
+#outTable th{
+  white-space:nowrap !important;
+}
+
+#outTable th,
+#outTable td{
+  padding:6px 7px !important;
+  font-size:11px !important;
+  line-height:1.12 !important;
+}
+
+#outTable td{
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+}
+
+/* evita scroll vertical forçado na planilha visual */
+#outTableWrap.tablewrap{
+  overflow-x:auto !important;
+  overflow-y:visible !important;
+}
+
+
+
+/* ====== PATCH JARVIS: PLANILHA VISUAL INTELIGENTE MAIS ENXUTA ====== */
+/* Faz a planilha gerada sair do aperto do campo bruto e usar a largura real do painel. */
+body.excel-visual-mode #outBox{
+  margin-top:14px !important;
+  width:100% !important;
+}
+body.excel-visual-mode #outTableWrap{
+  overflow-x:visible !important;
+  overflow-y:visible !important;
+}
+body.excel-visual-mode .smartTableWrap{
+  overflow-x:visible !important;
+  overflow-y:visible !important;
+}
+
+/* A antiga largura mínima obrigava barra horizontal. Agora a tabela obedece ao container. */
+.smartTable{
+  table-layout:fixed !important;
+  width:100% !important;
+  min-width:0 !important;
+}
+.smartTable th,
+.smartTable td{
+  padding:5px 6px !important;
+  font-size:11px !important;
+  line-height:1.12 !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+}
+.smartTable th{
+  font-size:10px !important;
+  letter-spacing:.15px !important;
+}
+.smartTable .c-ral,
+.smartTable .c-rec{ width:112px !important; min-width:0 !important; }
+.smartTable .c-des{ width:20% !important; min-width:0 !important; }
+.smartTable .c-cliente{ width:13% !important; min-width:0 !important; }
+.smartTable .c-cf{ width:18% !important; min-width:0 !important; }
+.smartTable .c-pir{ width:13% !important; min-width:0 !important; }
+.smartTable .c-uf{ width:34px !important; min-width:0 !important; }
+.smartTable .c-idade{ width:82px !important; min-width:0 !important; }
+.smartTable .c-resp{ width:13% !important; min-width:0 !important; }
+.smartTable .c-prazo{ width:78px !important; min-width:0 !important; }
+.smartTable .c-status{ width:76px !important; min-width:0 !important; }
+.smartTable .c-act{ width:42px !important; min-width:0 !important; }
+.smartTable .badge{
+  max-width:100% !important;
+  padding:2px 5px !important;
+  font-size:10px !important;
+  gap:4px !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+}
+.smartTable .dot{ width:7px !important; height:7px !important; flex:0 0 auto !important; }
+.smartTable .ageSub{ margin-top:2px !important; font-size:10px !important; }
+.smartTable select.statusSel,
+.smartTable .prazoBtn{
+  width:100% !important;
+  min-width:0 !important;
+  height:24px !important;
+  min-height:24px !important;
+  padding:2px 4px !important;
+  font-size:9px !important;
+}
+.smartTable .prazoWrap,
+.smartTable .prazoField{ min-width:0 !important; width:100% !important; }
+.smartSectionTitle{ padding:7px 9px !important; }
+.smartHint{ display:none !important; }
+
+/* Quando a tela for menor, sacrifica menos a leitura: mantém compacto e deixa só um respiro lateral mínimo. */
+@media(max-width:980px){
+  body.excel-visual-mode #outTableWrap,
+  body.excel-visual-mode .smartTableWrap{ overflow-x:auto !important; }
+  .smartTable{ min-width:900px !important; }
+}
+
+
+
+/* ====== PATCH PRAZO NA PLANILHA VISUAL INTELIGENTE ====== */
+.smartTable .c-prazo,
+.smartTable td.c-prazo,
+.smartTable td.prazoCell{
+  width:118px !important;
+  min-width:118px !important;
+  max-width:118px !important;
+  text-align:center !important;
+  overflow:visible !important;
+}
+.smartTable .prazoWrap{
+  min-width:104px !important;
+  width:104px !important;
+  margin:0 auto !important;
+}
+.smartTable .prazoField{
+  min-width:104px !important;
+  width:104px !important;
+}
+.smartTable .prazoBtn{
+  min-height:28px !important;
+  padding:4px 6px !important;
+  font-size:11px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:4px !important;
+  overflow:visible !important;
+  white-space:nowrap !important;
+}
+.smartTable .prazoBtnText{
+  display:inline-block !important;
+  max-width:none !important;
+}
 
 </style>
 </head>
 
-<body>
+<body data-theme="dark">
+<div id="toastContainer"></div>
+<div id="btnNocFloat" style="display:none!important"></div>
+
+<!-- Modal erros parsing -->
+<div id="parseModal" class="modal-overlay" style="display:none;">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">⚠️ Linhas ignoradas na importação</div>
+      <button class="modal-close" id="closeParseModal" title="Fechar">✕</button>
+    </div>
+    <div id="parseModalContent"></div>
+  </div>
+</div>
+
 <div class="wrap">
   <header>
     <div>
-      <h1>RALSCOPE</h1>
+      <h1>RALSCOPE <span class="version">v8.0 layout otimizado</span></h1>
       <div class="sub">
-        Distribuição por <b>faixa de idade</b> (SLA) usando a <b>data/hora de abertura</b> como base.
-        Gráfico clicável para enxergar e filtrar as <b>ofensoras &gt; 24h</b>.
+        Distribuição por <b>faixa de idade</b> (SLA) · Campo de dados brutos <b>híbrido Nível 2</b>: aceita <b>RAL</b> e <b>REC</b> juntos, inclusive RAL com QUALIDADE
+        <span style="margin-left:8px; opacity:.6;">· <span class="kbd">Ctrl+I</span> Importar · <span class="kbd">Ctrl+T</span> TXT · <span class="kbd">Ctrl+E</span> Excel · <span class="kbd">Ctrl+P</span> Imprimir</span>
       </div>
     </div>
-    <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-      <button class="ghost" id="btnTheme" title="Alternar tema">🌓 Modo</button>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+      <button class="ghost" id="btnTheme" title="Alternar tema (Ctrl+D)">🌓 Modo</button>
+      <button class="ghost" id="btnPrint" title="Imprimir">🖨️ Imprimir</button>
+      
       <span class="pill">📌 Registros: <strong id="count">0</strong></span>
+      <span class="pill" id="pillVencidos" style="display:none;" title="RALs com prazo vencido">🔴 Vencidos: <strong id="countVencidos">0</strong></span>
       <span class="pill">🗓️ Coleta: <strong id="rangeColeta" class="mono">-</strong></span>
+      <span class="pill" id="pillStorage" style="display:none;" title="Uso do localStorage">💾 <strong id="storageUsage">-</strong></span>
     </div>
   </header>
 
+  <!-- Storage warning bar -->
+  <div id="storageBar" class="hidden">
+    ⚠️ <strong>Atenção:</strong> O armazenamento local está com <span id="storagePercent">-</span>% de uso. Considere exportar e limpar dados antigos.
+  </div>
+
   <div class="grid">
     <div class="card">
-      <h2 style="margin:0 0 10px 0; font-size:14px; color: var(--muted); font-weight:900;">Dados brutos</h2>
-      <div class="rawSplit">
-      <div class="rawLeft">
-      <label for="raw">Cole o bloco aqui</label>
-      <textarea id="raw" placeholder=""></textarea>
-
-      <div class="actions">
-        <button class="primary" id="btnParse">Importar / Parsear</button>
-        <button id="btnTxt">Gerar TXT (na tela)</button>
-        <button id="btnXls">Gerar Planilha Excel</button>
-        <button id="btnCsv">Gerar CSV (download)</button>
-        <button class="danger" id="btnClear">Limpar tudo</button>
-        <button class="danger" id="btnResetStatus">Resetar status salvos</button>
+      <div class="sectionTitleRow">
+        <h2 style="margin:0;font-size:14px;color:var(--muted);font-weight:900;">Dados brutos híbridos</h2>
+        <div class="pill" title="Importação automática"></div>
       </div>
-
-<div class="out" id="outBox">
-        <div class="outHeader">
-          <div class="muted" id="outTitle" style="font-weight:900;">Saída</div>
-          <div class="outActions">
-            <button id="btnCopyOut">Copiar</button>
-            <button id="btnDownloadXls" title="Baixar como .xls (Excel abre)">Baixar XLS</button>
-            <button id="btnCloseOut" class="ghost">Fechar</button>
+      <div class="rawSplit">
+        <div class="rawLeft">
+          <label for="raw" id="rawLabel" style="display:none;">Dados brutos</label>
+          <textarea id="raw" placeholder="Cole RALs e/ou RECs no mesmo bloco"></textarea>
+          <div class="actions">
+            <button class="primary" id="btnParse" title="Ctrl+I">⬆️ Importar / Parsear</button>
+            <button id="btnTxt" title="Ctrl+T">📄 Gerar TXT</button>
+            <button id="btnXls" title="Ctrl+E">📊 Planilha Visual</button>
+            <button id="btnCsv">💾 CSV (download)</button>
+            <button id="btnCsvBom">🔤 CSV UTF-8 BOM</button>
+            <button type="button" id="btnReport" onclick="window.__ralscopeShowReport && window.__ralscopeShowReport()">📢 Relatório</button>
+            <button type="button" id="btnReportN3">📊 Relatório N3</button>
+            <button type="button" id="btnPrintInline">🖨️ Imprimir</button>
+            <button class="danger" id="btnClear">🗑️ Limpar tudo</button>
+            <button class="danger" id="btnResetStatus">↩️ Resetar status</button>
           </div>
+
+          <div class="out" id="outBox">
+            <div class="outHeader">
+              <div class="muted" id="outTitle" style="font-weight:900;">Saída</div>
+              <div class="outActions">
+                <button id="btnCopyOut">📋 Copiar</button>
+                <button id="btnDownloadXls" title="Baixar como arquivo Excel compatível">⬇️ Baixar XLS</button>
+                <button id="btnCloseOut" class="ghost">✕ Fechar</button>
+              </div>
+            </div>
+            <textarea id="outTxt" class="mono" readonly wrap="off"></textarea>
+            <div class="tablewrap" id="outTableWrap" style="display:none;margin-top:10px;">
+              <table id="outTable">
+                <thead id="outThead"></thead>
+                <tbody id="outTbody"></tbody>
+              </table>
+            </div>
+            <div class="hint" id="outHint">Dica: o TXT é TSV. Cola no Excel/Sheets que vira coluna.</div>
+          </div>
+        </div><!-- /rawLeft -->
+
+        <div class="rawRight">
+          <h2 style="margin:0 0 10px 0;font-size:14px;color:var(--muted);font-weight:900;" id="chartTitleText">Gráfico: registros por idade</h2>
+          <div class="hint" style="margin-top:-6px;margin-bottom:10px;">Clique em uma barra para filtrar. Clique de novo para soltar.</div>
+          <div class="chart compact" id="chart"></div>
         </div>
-
-        <!-- TXT/TSV -->
-        <textarea id="outTxt" class="mono" readonly wrap="off"></textarea>
-
-        <!-- Tabela (visual) -->
-        <div class="tablewrap" id="outTableWrap" style="display:none; margin-top:10px;">
-          <table id="outTable">
-            <thead>
-              <tr>
-                <th>RAL</th>
-                <th>PIRÂMIDE</th>
-                <th class="ufCol">UF</th>
-                <th class="cfCol">CF</th>
-                <th>FAIXA DE IDADE</th>
-                <th>RESPONSÁVEL</th>
-                <th>PRAZO</th>
-                <th>STATUS</th>
-              </tr>
-            </thead>
-            <tbody id="outTbody"></tbody>
-          </table>
-        </div>
-
-        <div class="hint" id="outHint">Dica: o TXT é TSV (tabulado). Cola no Excel/Sheets que vira coluna na hora.</div>
-    </div>
-      </div><!-- /rawLeft -->
-      <div class="rawRight">
-        <h2 style="margin:0 0 10px 0; font-size:14px; color: var(--muted); font-weight:900;">Gráfico: RALs por idade</h2>
-        <div class="hint" style="margin-top:-6px; margin-bottom:10px;">Clique em uma barra para filtrar. Clique de novo para soltar.</div>
-        <div class="chart compact" id="chart"></div>
-      </div><!-- /rawRight -->
       </div><!-- /rawSplit -->
-
-
     </div>
   </div>
 
+  <!-- KPI SUMMARY CARDS -->
+  <div class="kpiSection" id="kpiSection" style="display:none;">
+    <div class="card">
+      <h2 style="margin:0 0 10px 0;font-size:14px;color:var(--muted);font-weight:900;">📊 Resumo Operacional</h2>
+      <div class="kpiGrid" id="kpiGrid"></div>
+      <div class="summaryGrid" id="summaryGrid" style="margin-top:14px;">
+        <div class="summaryPanel">
+          <h3 id="sumTitle1" style="margin:0 0 10px;font-size:12px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.4px;">RALs abertas por UF</h3>
+          <div class="summaryBars" id="tblSummary1"></div>
+        </div>
+        <div class="summaryPanel">
+          <h3 id="sumTitle2" style="margin:0 0 10px;font-size:12px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.4px;">RALs &gt; 24h por UF</h3>
+          <div class="summaryBars" id="tblSummary2"></div>
+        </div>
+        <div class="summaryPanel">
+          <h3 id="sumTitle3" style="margin:0 0 10px;font-size:12px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.4px;">RALs &gt; 48h por UF</h3>
+          <div class="summaryBars" id="tblSummary3"></div>
+        </div>
+        <div class="summaryPanel">
+          <h3 id="sumTitle4" style="margin:0 0 10px;font-size:12px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.4px;">RALs &gt; 72h por UF</h3>
+          <div class="summaryBars" id="tblSummary4"></div>
+        </div>
+        <div class="summaryPanel">
+          <h3 id="sumTitle5" style="margin:0 0 10px;font-size:12px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.4px;">RALs com prazo vencido por UF</h3>
+          <div class="summaryBars" id="tblSummary5"></div>
+        </div>
+        <div class="summaryPanel">
+          <h3 id="sumTitle6" style="margin:0 0 10px;font-size:12px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.4px;">RALs por Pirâmide</h3>
+          <div class="summaryBars" id="tblSummary6"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FILTROS -->
   <div class="card controlBar">
     <div class="controlBarInner">
-      <div class="controlTitle muted">Filtros</div>
-
+      <div class="controlTitle muted">🔍 Filtros</div>
       <input id="fDesignacao" placeholder="Designação" aria-label="Designação" />
+      <input id="fCliente" placeholder="Cliente" aria-label="Cliente" />
       <input id="fCF" placeholder="CF" aria-label="CF" />
-      <input id="fRAL" class="mono" placeholder="RAL" aria-label="RAL" />
-
+      <input id="fTicket" class="mono" placeholder="RAL ou REC" aria-label="RAL ou REC" />
       <div class="controlActions">
         <button id="btnResetFilters">Limpar filtros</button>
-        <button id="btnClearRange" class="ghost" title="Remove o filtro de faixa do gráfico">Limpar faixa</button>
+        <button id="btnClearRange" class="ghost" title="Remove o filtro de faixa">Limpar faixa</button>
       </div>
     </div>
   </div>
 
+  <!-- PLANILHA PRINCIPAL (com status e prazo inline) -->
   <div class="card" style="margin-top:14px;">
-
-    <h2 style="margin:0 0 10px 0; font-size:14px; color: var(--muted); font-weight:900;">Planilha</h2>
-
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
+      <h2 style="margin:0;font-size:14px;color:var(--muted);font-weight:900;">Planilha</h2>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+        <span class="hint" style="margin:0;align-self:center;">Status e Prazo editáveis direto na linha</span>
+        <button id="btnPrintTable" class="ghost" type="button">🖨️ Imprimir</button>
+      </div>
+    </div>
     <div class="tablewrap">
       <table>
-        <colgroup>
-          <col class="col-age">
-          <col class="col-ral">
-          <col class="col-des">
-          <col class="col-cf">
-          <col class="col-act">
-        </colgroup>
-        <thead>
-          <tr>
-            <th>IDADE</th>
-            <th>RAL</th>
-            <th>DESIGNAÇÃO</th>
-            <th class="cfCol">CF</th>
-            <th>AÇÕES</th>
-          </tr>
-        </thead>
+        <thead id="mainThead"></thead>
         <tbody id="tbody"></tbody>
       </table>
     </div>
   </div>
 </div>
 
-<script>
-
-(() => {
-  const STORAGE_KEY = "monitor_rals_v4_upgrade_2026_02";
+<script>(() => {
+  const STORAGE_KEY = "monitor_rals_v7_7_2026";
+  const MODE_KEY = "monitor_rals_mode_v7";
   const THEME_KEY = "monitor_rals_theme";
-  const el = (id) => document.getElementById(id);
-
-  const raw = el("raw");
-  const count = el("count");
-  const rangeColeta = el("rangeColeta");
-
-  // Status editável (usado na planilha visual e refletido nas exportações)
-  const statusByRal = new Map(); // key: "RAL-12345/2026" -> "ABERTA"|"FECHADA"|"NORMALIZADA"
   const LS_STATUS_KEY = "monral_status_v1";
+  const LS_PRAZO_KEY = "monral_prazo_v1";
+  const STORAGE_WARN_PCT = 70;
 
+  const el = id => document.getElementById(id);
+
+  let items = [];
+  let selectedRangeKey = "";
+  let MODE = localStorage.getItem(MODE_KEY) === "REC" ? "REC" : "RAL";
+  let nocMode = false;
+  const statusByRal = new Map();
+  const prazoByRal = new Map();
+
+  const AGE_RANGES_BY_MODE = {
+    RAL: [
+      { key:"ACIMA_72", label:"Acima de 72h", manchester:"red" },
+      { key:"48_72", label:"48h – 72h", manchester:"red" },
+      { key:"24_48", label:"24h – 48h", manchester:"red" },
+      { key:"16_24", label:"16h – 24h", manchester:"orange" },
+      { key:"8_16", label:"8h – 16h", manchester:"yellow" },
+      { key:"4_8", label:"4h – 8h", manchester:"green" },
+      { key:"ATE_4", label:"Até 4h", manchester:"blue" }
+    ],
+    REC: [
+      { key:"ACIMA_24", label:"> 24h", manchester:"black" },
+      { key:"16_24", label:"16h – 24h", manchester:"red" },
+      { key:"8_16", label:"8h – 16h", manchester:"orange" },
+      { key:"4_8", label:"4h – 8h", manchester:"yellow" },
+      { key:"2_4", label:"2h – 4h", manchester:"green" },
+      { key:"1_2", label:"1h – 2h", manchester:"blue" }
+    ]
+  };
+
+  const CF_RULES = {
+    infra_suffixes:["/EN","/EN/","//EN","/AC","/AC/","//AC","/IN","/IN/","//IN","/INF","/INF/","//INF"],
+    uf_map:[
+      { keys:["CPE","DOS","TLS"], uf:"MS" },
+      { keys:["BSA"], uf:"DF" },
+      { keys:["PMJ","GUR","ARN"], uf:"TO" },
+      { keys:["CBA","ROI","SNO","BAG","CCS"], uf:"MT" },
+      { keys:["GNA","ANS","RVD","JTI"], uf:"GO" },
+      { keys:["PVO","JIP"], uf:"RO" },
+      { keys:["RBO"], uf:"AC" },
+    ]
+  };
+
+  function getAgeRanges(){
+    return [
+      { key:"ACIMA_72", label:"Acima de 72h", manchester:"red" },
+      { key:"48_72", label:"48h – 72h", manchester:"red" },
+      { key:"24_48", label:"24h – 48h", manchester:"red" },
+      { key:"16_24", label:"16h – 24h", manchester:"orange" },
+      { key:"8_16", label:"8h – 16h", manchester:"yellow" },
+      { key:"4_8", label:"4h – 8h", manchester:"green" },
+      { key:"2_4", label:"2h – 4h", manchester:"green" },
+      { key:"1_2", label:"1h – 2h", manchester:"blue" },
+      { key:"ATE_1", label:"Até 1h", manchester:"blue" }
+    ];
+  }
+  function currentLabel(){ return "REGISTRO"; }
+  function currentPlural(){ return "registros"; }
+  function currentTicket(x){ return x.rec || x.ral || ""; }
+  function currentItems(){ return items; }
+  function itemMode(x){ return (x.mode || (x.rec ? "REC" : "RAL")).toUpperCase(); }
+  function itemTicket(x){ return x.rec || x.ral || ""; }
+
+  function getCss(v){ return getComputedStyle(document.body).getPropertyValue(v).trim(); }
+  function manchesterColor(k){ const map={red:"--m-red",orange:"--m-orange",yellow:"--m-yellow",green:"--m-green",blue:"--m-blue",black:"--m-black"}; return getCss(map[k] || "--m-blue"); }
+
+  function escapeHtml(str){
+    return (str ?? "").toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+  }
+  function normalize(s){ return (s ?? "").toString().trim().toLowerCase(); }
+  function normalizeCFPath(cf){ return (cf ?? "").toString().trim().replace(/\s*\/\s*/g,'/').replace(/\s{2,}/g,' '); }
+  function ticketNumeric(ral){ return (ral ?? "").toString().trim().replace(/^RAL\s*-\s*/i,""); }
+  function fmtBR(dt){ const p=n=>String(n).padStart(2,'0'); return `${p(dt.getDate())}/${p(dt.getMonth()+1)}/${dt.getFullYear()} - ${p(dt.getHours())}:${p(dt.getMinutes())}`; }
+  function fmtPrazoBR(iso){ if(!/^\d{4}-\d{2}-\d{2}$/.test((iso||"").trim())) return ""; const [y,m,d]=iso.split('-'); return `${d}/${m}/${y}`; }
+  function getPrazoForRalBR(ral){ return fmtPrazoBR(getPrazoForRal(ral)); }
+  function stampName(prefix,ext){ const d=new Date(), p=n=>String(n).padStart(2,'0'); return `${prefix}_${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}_${p(d.getHours())}${p(d.getMinutes())}.${ext}`; }
+  function downloadFile(content,mime,filename){ const blob=new Blob([content],{type:mime}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.download=filename; a.href=url; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); }
+  function ageMs(dt){ return Date.now() - dt.getTime(); }
+  function ageHuman(dt){ const ms=Math.max(0, ageMs(dt)); const tm=Math.floor(ms/60000); return { days:Math.floor(tm/1440), hours:Math.floor((tm%1440)/60), minutes:tm%60, totalHours:ms/3600000 }; }
+  function formatAgeShort(a){ return `${a.days}d ${a.hours}h ${a.minutes}m`; }
+
+  function agoraDetalhado(){
+    const d = new Date();
+    const p = n => String(n).padStart(2,'0');
+    return {
+      data: `${p(d.getDate())}/${p(d.getMonth()+1)}/${d.getFullYear()}`,
+      hora: `${p(d.getHours())}:${p(d.getMinutes())}`,
+      raw: d
+    };
+  }
+
+  function gerarReportID(){
+    const d = new Date();
+    const p = n => String(n).padStart(2,'0');
+    const base = `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}`;
+    const random = Math.random().toString(36).substring(2,6).toUpperCase();
+    return `RS-${base}-${random}`;
+  }
+
+  function tempoDesdeColeta(rows){
+    if(!rows || !rows.length) return 'N/D';
+    const datas = rows
+      .map(r => new Date(r.x && r.x.aberturaISO ? r.x.aberturaISO : r.aberturaISO))
+      .filter(d => !Number.isNaN(d.getTime()));
+    if(!datas.length) return 'N/D';
+    const maisRecente = new Date(Math.max(...datas.map(d => d.getTime())));
+    let diffMs = Date.now() - maisRecente.getTime();
+    if(diffMs < 0) diffMs = 0;
+    const min = Math.floor(diffMs / 60000);
+    const h = Math.floor(min / 60);
+    const m = min % 60;
+    return `${String(h).padStart(2,'0')}h ${String(m).padStart(2,'0')}m`;
+  }
+
+  function cabecalhoRelatorioLinha(){
+    const agora = agoraDetalhado();
+    return `RALSCOPE • Relatório operacional | Gerado em: ${agora.data} às ${agora.hora}`;
+  }
+
+  function montarCabecalhoRelatorio(rows, titulo='RALSCOPE • Relatório operacional'){
+    return [cabecalhoRelatorioLinha(), ''];
+  }
+
+  function priorityInfo(totalHours, mode){
+    const tipo = (mode || MODE || 'RAL').toUpperCase();
+
+    // Régua final de severidade:
+    // REC: 24h+ = CRÍTICA; 16h-24h = ATENÇÃO; abaixo disso não polui a planilha.
+    // RAL: 24h+ = CRÍTICA; 16h-24h = ATENÇÃO.
+    if(tipo === 'REC'){
+      if(totalHours >= 24) return {label:'CRÍTICA', cls:'priority-critica'};
+      if(totalHours >= 16) return {label:'ATENÇÃO', cls:'priority-atencao'};
+      return null;
+    }
+
+    if(totalHours >= 24) return {label:'CRÍTICA', cls:'priority-critica'};
+    if(totalHours >= 16) return {label:'ATENÇÃO', cls:'priority-atencao'};
+    return null;
+  }
+  function buildOperationalReport(){
+    const rows = buildDerivedRows();
+    const sla = MODE==='REC' ? 24 : 24;
+    const crit = MODE==='REC' ? 24 : 72;
+    const abertas = rows.filter(r => r.status === 'ABERTA' && r.a.totalHours >= sla);
+    const criticas = abertas.filter(r => r.a.totalHours >= crit).length;
+    const porGrupo = {};
+    abertas.forEach(r=>{
+      const nome = MODE==='REC' ? (r.piramide || 'NÃO CLASSIFICADO') : (r.responsavel || '(sem responsável)');
+      porGrupo[nome] = (porGrupo[nome]||0)+1;
+    });
+    const tituloGrupo = MODE==='REC' ? 'Por pirâmide:' : 'Por responsável:';
+    const listaGrupo = Object.entries(porGrupo).sort((a,b)=>b[1]-a[1]).map(([n,c])=>`• ${n}: ${c}`).join('\n') || '• Nenhuma';
+    const linhas = abertas.length ? abertas.map(r => MODE==='REC'
+      ? `• ${r.x.rec} | ${r.x.designacao} | ${r.x.cliente||''} | ${r.x.cf} | ${r.piramide} | ${r.uf} | ${formatAgeShort(r.a)}`
+      : `• ${ticketNumeric(r.x.ral)} | ${r.piramide} | ${r.x.cf} | ${r.faixa} | ${r.responsavel || '(sem responsável)'} | ${formatAgeShort(r.a)}`
+    ) : ['• Nenhuma'];
+    return [
+      ...montarCabecalhoRelatorio(rows, `RALSCOPE • Relatório operacional ${currentLabel()}`),
+      `${currentPlural()} abertas > ${sla}h: ${abertas.length}`,
+      `${currentPlural()} críticas: ${criticas}`,
+      '',
+      tituloGrupo,
+      listaGrupo,
+      '',
+      `${currentPlural()} abertas acima de ${sla}h:`,
+      ...linhas
+    ].join('\n');
+  }
+  function rangeKeyForHours(h){
+    if(h>=72) return "ACIMA_72";
+    if(h>=48) return "48_72";
+    if(h>=24) return "24_48";
+    if(h>=16) return "16_24";
+    if(h>=8) return "8_16";
+    if(h>=4) return "4_8";
+    if(h>=2) return "2_4";
+    if(h>=1) return "1_2";
+    return "ATE_1";
+  }
+  function rangeMeta(k){ return getAgeRanges().find(r=>r.key===k) || getAgeRanges()[getAgeRanges().length-1]; }
+  function rangeOrderIndex(k){ return getAgeRanges().findIndex(r=>r.key===k); }
+
+  function itemStatus(x){
+    // Regra operacional: REC importada entra sempre como ABERTA.
+    // O status vindo do dump pode aparecer truncado/deslocado e gerava falso FECHADA.
+    if((x.mode || "RAL") === "REC") return "ABERTA";
+    return statusByRal.get(x.ral) || "ABERTA";
+  }
+
+  function save(){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify({ items })); }
+    catch{ showToast('err','Erro ao salvar','localStorage cheio ou indisponível.'); }
+  }
+  function load(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('monitor_rals_v5_2026') || localStorage.getItem('monitor_rals_v4_upgrade_2026_02');
+      if(!raw) return [];
+      const p = JSON.parse(raw);
+      const arr = Array.isArray(p.items) ? p.items : [];
+      return arr.map(x => ({ mode:'RAL', cliente:'', statusSrc:'E', ...x }));
+    }catch{return [];}
+  }
   function loadStatusMap(){
+    try{ const raw=localStorage.getItem(LS_STATUS_KEY); if(!raw) return; const obj=JSON.parse(raw); if(obj&&typeof obj==='object') Object.entries(obj).forEach(([k,v])=>statusByRal.set(k,(v==='FECHADA'||v==='NORMALIZADA')?v:'ABERTA')); }catch{}
+  }
+  function persistStatusMap(){ try{ localStorage.setItem(LS_STATUS_KEY, JSON.stringify(Object.fromEntries(statusByRal))); }catch{} }
+  function loadPrazoMap(){
+    try{ const raw=localStorage.getItem(LS_PRAZO_KEY); if(!raw) return; const obj=JSON.parse(raw); if(obj&&typeof obj==='object') Object.entries(obj).forEach(([k,v])=>{ if(typeof v==='string') prazoByRal.set(k,v); }); }catch{}
+  }
+  function persistPrazoMap(){ try{ localStorage.setItem(LS_PRAZO_KEY, JSON.stringify(Object.fromEntries(prazoByRal))); }catch{} }
+  function getPrazoForRal(ral){ return prazoByRal.get(ral) || ""; }
+  function setPrazoForRal(ral,val){ if(!ral) return; if(!val) prazoByRal.delete(ral); else prazoByRal.set(ral,val); persistPrazoMap(); }
+  function isPrazoVencido(ral){ const p=getPrazoForRal(ral); if(!p) return false; const today=new Date(); today.setHours(0,0,0,0); const d=new Date(p+'T00:00:00'); return d < today; }
+  function checkStorageUsage(){
     try{
-      const raw = localStorage.getItem(LS_STATUS_KEY);
-      if(!raw) return;
-      const obj = JSON.parse(raw);
-      if(obj && typeof obj === "object"){
-        Object.entries(obj).forEach(([k,v])=>{
-          if(typeof k === "string"){
-            statusByRal.set(k, (v === "FECHADA" || v === "NORMALIZADA") ? v : "ABERTA");
-          }
-        });
-      }
-    }catch(_e){}
+      let total=0; for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); total += (localStorage.getItem(k)||'').length * 2; }
+      const pct=Math.round((total/(5*1024*1024))*100), mb=(total/(1024*1024)).toFixed(2);
+      el('storageUsage').textContent=`${mb}MB`; el('pillStorage').style.display = pct > 20 ? '' : 'none';
+      if(pct >= STORAGE_WARN_PCT){ el('storagePercent').textContent = pct; el('storageBar').classList.remove('hidden'); }
+      else el('storageBar').classList.add('hidden');
+    }catch{}
   }
 
-  function persistStatusMap(){
-    try{
-      const obj = Object.fromEntries(statusByRal.entries());
-      localStorage.setItem(LS_STATUS_KEY, JSON.stringify(obj));
-    }catch(_e){}
+  function showToast(type,title,msg,duration=4000){
+    const icons={ok:'✅',err:'❌',warn:'⚠️',info:'ℹ️'}; const c=el('toastContainer'); const t=document.createElement('div');
+    t.className=`toast toast-${type}`;
+    t.innerHTML=`<span class="toast-icon">${icons[type]||'ℹ️'}</span><div class="toast-body"><div class="toast-title">${escapeHtml(title)}</div>${msg?`<div class="toast-msg">${escapeHtml(msg)}</div>`:''}</div><button class="toast-close" title="Fechar">✕</button>`;
+    t.querySelector('.toast-close').addEventListener('click',()=>t.remove()); c.appendChild(t); if(duration>0) setTimeout(()=>{ try{t.remove();}catch{} },duration);
   }
 
-  function getStatusForRal(ral){
-    return statusByRal.get(ral) || "ABERTA";
+  function parseAbertura(str){
+    const m = (str || '').match(/(\d{2}\/\d{2}\/\d{4})\s*(?:-|\s)\s*(\d{2}:\d{2})/);
+    if(!m) return null;
+    const [dd,mm,yyyy]=m[1].split('/').map(Number); const [HH,MI]=m[2].split(':').map(Number);
+    return new Date(yyyy,mm-1,dd,HH,MI,0,0);
   }
-
-  function setStatusForRal(ral, val){
-    statusByRal.set(ral, (val === "FECHADA" || val === "NORMALIZADA") ? val : "ABERTA");
-    persistStatusMap();
-  }
-
-
-  
-
-// ====== PRAZO (data prevista de normalização) ======
-const prazoByRal = new Map(); // key: "RAL-123/2026" -> "YYYY-MM-DD"
-const LS_PRAZO_KEY = "monral_prazo_v1";
-
-function loadPrazoMap(){
-  try{
-    const raw = localStorage.getItem(LS_PRAZO_KEY);
-    if(!raw) return;
-    const obj = JSON.parse(raw);
-    if(obj && typeof obj === "object"){
-      Object.entries(obj).forEach(([k,v])=>{
-        if(typeof k === "string" && typeof v === "string"){
-          prazoByRal.set(k, v);
-        }
-      });
+  function parseRALLines(text){
+    const lines=text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean), parsed=[], errors=[];
+    for(const line of lines){
+      if(/^E\s*-\s*C$/i.test(line)) continue;
+      if(/\bREC-\d+\/\d{4}\b/i.test(line)){ errors.push({line,reason:'Linha REC em modo RAL'}); continue; }
+      // Nível 2: QUALIDADE não derruba mais a RAL. Se houver RAL na linha, ela é importada normalmente.
+      const m1=line.match(/\bRAL-\d+\/\d{4}\b/i);
+      const m2=!m1 && !/\bREC-\d+\/\d{4}\b/i.test(line) ? line.match(/\b\d+\/\d{4}\b/) : null;
+      const ral=m1 ? m1[0].toUpperCase() : (m2 ? `RAL-${m2[0]}` : '');
+      if(!ral){ errors.push({line,reason:'Sem RAL'}); continue; }
+      const dt=parseAbertura(line); if(!dt){ errors.push({line,reason:'Sem data/hora'}); continue; }
+      const typeFound=line.includes('ACESSO CLIENTE') ? 'ACESSO CLIENTE' : (line.includes('COLETOR') ? 'COLETOR' : '');
+      const design = typeFound && line.indexOf(typeFound) > 0 ? line.slice(0,line.indexOf(typeFound)).trim() : line.trim();
+      let cf='';
+      if(line.includes('\t')){ const cols=line.split('\t').map(c=>c.trim()).filter(Boolean); const idx=cols.findIndex(c=>c.toUpperCase()===ral || /^RAL-\d+\/\d{4}$/i.test(c) || /^\d+\/\d{4}$/.test(c)); if(idx>=0 && cols[idx+4] && cols[idx+4].includes('/')) cf = normalizeCFPath(cols[idx+4]); }
+      if(!cf){ const cands=line.match(/([A-Z]{2}\/[A-Z0-9]+(?:\s*\/{1,2}\s*[A-Z0-9]+)+\/?)/g) || []; cf = cands.length ? normalizeCFPath(cands[cands.length-1]) : ''; }
+      if(!cf){ errors.push({line,reason:'Sem CF detectado'}); continue; }
+      parsed.push({ id: (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())+Math.random().toString(16).slice(2)), mode:'RAL', ral, aberturaISO:dt.toISOString(), designacao:design, cf, cliente:'', statusSrc:'E' });
     }
-  }catch(_e){}
-}
-
-function persistPrazoMap(){
-  try{
-    const obj = Object.fromEntries(prazoByRal.entries());
-    localStorage.setItem(LS_PRAZO_KEY, JSON.stringify(obj));
-  }catch(_e){}
-}
-
-function getPrazoForRal(ral){
-  return prazoByRal.get(ral) || "";
-}
-
-function setPrazoForRal(ral, val){
-  if(!ral) return;
-  if(!val){
-    prazoByRal.delete(ral);
-  }else{
-    prazoByRal.set(ral, val);
-  }
-  persistPrazoMap();
-}
-
-function clearPrazoAll(){
-  try{ localStorage.removeItem(LS_PRAZO_KEY); }catch(_e){}
-  prazoByRal.clear();
-}
-
-const fDesignacao = el("fDesignacao");
-  const fCF = el("fCF");
-  const fRAL = el("fRAL");
-
-  const tbody = el("tbody");
-  const chart = el("chart");
-
-  const outBox = el("outBox");
-  const outTxt = el("outTxt");
-let items = load();
-  loadStatusMap();
-  loadPrazoMap();
-  let selectedRangeKey = ""; // filtro do gráfico (faixa)
-  initTheme();
-
-  // ====== Faixas (NOVAS) + Manchester ======
-  // Ordem de criticidade (topo primeiro)
-  const AGE_RANGES = [
-    { key: "ACIMA_72", label: "Acima de 72h",  manchester: "red" },
-    { key: "48_72",    label: "Entre 48h–72h", manchester: "red" },
-    { key: "24_48",    label: "Entre 24h–48h", manchester: "red" },
-    { key: "16_24",    label: "Entre 16h–24h", manchester: "orange" },
-    { key: "8_16",     label: "Entre 8h–16h",  manchester: "yellow" },
-    { key: "4_8",      label: "Entre 4h–8h",   manchester: "green" },
-    { key: "ATE_4",    label: "Até 4h",        manchester: "blue" },
-  ];
-
-  function manchesterColor(kind){
-    switch(kind){
-      case "red": return getCss("--m-red");
-      case "orange": return getCss("--m-orange");
-      case "yellow": return getCss("--m-yellow");
-      case "green": return getCss("--m-green");
-      case "blue": return getCss("--m-blue");
-      default: return getCss("--m-blue");
-    }
-  }
-
-  function getCss(varName){
-    return getComputedStyle(document.body).getPropertyValue(varName).trim();
-  }
-
-  function rangeKeyForHours(hours) {
-    if (hours >= 72) return "ACIMA_72";
-    if (hours >= 48) return "48_72";
-    if (hours >= 24) return "24_48";
-    if (hours >= 16) return "16_24";
-    if (hours >= 8)  return "8_16";
-    if (hours >= 4)  return "4_8";
-    return "ATE_4";
-  }
-
-  function rangeMeta(key) {
-    return AGE_RANGES.find(r => r.key === key) || AGE_RANGES[AGE_RANGES.length - 1];
-  }
-
-  function rangeOrderIndex(key) {
-    return AGE_RANGES.findIndex(r => r.key === key);
-  }
-
-  function save() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ items }));
-  }
-
-  function load() {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return [];
-      const parsed = JSON.parse(raw);
-      return Array.isArray(parsed.items) ? parsed.items : [];
-    } catch {
-      return [];
-    }
-  }
-
-  function normalize(s) {
-    return (s ?? "").toString().trim().toLowerCase();
-  }
-
-  function escapeHtml(str) {
-    return (str ?? "").toString()
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
-  }
-
-  // RAL "compacta" para planilha (93056/2026)
-  function ralNumeric(ral){
-    return (ral ?? "").toString().trim().replace(/^RAL\s*-\s*/i, "");
-  }
-
-  function parseAbertura(line) {
-    const m = line.match(/(\d{2}\/\d{2}\/\d{4})\s*-\s*(\d{2}:\d{2})/);
-    if (!m) return null;
-    const [dd, mm, yyyy] = m[1].split("/").map(Number);
-    const [HH, MI] = m[2].split(":").map(Number);
-    return new Date(yyyy, mm - 1, dd, HH, MI, 0, 0);
-  }
-
-  function findRAL(line) {
-    // aceita "RAL-123/2026" e também só "123/2026"
-    const m1 = line.match(/\bRAL-\d+\/\d{4}\b/);
-    if (m1) return m1[0];
-    const m2 = line.match(/\b\d+\/\d{4}\b/);
-    return m2 ? `RAL-${m2[0]}` : null;
-  }
-
-  function detectType(line) {
-    if (line.includes("ACESSO CLIENTE")) return "ACESSO CLIENTE";
-    if (line.includes("COLETOR")) return "COLETOR";
-    return "";
-  }
-
-  function extractDesignacao(line, typeFound) {
-    if (!typeFound) return line.trim();
-    const idx = line.indexOf(typeFound);
-    if (idx <= 0) return "";
-    return line.slice(0, idx).trim();
-  }
-
-  function ageMs(dt) { return Date.now() - dt.getTime(); }
-
-  function ageHuman(dt) {
-    const ms = Math.max(0, ageMs(dt));
-    const totalMinutes = Math.floor(ms / 60000);
-    const days = Math.floor(totalMinutes / (60 * 24));
-    const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
-    const minutes = totalMinutes % 60;
-    const totalHours = ms / 3600000;
-    return { days, hours, minutes, totalHours };
-  }
-
-  function formatAgeShort(a) { return `${a.days}d ${a.hours}h ${a.minutes}m`; }
-
-  function normalizeCFPath(cf) {
-    return (cf ?? "")
-      .toString()
-      .trim()
-      .replace(/\s*\/\s*/g, "/")
-      .replace(/\s{2,}/g, " ");
-  }
-
-  function extractCF(line) {
-    if (line.includes("\t")) {
-      const cols = line.split("\t").map(c => c.trim()).filter(Boolean);
-      const ralIdx = cols.findIndex(c => /\bRAL-\d+\/\d{4}\b/.test(c) || /\b\d+\/\d{4}\b/.test(c));
-      if (ralIdx >= 0) {
-        const cfIdx = ralIdx + 4;
-        if (cols[cfIdx] && cols[cfIdx].includes("/")) return normalizeCFPath(cols[cfIdx]);
-      }
-      const candidate = cols.find(c => c.includes("/") && /[A-Z]{2}\//.test(c));
-      return candidate ? normalizeCFPath(candidate) : "";
-    }
-
-    const m = line.match(/\b\d+\b\s+([A-Z]{2}\/[A-Z0-9]+(?:\s*\/{1,2}\s*[A-Z0-9]+)*)/);
-    if (m) return normalizeCFPath(m[1]);
-
-    const m2 = line.match(/([A-Z]{2}\/[A-Z0-9]+(?:\s*\/{1,2}\s*[A-Z0-9]+)*)/);
-    return m2 ? normalizeCFPath(m2[1]) : "";
-  }
-
-  function parseLines(text) {
-    const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
-    const parsed = [];
-    const errors = [];
-
-    for (const line of lines) {
-      if (/^E\s*-\s*C$/i.test(line)) continue;
-
-      // Descarta qualquer RAL de QUALIDADE (regra de negócio)
-      if (/\bQUALIDADE\b/i.test(line)) { errors.push({ line, reason: "Descartada (QUALIDADE)" }); continue; }
-
-      const ralFound = findRAL(line);
-      if (!ralFound) { errors.push({ line, reason: "Sem RAL" }); continue; }
-
-      const dt = parseAbertura(line);
-      if (!dt) { errors.push({ line, reason: "Sem data/hora" }); continue; }
-
-      const typeFound = detectType(line);
-      const design = extractDesignacao(line, typeFound);
-
-      const cfFound = extractCF(line);
-      if (!cfFound) { errors.push({ line, reason: "Sem CF (path) detectado" }); continue; }
-
-      parsed.push({
-        id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2),
-        ral: ralFound,
-        aberturaISO: dt.toISOString(),
-        designacao: design,
-        cf: cfFound
-      });
-    }
-
     return { parsed, errors };
   }
-
-  function mergeNoDuplicates(newItems) {
-    const existing = new Set(items.map(x => normalize(x.ral)));
-    let added = 0;
-    for (const n of newItems) {
-      const key = normalize(n.ral);
-      if (existing.has(key)) continue;
-      items.push(n);
-      existing.add(key);
-      added++;
-    }
-    return added;
-  }
-
-  function applyFilters(list) {
-    const fd = normalize(fDesignacao.value);
-    const fc = normalize(fCF.value);
-    const fr = normalize(fRAL.value);
-
-    return list.filter(x => {
-      const d = normalize(x.designacao);
-      const c = normalize(x.cf);
-      const r = normalize(x.ral);
-
-      if (selectedRangeKey) {
-        const dt = new Date(x.aberturaISO);
-        const a = ageHuman(dt);
-        const key = rangeKeyForHours(a.totalHours);
-        if (key !== selectedRangeKey) return false;
+  function parseRECLines(text){
+    const lines=text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean), parsed=[], errors=[];
+    for(const line of lines){
+      if(/\bRAL-\d+\/\d{4}\b/i.test(line)){ errors.push({line,reason:'Linha RAL'}); continue; }
+      const cols=line.includes('\t') ? line.split('\t').map(c=>c.trim()).filter(c=>c!=="") : line.split(/\s{2,}/).map(c=>c.trim()).filter(c=>c!=="");
+      let recIdx=cols.findIndex(c=>/^REC-\d+\/\d{4}$/i.test(c));
+      let rec='', cliente='', designacao='', dt=null, cf='', statusSrc='E';
+      if(recIdx >= 0){
+        rec=cols[recIdx].toUpperCase();
+        cliente=cols[recIdx+1] || '';
+        designacao=cols[recIdx+2] || '';
+        dt=parseAbertura(cols[recIdx+3] || '');
+        cf=normalizeCFPath(cols[recIdx+4] || '');
+        statusSrc=((cols[recIdx+5] || 'E').toUpperCase().trim()==='C') ? 'C' : 'E';
+      }else{
+        const m=line.match(/\bREC-\d+\/\d{4}\b/i);
+        if(!m){ errors.push({line,reason:'Sem REC'}); continue; }
+        rec=m[0].toUpperCase();
+        const after=line.slice(m.index + m[0].length).trim();
+        const dtm=after.match(/(\d{2}\/\d{2}\/\d{4}\s*(?:-|\s)\s*\d{2}:\d{2})/);
+        dt=dtm ? parseAbertura(dtm[1]) : null;
+        const beforeDate=dtm ? after.slice(0, dtm.index).trim() : after;
+        const afterDate=dtm ? after.slice(dtm.index + dtm[0].length).trim() : '';
+        const cfMatch=afterDate.match(/([A-Z]{2}\/[A-Z0-9]+(?:\s*\/{1,2}\s*[A-Z0-9]+)+\/?)/);
+        cf=cfMatch ? normalizeCFPath(cfMatch[1]) : '';
+        const parts=beforeDate.split(/\s{2,}/).map(x=>x.trim()).filter(Boolean);
+        cliente=parts[0] || '';
+        designacao=parts.slice(1).join(' ') || beforeDate.replace(cliente,'').trim();
+        const st=afterDate.match(/\b([EC])\b\s*$/i);
+        statusSrc=st && st[1].toUpperCase()==='C' ? 'C' : 'E';
       }
-
-      return (!fd || d.includes(fd)) && (!fc || c.includes(fc)) && (!fr || r.includes(fr));
-    });
+      if(!designacao){ errors.push({line,reason:'Sem designação'}); continue; }
+      if(!dt){ errors.push({line,reason:'Sem data/hora'}); continue; }
+      if(!cf){ errors.push({line,reason:'Sem CF detectado'}); continue; }
+      parsed.push({ id:(crypto.randomUUID ? crypto.randomUUID() : String(Date.now())+Math.random().toString(16).slice(2)), mode:'REC', rec, cliente, designacao, aberturaISO:dt.toISOString(), cf, statusSrc });
+    }
+    return { parsed, errors };
+  }
+  function splitLogicalLines(text){
+    // Nível 2: segura bem quando o dump quebra uma linha visual em duas.
+    // Junta linhas de continuação que não possuem RAL/REC, mas parecem status/fragmentos do registro anterior.
+    const physical = text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+    const logical = [];
+    for(const ln of physical){
+      if(/^E\s*-\s*C$/i.test(ln)) continue;
+      const hasTicket = /\b(?:RAL|REC)-\d+\/\d{4}\b/i.test(ln) || /\b\d{5,}\/\d{4}\b/.test(ln);
+      if(hasTicket || !logical.length){
+        logical.push(ln);
+      }else{
+        // Continuação curta: cola no registro anterior para recuperar status/CF quebrados.
+        logical[logical.length-1] += ' ' + ln;
+      }
+    }
+    return logical;
   }
 
-  function removeItem(id) {
-    if (!confirm("Remover este registro?")) return;
-    items = items.filter(x => x.id !== id);
-    save();
-    render();
+  function parseRALLineLevel2(line){
+    const parsed=[], errors=[];
+    const m1 = line.match(/\bRAL-\d+\/\d{4}\b/i);
+    const m2 = !m1 ? line.match(/\b\d{5,}\/\d{4}\b/) : null;
+    const ral = m1 ? m1[0].toUpperCase() : (m2 ? `RAL-${m2[0]}` : '');
+    if(!ral){ errors.push({line,reason:'Sem RAL'}); return {parsed,errors}; }
+
+    const dt = parseAbertura(line);
+    if(!dt){ errors.push({line,reason:'Sem data/hora da RAL'}); return {parsed,errors}; }
+
+    let cf='';
+    const cols = line.includes('\t') ? line.split('\t').map(c=>c.trim()).filter(Boolean) : line.split(/\s{2,}/).map(c=>c.trim()).filter(Boolean);
+    const idx = cols.findIndex(c => /^RAL-\d+\/\d{4}$/i.test(c) || c.toUpperCase() === ral || /^\d{5,}\/\d{4}$/.test(c));
+    if(idx>=0){
+      const cfCand = cols.slice(idx+1).find(c => /[A-Z]{2}\s*\/\s*[A-Z0-9]+/i.test(c));
+      if(cfCand) cf = normalizeCFPath(cfCand);
+    }
+    if(!cf){
+      const cands = line.match(/([A-Z]{2}\s*\/\s*[A-Z0-9]+(?:\s*\/{1,2}\s*[A-Z0-9]+)+\s*\/?)/gi) || [];
+      if(cands.length) cf = normalizeCFPath(cands[cands.length-1]);
+    }
+    if(!cf){ errors.push({line,reason:'Sem CF detectado na RAL'}); return {parsed,errors}; }
+
+    const ralIndex = line.toUpperCase().indexOf(ral);
+    let before = ralIndex >= 0 ? line.slice(0, ralIndex).trim() : line;
+    before = before.replace(/\bQUALIDADE\b/ig,'').replace(/\b[A-Z]{2}-\d{2}\b/g,'').replace(/\s+/g,' ').trim();
+    const typeFound = before.includes('ACESSO CLIENTE') ? 'ACESSO CLIENTE' : (before.includes('COLETOR') ? 'COLETOR' : '');
+    const designacao = typeFound && before.indexOf(typeFound)>0 ? before.slice(0,before.indexOf(typeFound)).trim() : (before || ral);
+
+    parsed.push({ id:(crypto.randomUUID ? crypto.randomUUID() : String(Date.now())+Math.random().toString(16).slice(2)), mode:'RAL', ral, aberturaISO:dt.toISOString(), designacao, cf, cliente:'', statusSrc:'E' });
+    return {parsed,errors};
   }
 
-  function clearAll() {
-    if (!confirm("Apagar TUDO?")) return;
+  function parseRECLineLevel2(line){
+    // Primeiro usa o parser antigo; se ele falhar, entra o fallback por regex contextual.
+    const old = parseRECLines(line);
+    if(old.parsed.length) return old;
 
+    const parsed=[], errors=[];
+    const m=line.match(/\bREC-\d+\/\d{4}\b/i);
+    if(!m){ errors.push({line,reason:'Sem REC'}); return {parsed,errors}; }
+    const rec=m[0].toUpperCase();
+    const dtm=line.match(/(\d{2}\/\d{2}\/\d{4}\s*(?:-|\s)\s*\d{2}:\d{2})/);
+    const dt=dtm ? parseAbertura(dtm[1]) : null;
+    if(!dt){ errors.push({line,reason:'Sem data/hora da REC'}); return {parsed,errors}; }
+    const cfCands = line.match(/([A-Z]{2}\s*\/\s*[A-Z0-9]+(?:\s*\/{1,2}\s*[A-Z0-9]+)+\s*\/?)/gi) || [];
+    const cf = cfCands.length ? normalizeCFPath(cfCands[cfCands.length-1]) : '';
+    if(!cf){ errors.push({line,reason:'Sem CF detectado na REC'}); return {parsed,errors}; }
 
-    // PRAZO (módulo): limpa todas as datas salvas (inclusive relatórios antigos)
-    clearPrazoAll();
-
-    // limpa entrada (dados brutos)
-    el("raw").value = "";
-
-    // limpa filtros
-    fDesignacao.value = "";
-    fCF.value = "";
-    fRAL.value = "";
-
-    // limpa saídas (TXT)
-    outTxt.value = "";
-    outBox.style.display = "none";
-
-    // reseta dataset e seleção
-    items = [];
-    selectedRangeKey = "";
-    save();
-    render();
-  }
-  function downloadFile(content, mime, filename) {
-    const blob = new Blob([content], { type: mime });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.download = filename;
-    a.href = url;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-  }
-
-  function stampName(prefix, ext) {
-    const d = new Date();
-    const pad = (n) => String(n).padStart(2,"0");
-    return `${prefix}_${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}.${ext}`;
+    const cols = line.includes('\t') ? line.split('\t').map(c=>c.trim()).filter(Boolean) : line.split(/\s{2,}/).map(c=>c.trim()).filter(Boolean);
+    const recIdx=cols.findIndex(c=>/^REC-\d+\/\d{4}$/i.test(c));
+    let cliente='', designacao='';
+    if(recIdx>=0){
+      cliente=cols[recIdx+1] || '';
+      designacao=cols[recIdx+2] || '';
+    }
+    if(!designacao){
+      const after = line.slice(m.index + m[0].length, dtm.index).trim();
+      const parts = after.split(/\s{2,}/).map(x=>x.trim()).filter(Boolean);
+      cliente = parts[0] || '';
+      designacao = parts.slice(1).join(' ') || after.replace(cliente,'').trim() || rec;
+    }
+    const afterDate = line.slice(dtm.index + dtm[0].length);
+    const st=afterDate.match(/\b([EC])\b\s*$/i);
+    const statusSrc=st && st[1].toUpperCase()==='C' ? 'C' : 'E';
+    parsed.push({ id:(crypto.randomUUID ? crypto.randomUUID() : String(Date.now())+Math.random().toString(16).slice(2)), mode:'REC', rec, cliente, designacao, aberturaISO:dt.toISOString(), cf, statusSrc });
+    return {parsed,errors};
   }
 
-  function fmtBR(dt){
-    const pad = (n) => String(n).padStart(2,"0");
-    return `${pad(dt.getDate())}/${pad(dt.getMonth()+1)}/${dt.getFullYear()} - ${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
+  function parseLines(text){
+    // Parser híbrido Nível 2: detecção por padrão, não por botão.
+    // RAL com QUALIDADE, RAL no meio da linha e REC tabulada entram no mesmo funil.
+    const lines = splitLogicalLines(text);
+    const allParsed = [];
+    const allErrors = [];
+    for(const line of lines){
+      const hasREC = /\bREC-\d+\/\d{4}\b/i.test(line);
+      const hasRAL = /\bRAL-\d+\/\d{4}\b/i.test(line) || (!hasREC && /\b\d{5,}\/\d{4}\b/.test(line));
+      let r = null;
+      if(hasREC) r = parseRECLineLevel2(line);
+      else if(hasRAL) r = parseRALLineLevel2(line);
+      else { allErrors.push({line, reason:'Sem RAL/REC'}); continue; }
+      allParsed.push(...r.parsed);
+      allErrors.push(...r.errors);
+    }
+    return { parsed: allParsed, errors: allErrors };
   }
+  function itemUniqueKey(x){ return `${x.mode || 'RAL'}::${normalize(x.rec || x.ral || '')}`; }
+  function mergeNoDuplicates(newItems){ const existing=new Set(items.map(itemUniqueKey)); let added=0; for(const n of newItems){ const k=itemUniqueKey(n); if(existing.has(k)) continue; existing.add(k); items.push(n); added++; } return added; }
 
-  // PRAZO em PT-BR (exibição): 2026-02-28 -> 28/02/2026
-  function fmtPrazoBR(isoDate){
-    const s = (isoDate || "").toString().trim();
-    if(!/^\d{4}-\d{2}-\d{2}$/.test(s)) return "";
-    const [y,m,d] = s.split("-");
-    return `${d}/${m}/${y}`;
-  }
-
-
-  // PRAZO: formato de exibição (DD/MM/AAAA) para telas e exports
-  function getPrazoForRalBR(ral){
-    return fmtPrazoBR(getPrazoForRal(ral));
-  }
-
-  function updateColetaPill(list){
-    if (!list.length) { rangeColeta.textContent = "-"; return; }
-    const dts = list.map(x => new Date(x.aberturaISO)).sort((a,b)=>a-b);
-    rangeColeta.textContent = `${fmtBR(dts[0])} → ${fmtBR(dts[dts.length-1])}`;
-  }
-
-  // ====== Regras de negócio (CF -> Pirâmide / UF / Responsável) ======
-  function cfNorm(cf){
-    return normalizeCFPath(cf).toUpperCase();
-  }
-
-  function endsWithCBS(cfN){ return cfN.endsWith("/CBS") || cfN.includes("/CBS"); }
-
-
-  function infraSuffixMatch(cfN){
-  // CF terminado com sufixos de infraestrutura (prioridade máxima)
-  // Ajuste: garantir também os finais exatamente com "//EN", "//AC", "//IN", "//INF"
-  const suf = [
-    "/EN", "/EN/",
-    "//EN",
-    "/AC", "/AC/",
-    "//AC",
-    "/IN", "/IN/",
-    "//IN",
-    "/INF", "/INF/",
-    "//INF"
-  ];
-  for (const s of suf){
-    if (cfN.endsWith(s)) return true;
-  }
-  return false;
-}
-
+  function cfNorm(cf){ return normalizeCFPath(cf).toUpperCase(); }
+  function endsWithCBS(c){ return c.endsWith('/CBS') || c.includes('/CBS'); }
+  function infraSuffixMatch(c){ return CF_RULES.infra_suffixes.some(s=>c.endsWith(s)); }
   function piramideFromCF(cf){
-    const c = cfNorm(cf);
-
-
-    // REGRA GLOBAL: qualquer CF contendo DTC vai para REDE EXTERNA (independente de prefixo/sufixo)
-    if (c.includes("DTC")) return "REDE EXTERNA";
-    // PRIORIDADE MÁXIMA: sufixos de infraestrutura (CF terminado com EN/AC/IN/INF)
-    if (infraSuffixMatch(c)) return "INFRAESTRUTURA";
-
-    // 0) Móvel Agregação (CF final CLA/IP)
-    if (/\/CLA\/IP\/?$/.test(c)) return "MOVEL AGREGAÇÃO";
-
-// Regras específicas solicitadas (prioridade alta)
-if (c.includes("OM/BSA/SGS/DTC/BS")) return "REDE EXTERNA";
-if (c.includes("OM/GNA/QZ/DTC/BS"))  return "REDE EXTERNA";
-
-
-    // 1) Assistência Técnica
-    if (c.startsWith("PR/")) return "ASSISTÊNCIA TÉCNICA";
-
-    // 2) Swap
-    if (c.includes("/SW")) return "SWAP";
-
-    // 4) Rede interna
-    if (c.startsWith("TT/")) return "REDE INTERNA";
-    if (c.includes("BKB/TX") || c.includes("BKB/CD") || c.includes("BKB/MT") || c.includes("RED/MT") || c.endsWith("RED") || c.endsWith("/RED") || c.endsWith("/RED/")) return "REDE INTERNA";
-
-    // 5) Rede externa
-    if (c.includes("CO/NET/FO") || c.includes("CBS")) return "REDE EXTERNA";
-
-    return "N/D";
+    const c=cfNorm(cf);
+    if(c.includes('DTC')) return 'REDE EXTERNA';
+    if(infraSuffixMatch(c)) return 'INFRAESTRUTURA';
+    if(/\/CLA\/IP\/?$/.test(c)) return 'MOVEL AGREGAÇÃO';
+    if(c.startsWith('PR/')) return 'ASSISTÊNCIA TÉCNICA';
+    if(c.includes('/SW')) return 'SWAP';
+    if(c.startsWith('TT/') || c.includes('BKB/TX') || c.includes('BKB/CD') || c.includes('BKB/MT') || c.includes('RED/MT') || c.endsWith('RED') || c.endsWith('/RED') || c.endsWith('/RED/')) return 'REDE INTERNA';
+    if(c.includes('CO/NET/FO') || c.includes('CBS')) return 'REDE EXTERNA';
+    return MODE === 'REC' ? 'NÃO CLASSIFICADO' : 'N/D';
   }
-
-  function ufFromCF(cf){
-    const c = cfNorm(cf);
-
-    // Ordem conforme solicitado (primeiro que bater, levou)
-    if (c.includes("CPE") || c.includes("DOS") || c.includes("TLS")) return "MS";
-    if (c.includes("BSA")) return "DF";
-    if (c.includes("PMJ") || c.includes("GUR") || c.includes("ARN")) return "TO";
-    if (c.includes("CBA") || c.includes("ROI") || c.includes("SNO") || c.includes("BAG") || c.includes("CCS")) return "MT";
-    if (c.includes("GNA") || c.includes("ANS") || c.includes("RVD") || c.includes("JTI")) return "GO";
-    if (c.includes("PVO") || c.includes("JIP")) return "RO";
-    if (c.includes("RBO")) return "AC";
-    return "";
-  }
-
+  function ufFromCF(cf){ const c=cfNorm(cf); for(const rule of CF_RULES.uf_map){ if(rule.keys.some(k=>c.includes(k))) return rule.uf; } return ''; }
   function responsavelFromCF(cf){
-    const c = cfNorm(cf);
-    const isCBS = endsWithCBS(c);
-
-
-
-    // REGRA GLOBAL: qualquer CF contendo DTC terá responsável Márcio Dias (independente de prefixo/sufixo)
-    if (c.includes("DTC")) return "Márcio Dias";
-    // PRIORIDADE MÁXIMA: se caiu em INFRAESTRUTURA (CF terminado com EN/AC/IN/INF), responsável é Ângelo
-    if (infraSuffixMatch(c)) return "Ângelo Fraianeli";
-
-// Regras AT/*/XXX/CLA/IP (prioridade máxima)
-if (/AT\/CPE\/.+\/CLA\/IP/.test(c)) return "Edmar Almeida";
-if (/AT\/GNA\/.+\/CLA\/IP/.test(c)) return "Valdir Donizetti";
-if (/AT\/PVO\/.+\/CLA\/IP/.test(c)) return "Rodrigo Mozart";
-if (/AT\/PMJ\/.+\/CLA\/IP/.test(c)) return "Atanagildo José";
-if (/AT\/BSA\/.+\/CLA\/IP/.test(c)) return "Joaquim Ferreira";
-if (/AT\/RBO\/.+\/CLA\/IP/.test(c)) return "Rodrigo Mozart";
-
-// Regras específicas solicitadas (prioridade máxima)
-if (c.includes("AT/CBA/MC/CLA/IP")) return "Albino Júnior";
-if (/\/SW$/.test(c)) return "Fábio Torres / Francisco Manuel";
-if (c.includes("OM/BSA/SGS/DTC/BS")) return "Dennys Rezende";
-if (c.includes("OM/GNA/QZ/DTC/BS"))  return "Márcio Dias";
-
-    // Mais específicos primeiro
-    if (c.includes("AT/GNA/RD/CLA/IP")) return "Ulysses Antônio";
-    if (c.includes("BSA/CO/NET/FO")) return "Mario da Costa";
-
-    if (c.includes("CPE/CO/NET/FO") || c.includes("DOS/CO/NET/FO") || c.includes("TLS/CO/NET/FO")) return "Romildo Longuinho";
-
-    if (c.includes("CBA/CO/NET/FO") || c.includes("BAG/CO/NET/FO") || c.includes("CCS/CO/NET/FO") || c.includes("ROI/CO/NET/FO") || c.includes("SNO/CO/NET/FO")) return "Gilson Nogueira";
-
-    if (c.includes("GNA/CO/NET/FO") || c.includes("ANS/CO/NET/FO") || c.includes("RVD/CO/NET/FO") || c.includes("JTI/CO/NET/FO")) return "Wendell Felippe";
-
-    if (c.includes("PMJ/CO/NET/FO") || c.includes("ARN/CO/NET/FO") || c.includes("GUR/CO/NET/FO")) return "Alessandro Marques";
-
-    if (c.includes("RBO/CO/NET/FO") || c.includes("PVO/CO/NET/FO") || c.includes("JIP/CO/NET/FO")) return "Joacyr Alencar";
-
-    // Regras com exceção CBS
-    if (!isCBS && (c.includes("OM/CPE") || c.includes("PR/CPE") || c.includes("OM/DOS") || c.includes("PR/DOS") || c.includes("OM/TLS") || c.includes("PR/TLS"))) return "Edmar Castro";
-
-    if (!isCBS && (c.startsWith("OM/BSA/") || c.startsWith("PR/BSA"))) return "Edgar Filho";
-
-    if (!isCBS && (c.startsWith("OM/CBA") || c.startsWith("OM/BAG") || c.startsWith("OM/CCS") || c.startsWith("OM/ROI") || c.startsWith("OM/SNO") ||
-                   c.startsWith("TT/CBA") || c.startsWith("TT/BAG") || c.startsWith("TT/CCS") || c.startsWith("TT/ROI") || c.startsWith("TT/SNO"))) return "Danielson Jose";
-
-    if (!isCBS && (c.includes("OM/GNA") || c.includes("OM/ANS") || c.includes("OM/RVD") || c.includes("OM/JTI") ||
-                   c.includes("TT/GNA") || c.includes("TT/ANS") || c.includes("TT/RVD") || c.includes("TT/JTI"))) return "Márcio Humberto/Edgar";
-
-    if (c.includes("OM/PMJ") || c.includes("IM/PMJ") || c.includes("OM/ARN") || c.includes("OM/GUR") || c.includes("TT/PMJ") || c.includes("TT/ARN") || c.includes("TT/GUR")) return "Ajax Barbosa";
-
-    if (!isCBS && (c.includes("OM/RBO") || c.includes("TT/RBO") || c.includes("OM/PVO") || c.includes("TT/PVO") || c.includes("JIP/PVO"))) return "Adriano Campigotto";
-
-    return "";
+    const c=cfNorm(cf), isCBS=endsWithCBS(c);
+    if(c.includes('DTC')) return 'Márcio Dias'; if(infraSuffixMatch(c)) return 'Ângelo Fraianeli';
+    if(/AT\/CPE\/.+\/CLA\/IP/.test(c)) return 'Edmar Almeida'; if(/AT\/GNA\/.+\/CLA\/IP/.test(c)) return 'Valdir Donizetti';
+    if(/AT\/PVO\/.+\/CLA\/IP/.test(c)) return 'Rodrigo Mozart'; if(/AT\/PMJ\/.+\/CLA\/IP/.test(c)) return 'Atanagildo José';
+    if(/AT\/BSA\/.+\/CLA\/IP/.test(c)) return 'Joaquim Ferreira'; if(/AT\/RBO\/.+\/CLA\/IP/.test(c)) return 'Rodrigo Mozart';
+    if(c.includes('AT/CBA/MC/CLA/IP')) return 'Albino Júnior'; if(/\/SW$/.test(c)) return 'Fábio Torres / Francisco Manuel';
+    if(c.includes('BSA/CO/NET/FO')) return 'Mario da Costa';
+    if(c.includes('CPE/CO/NET/FO')||c.includes('DOS/CO/NET/FO')||c.includes('TLS/CO/NET/FO')) return 'Romildo Longuinho';
+    if(c.includes('CBA/CO/NET/FO')||c.includes('BAG/CO/NET/FO')||c.includes('CCS/CO/NET/FO')||c.includes('ROI/CO/NET/FO')||c.includes('SNO/CO/NET/FO')) return 'Gilson Nogueira';
+    if(c.includes('GNA/CO/NET/FO')||c.includes('ANS/CO/NET/FO')||c.includes('RVD/CO/NET/FO')||c.includes('JTI/CO/NET/FO')) return 'Wendell Felippe';
+    if(c.includes('PMJ/CO/NET/FO')||c.includes('ARN/CO/NET/FO')||c.includes('GUR/CO/NET/FO')) return 'Alessandro Marques';
+    if(c.includes('RBO/CO/NET/FO')||c.includes('PVO/CO/NET/FO')||c.includes('JIP/CO/NET/FO')) return 'Joacyr Alencar';
+    if(!isCBS&&(c.includes('OM/CPE')||c.includes('PR/CPE')||c.includes('OM/DOS')||c.includes('PR/DOS')||c.includes('OM/TLS')||c.includes('PR/TLS'))) return 'Edmar Castro';
+    if(!isCBS&&(c.startsWith('OM/BSA/')||c.startsWith('PR/BSA'))) return 'Edgar Filho';
+    if(!isCBS&&(c.startsWith('OM/CBA')||c.startsWith('OM/BAG')||c.startsWith('OM/CCS')||c.startsWith('OM/ROI')||c.startsWith('OM/SNO')||c.startsWith('TT/CBA')||c.startsWith('TT/BAG')||c.startsWith('TT/CCS')||c.startsWith('TT/ROI')||c.startsWith('TT/SNO'))) return 'Danielson Jose';
+    if(!isCBS&&(c.includes('OM/GNA')||c.includes('OM/ANS')||c.includes('OM/RVD')||c.includes('OM/JTI')||c.includes('TT/GNA')||c.includes('TT/ANS')||c.includes('TT/RVD')||c.includes('TT/JTI'))) return 'Márcio Humberto/Edgar';
+    if(c.includes('OM/PMJ')||c.includes('IM/PMJ')||c.includes('OM/ARN')||c.includes('OM/GUR')||c.includes('TT/PMJ')||c.includes('TT/ARN')||c.includes('TT/GUR')) return 'Ajax Barbosa';
+    if(!isCBS&&(c.includes('OM/RBO')||c.includes('TT/RBO')||c.includes('OM/PVO')||c.includes('TT/PVO')||c.includes('JIP/PVO'))) return 'Adriano Campigotto';
+    return '';
   }
 
-  function prazoDefault(){
-    // Não veio no dump. Mantive padrão (ajusta se você tiver a regra real).
-    return "24h";
+  function applyFilters(list){
+    const fd=normalize(el('fDesignacao').value), fcli=normalize(el('fCliente').value), fc=normalize(el('fCF').value), ft=normalize(el('fTicket').value);
+    return list.filter(x=>{
+      const a=ageHuman(new Date(x.aberturaISO)); if(selectedRangeKey && rangeKeyForHours(a.totalHours)!==selectedRangeKey) return false;
+      const ticket=normalize(x.rec || x.ral || ''), cliente=normalize(x.cliente || '');
+      return (!fd || normalize(x.designacao).includes(fd)) && (!fcli || cliente.includes(fcli)) && (!fc || normalize(x.cf).includes(fc)) && (!ft || ticket.includes(ft));
+    });
   }
-
-  function statusDefault(){
-    // Não veio no dump. Padrão “ABERTA”.
-    return "ABERTA";
-  }
-
-  function faixaIdadeLabelFromISO(iso){
-    const dt = new Date(iso);
-    const a = ageHuman(dt);
-    return rangeMeta(rangeKeyForHours(a.totalHours)).label;
-  }
-
   function buildDerivedRows(){
-    const filtered = applyFilters(items);
-
-    const rows = filtered.map(x => {
-      const dt = new Date(x.aberturaISO);
-      const a = ageHuman(dt);
-      const key = rangeKeyForHours(a.totalHours);
-      const meta = rangeMeta(key);
-      return {
-        x,
-        key,
-        meta,
-        ageMs: ageMs(dt),
-        faixa: meta.label,
-        piramide: piramideFromCF(x.cf),
-        uf: ufFromCF(x.cf),
-        responsavel: responsavelFromCF(x.cf),
-        status: getStatusForRal(x.ral),
-      };
-    });
-
-    rows.sort((p,q) => {
-      const byRange = rangeOrderIndex(p.key) - rangeOrderIndex(q.key);
-      if (byRange !== 0) return byRange;
-      return q.ageMs - p.ageMs;
-    });
-
+    const rows=applyFilters(currentItems()).map(x=>{ const dt=new Date(x.aberturaISO), a=ageHuman(dt), key=rangeKeyForHours(a.totalHours), meta=rangeMeta(key); return { x, a, key, meta, ageMs:ageMs(dt), faixa:meta.label, piramide:piramideFromCF(x.cf), uf:ufFromCF(x.cf), responsavel:responsavelFromCF(x.cf), status:itemStatus(x) }; });
+    rows.sort((p,q)=>{ const b=rangeOrderIndex(p.key)-rangeOrderIndex(q.key); return b!==0 ? b : q.ageMs-p.ageMs; });
     return rows;
   }
+  function updateColetaPill(list){ if(!list.length){ el('rangeColeta').textContent='-'; return; } const dts=list.map(x=>new Date(x.aberturaISO)).sort((a,b)=>a-b); el('rangeColeta').textContent=`${fmtBR(dts[0])} → ${fmtBR(dts[dts.length-1])}`; }
 
-  // ====== TXT (alinhado) NA TELA (7 colunas, sem PRAZO) ======
-  function buildTxtAligned(){
-    const rows = buildDerivedRows();
-
-    const head = ["RAL","PIRÂMIDE","UF","CF","FAIXA DE IDADE","RESPONSÁVEL","PRAZO","STATUS"];
-    const cols = [];
-    cols.push(head);
-    for (const r of rows){
-      cols.push([
-        r.x.ral,
-        r.piramide,
-        r.uf,
-        r.x.cf,
-        r.faixa,
-        r.responsavel,
-        getPrazoForRalBR(r.x.ral),
-        r.status
-      ]);
+  function renderSummaryTable(tblId,titleId,title,pairs,colorClass='color-blue',compact=false){
+    const titleEl = el(titleId); if(titleEl) titleEl.textContent = title;
+    const wrap = el(tblId);
+    if(!wrap) return;
+    if(!pairs.length){ wrap.innerHTML = `<div class="summaryEmpty">Sem dados para exibir.</div>`; return; }
+    const max = Math.max(1, ...pairs.map(([,c])=>Number(c)||0));
+    wrap.className = compact ? 'summaryBars compact' : 'summaryBars';
+    wrap.innerHTML = pairs.map(([n,c])=>{
+      const pct = Math.max(8, Math.round(((Number(c)||0)/max)*100));
+      return `<div class="sumBarRow" title="${escapeHtml(n)}: ${c}">
+        <div class="sumBarLabel">${escapeHtml(n)}</div>
+        <div class="sumBarTrack"><div class="sumBarFill ${colorClass}" style="width:${pct}%"></div></div>
+        <div class="sumBarValue">${c}</div>
+      </div>`;
+    }).join('');
+  }
+  function countBy(arr,fn){ const obj={}; arr.forEach(x=>{ const k=fn(x) || '(n/d)'; obj[k]=(obj[k]||0)+1; }); return Object.entries(obj).sort((a,b)=>b[1]-a[1]); }
+  function countByRows(rows, fn){ const obj={}; rows.forEach(r=>{ const k=fn(r) || '(n/d)'; obj[k]=(obj[k]||0)+1; }); return Object.entries(obj).sort((a,b)=>b[1]-a[1]); }
+  function overdueRowsBySla(rows){ return rows.filter(r=>r.status==='ABERTA' && r.a.totalHours>=24); }
+  function recRangeColorClass(key){
+    if(key==='1_2') return 'color-blue';
+    if(key==='2_4') return 'color-green';
+    if(key==='4_8') return 'color-yellow';
+    if(key==='8_16') return 'color-orange';
+    if(key==='16_24') return 'color-red';
+    if(key==='ACIMA_24') return 'color-black';
+    return 'color-blue';
+  }
+  function recRangeLabel(key){
+    if(key==='4_8') return '4H - 8H';
+    if(key==='8_16') return '8H - 16H';
+    if(key==='16_24') return '16H - 24H';
+    if(key==='ACIMA_24') return '>24H';
+    return key;
+  }
+  function recRangeFilterRows(rows, key){
+    if(key==='4_8') return rows.filter(r=>r.a.totalHours>=4 && r.a.totalHours<8);
+    if(key==='8_16') return rows.filter(r=>r.a.totalHours>=8 && r.a.totalHours<16);
+    if(key==='16_24') return rows.filter(r=>r.a.totalHours>=16 && r.a.totalHours<=24);
+    if(key==='ACIMA_24') return rows.filter(r=>r.a.totalHours>24);
+    return [];
+  }
+  function buildMiniSummaryPanel(title, pairs, colorClass){
+    if(!pairs.length){
+      return `<div class="miniSummaryPanel"><h4 class="miniSummaryTitle">${escapeHtml(title)}</h4><div class="summaryEmpty">Sem dados para exibir.</div></div>`;
     }
+    const max = Math.max(1, ...pairs.map(([,c])=>Number(c)||0));
+    const rowsHtml = pairs.map(([n,c])=>{
+      const pct = Math.max(8, Math.round(((Number(c)||0)/max)*100));
+      return `<div class="sumBarRow" title="${escapeHtml(n)}: ${c}">
+        <div class="sumBarLabel">${escapeHtml(n)}</div>
+        <div class="sumBarTrack"><div class="sumBarFill ${colorClass}" style="width:${pct}%"></div></div>
+        <div class="sumBarValue">${c}</div>
+      </div>`;
+    }).join('');
+    return `<div class="miniSummaryPanel"><h4 class="miniSummaryTitle">${escapeHtml(title)}</h4><div class="summaryBars compact">${rowsHtml}</div></div>`;
+  }
+  function renderRalSummaryGrid(rows, abertasRows, abertas24Rows, abertas48Rows, abertas72Rows, prazoVencidoRows){
+    const grid = el('summaryGrid');
+    if(!grid) return;
+    grid.className = 'summaryGrid';
+    grid.innerHTML = `
+      <div class="summaryPanel">
+        <h3 id="sumTitle1" style="margin:0 0 10px;font-size:12px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.4px;">RALs abertas por UF</h3>
+        <div class="summaryBars" id="tblSummary1"></div>
+      </div>
+      <div class="summaryPanel">
+        <h3 id="sumTitle2" style="margin:0 0 10px;font-size:12px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.4px;">RALs > 24h por UF</h3>
+        <div class="summaryBars" id="tblSummary2"></div>
+      </div>
+      <div class="summaryPanel">
+        <h3 id="sumTitle3" style="margin:0 0 10px;font-size:12px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.4px;">RALs > 48h por UF</h3>
+        <div class="summaryBars" id="tblSummary3"></div>
+      </div>
+      <div class="summaryPanel">
+        <h3 id="sumTitle4" style="margin:0 0 10px;font-size:12px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.4px;">RALs > 72h por UF</h3>
+        <div class="summaryBars" id="tblSummary4"></div>
+      </div>
+      <div class="summaryPanel">
+        <h3 id="sumTitle5" style="margin:0 0 10px;font-size:12px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.4px;">RALs com prazo vencido por UF</h3>
+        <div class="summaryBars" id="tblSummary5"></div>
+      </div>
+      <div class="summaryPanel">
+        <h3 id="sumTitle6" style="margin:0 0 10px;font-size:12px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.4px;">RALs &gt; 24h por Pirâmide</h3>
+        <div class="summaryBars" id="tblSummary6"></div>
+      </div>
+      <div class="summaryPanel">
+        <h3 id="sumTitle7" style="margin:0 0 10px;font-size:12px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.4px;">RALs 16h–24h por Pirâmide</h3>
+        <div class="summaryBars" id="tblSummary7"></div>
+      </div>`;
+    renderSummaryTable('tblSummary1','sumTitle1','RALs abertas por UF', countByRows(abertasRows,r=>r.uf||'(n/d)'), 'color-blue');
+    renderSummaryTable('tblSummary2','sumTitle2','RALs > 24h por UF', countByRows(abertas24Rows,r=>r.uf||'(n/d)'), 'color-red');
+    renderSummaryTable('tblSummary3','sumTitle3','RALs > 48h por UF', countByRows(abertas48Rows,r=>r.uf||'(n/d)'), 'color-red');
+    renderSummaryTable('tblSummary4','sumTitle4','RALs > 72h por UF', countByRows(abertas72Rows,r=>r.uf||'(n/d)'), 'color-red');
+    renderSummaryTable('tblSummary5','sumTitle5','RALs com prazo vencido por UF', countByRows(prazoVencidoRows,r=>r.uf||'(n/d)'), 'color-red');
+    const rals16a24Rows = rows.filter(r=>r.status==='ABERTA' && r.a.totalHours>=16 && r.a.totalHours<24);
+    renderSummaryTable('tblSummary6','sumTitle6','RALs > 24h por Pirâmide', countByRows(abertas24Rows,r=>r.piramide||'N/D'), 'color-red');
+    renderSummaryTable('tblSummary7','sumTitle7','RALs 16h–24h por Pirâmide', countByRows(rals16a24Rows,r=>r.piramide||'N/D'), 'color-orange');
+  }
+  function renderRecSummaryGrid(abertasRows){
+    const grid = el('summaryGrid');
+    if(!grid) return;
+    grid.className = 'summaryGrid rec-layout';
+    const groups = [
+      { title:'RECS ABERTAS por UF', getter:r=>r.uf||'(n/d)' },
+      { title:'RECS ABERTAS por CF', getter:r=>r.x.cf||'(n/d)' },
+      { title:'RECS ABERTAS por PIRÂMIDE', getter:r=>r.piramide||'NÃO CLASSIFICADO' }
+    ];
+    const ranges = ['4_8','8_16','16_24','ACIMA_24'];
+    grid.innerHTML = groups.map(group=>`<div class="summaryGroup">
+      <h3 style="margin:0 0 10px;font-size:12px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.4px;">${group.title}</h3>
+      <div class="miniChartsGrid">${ranges.map(rangeKey=>{
+        const pairs = countByRows(recRangeFilterRows(abertasRows, rangeKey), group.getter);
+        return buildMiniSummaryPanel(recRangeLabel(rangeKey), pairs, recRangeColorClass(rangeKey));
+      }).join('')}</div>
+    </div>`).join('');
+  }
 
-    // calcula larguras (monoespaçado) para alinhar cabeçalho com os valores
-    const widths = head.map((_,i)=>0);
-    for (const row of cols){
-      row.forEach((v,i)=>{
-        const s = (v ?? "").toString();
-        widths[i] = Math.max(widths[i], s.length);
-      });
+function renderKPIs(){
+    const arr=currentItems();
+    const section=el('kpiSection');
+    if(!arr.length){ section.style.display='none'; return; }
+    section.style.display='';
+
+    const rows=buildDerivedRows();
+    const rals=rows.filter(r=>itemMode(r.x)==='RAL');
+    const recs=rows.filter(r=>itemMode(r.x)==='REC');
+    const hasRAL = rals.length > 0;
+    const hasREC = recs.length > 0;
+
+    const ralsAbertas = rals.filter(r=>r.status==='ABERTA');
+    const recsAbertas = recs.filter(r=>r.status==='ABERTA');
+
+    const rals16_24=ralsAbertas.filter(r=>r.a.totalHours>=16 && r.a.totalHours<24);
+    const rals24=ralsAbertas.filter(r=>r.a.totalHours>=24);
+    const rals48=ralsAbertas.filter(r=>r.a.totalHours>=48);
+    const rals72=ralsAbertas.filter(r=>r.a.totalHours>=72);
+
+    // REC >24h soma TODAS as faixas acima de 24: 24-48 + 48-72 + acima de 72.
+    const recs16_24 = recsAbertas.filter(r=>r.a.totalHours>=16 && r.a.totalHours<24);
+    const recs24 = recsAbertas.filter(r=>r.a.totalHours>=24);
+    const recs48 = recsAbertas.filter(r=>r.a.totalHours>=48);
+    const recs72 = recsAbertas.filter(r=>r.a.totalHours>=72);
+
+    el('countVencidos').textContent=String(rals24.length);
+    el('pillVencidos').style.display = hasRAL && rals24.length>0 ? '' : 'none';
+
+    let kpis = '';
+    if(hasRAL && hasREC){
+      kpis += `<div class="kpiCard"><div class="kpiTitle">TOTAL GERAL</div><div class="kpiValue">${arr.length}</div><div class="kpiSub">RAL + REC</div></div>`;
     }
+    if(hasRAL){
+      kpis += `
+        <div class="kpiCard"><div class="kpiTitle">TOTAL DE RALS</div><div class="kpiValue">${rals.length}</div><div class="kpiSub">importadas</div></div>
+        <div class="kpiCard" style="border-color:rgba(251,140,0,.45);background:rgba(251,140,0,.07)"><div class="kpiTitle">RALS 16H - 24H</div><div class="kpiValue" style="color:#fb8c00">${rals16_24.length}</div><div class="kpiSub">atenção antes do SLA</div></div>
+        <div class="kpiCard" style="border-color:rgba(229,57,53,.35)"><div class="kpiTitle">RALS > 24H</div><div class="kpiValue" style="color:#e53935">${rals24.length}</div><div class="kpiSub">backlog aberto</div></div>
+        <div class="kpiCard" style="border-color:rgba(229,57,53,.45)"><div class="kpiTitle">RALS > 48H</div><div class="kpiValue" style="color:#e53935">${rals48.length}</div><div class="kpiSub">alta prioridade</div></div>
+        <div class="kpiCard" style="border-color:rgba(0,0,0,.55)"><div class="kpiTitle">RALS > 72H</div><div class="kpiValue">${rals72.length}</div><div class="kpiSub">críticas</div></div>`;
+    }
+    if(hasREC){
+      kpis += `
+        <div class="kpiCard"><div class="kpiTitle">TOTAL DE RECS</div><div class="kpiValue">${recs.length}</div><div class="kpiSub">importadas abertas</div></div>
+        <div class="kpiCard" style="border-color:rgba(251,140,0,.45);background:rgba(251,140,0,.07)"><div class="kpiTitle">RECS 16H - 24H</div><div class="kpiValue" style="color:#fb8c00">${recs16_24.length}</div><div class="kpiSub">atenção operacional</div></div>
+        <div class="kpiCard" style="border-color:rgba(229,57,53,.55);background:rgba(229,57,53,.08)"><div class="kpiTitle">RECS > 24H</div><div class="kpiValue" style="color:#e53935">${recs24.length}</div><div class="kpiSub">24-48 + 48-72 + >72</div></div>
+        <div class="kpiCard" style="border-color:rgba(229,57,53,.45)"><div class="kpiTitle">RECS > 48H</div><div class="kpiValue" style="color:#e53935">${recs48.length}</div><div class="kpiSub">escalonamento forte</div></div>
+        <div class="kpiCard" style="border-color:rgba(0,0,0,.55)"><div class="kpiTitle">RECS > 72H</div><div class="kpiValue">${recs72.length}</div><div class="kpiSub">criticidade máxima</div></div>`;
+    }
+    el('kpiGrid').innerHTML = kpis;
 
-    const pad = (s,n) => (s ?? "").toString().padEnd(n, " ");
-    const lines = cols.map(row => row.map((v,i)=>pad(v,widths[i])).join("  "));
-    return lines.join("\n");
-  }
+    const grid=el('summaryGrid');
+    grid.className='summaryGrid';
+    let html = '';
 
-
-  function showOutTxt(){
-    const rows = buildDerivedRows();
-    if (!rows.length) { alert("Nada para gerar (não há RALs visíveis com os filtros atuais)."); return; }
-
-    el("outTitle").textContent = "TXT (alinhado) gerado";
-    el("outHint").textContent = "Texto alinhado em colunas (monoespaçado). Se quiser colunas no Excel, use Gerar CSV ou Baixar XLS.";
-    outTxt.style.display = "block";
-    el("outTableWrap").style.display = "none";
-
-    outTxt.value = buildTxtAligned();
-    outBox.style.display = "block";
-    outTxt.scrollTop = 0;
-    try{ outBox.scrollIntoView({behavior:"smooth", block:"start"}); }catch(_e){}
-  }
-
-  // ====== “Excel na tela” ======
-
-  function applySlaHighlight(tr, ageKey, status){
-    tr.classList.remove("sla24","sla48","sla72");
-    if (status !== "ABERTA") return;
-    if (ageKey === "24_48") tr.classList.add("sla24");
-    else if (ageKey === "48_72") tr.classList.add("sla48");
-    else if (ageKey === "ACIMA_72") tr.classList.add("sla72");
-  }
-
-  function showOutExcel(){
-    const rows = buildDerivedRows();
-    if (!rows.length) { alert("Nada para gerar (não há RALs visíveis com os filtros atuais)."); return; }
-
-    el("outTitle").textContent = "Planilha (visual)";
-    el("outHint").textContent = "Dica: se quiser abrir no Excel mesmo, use o botão Baixar XLS (abre direto).";
-
-    outTxt.style.display = "none";
-    el("outTableWrap").style.display = "block";
-
-    const outTbody = el("outTbody");
-    outTbody.innerHTML = "";
-    for (const r of rows){
-      const tr = document.createElement("tr");
-      tr.setAttribute("data-ral", r.x.ral);
-      tr.setAttribute("data-agekey", r.key);
-      applySlaHighlight(tr, r.key, r.status);
-      tr.innerHTML = `
-        <td class="mono">${escapeHtml(ralNumeric(r.x.ral))}</td>
-        <td>${escapeHtml(r.piramide)}</td>
-        <td class="mono ufCol">${escapeHtml(r.uf)}</td>
-        <td class="mono cfCol">${escapeHtml(r.x.cf)}</td>
-        <td>${escapeHtml(r.faixa)}</td>
-        <td>${escapeHtml(r.responsavel)}</td>
-        <td class="prazoCell">
-          <div class="prazoWrap">
-            <div class="prazoField">
-              <input type="date" class="prazoInput" data-ral="${escapeHtml(r.x.ral)}" value="${escapeHtml(getPrazoForRal(r.x.ral))}">
-              <button type="button" class="prazoBtn" title="Selecionar data" aria-label="Selecionar data">
-                <span aria-hidden="true">📅</span>
-                <span class="prazoBtnText">${escapeHtml(fmtPrazoBR(getPrazoForRalBR(r.x.ral))) || ""}</span>
-              </button>
-            </div>
+    if(hasREC){
+      const topPair = (pairs) => pairs && pairs.length ? pairs[0] : ['Sem dados',0];
+      const topRecResp = topPair(countByRows(recs24,r=>r.responsavel||'(sem responsável)'));
+      const topRecCF = topPair(countByRows(recs24,r=>r.x.cf||'(n/d)'));
+      const topRec16Resp = topPair(countByRows(recs16_24,r=>r.responsavel||'(sem responsável)'));
+      const topRec16CF = topPair(countByRows(recs16_24,r=>r.x.cf||'(n/d)'));
+      html += `
+        <div class="summaryPanel" style="grid-column:1/-1;">
+          <h3 style="margin:0 0 10px;font-size:12px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.4px;">📌 Painel executivo REC - indicadores críticos</h3>
+          <div class="warStrip">
+            <div class="warCard"><div class="warLabel">REC >24h por responsável</div><div class="warValue" title="${escapeHtml(topRecResp[0])}">${escapeHtml(topRecResp[0])}</div><div class="warSub">${topRecResp[1]} registro(s)</div></div>
+            <div class="warCard"><div class="warLabel">REC >24h por CF</div><div class="warValue" title="${escapeHtml(topRecCF[0])}">${escapeHtml(topRecCF[0])}</div><div class="warSub">${topRecCF[1]} registro(s)</div></div>
+            <div class="warCard warn"><div class="warLabel">REC 16-24h por responsável</div><div class="warValue" title="${escapeHtml(topRec16Resp[0])}">${escapeHtml(topRec16Resp[0])}</div><div class="warSub">${topRec16Resp[1]} registro(s)</div></div>
+            <div class="warCard warn"><div class="warLabel">REC 16-24h por CF</div><div class="warValue" title="${escapeHtml(topRec16CF[0])}">${escapeHtml(topRec16CF[0])}</div><div class="warSub">${topRec16CF[1]} registro(s)</div></div>
           </div>
-        </td>
-        <td>
-          <select class=\"statusSel\" data-ral="${escapeHtml(r.x.ral)}">
-            <option value="ABERTA"${r.status==="ABERTA"?" selected":""}>ABERTA</option>
-            <option value="FECHADA"${r.status==="FECHADA"?" selected":""}>FECHADA</option>
-            <option value="NORMALIZADA"${r.status==="NORMALIZADA"?" selected":""}>NORMALIZADA</option>
-          </select>
-        </td>
+        </div>
+        <div class="summaryPanel"><h3 id="sumTitle5" style="margin:0 0 10px;font-size:12px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.4px;">REC >24h por responsável</h3><div class="summaryBars" id="tblSummary5"></div></div>
+        <div class="summaryPanel"><h3 id="sumTitle6" style="margin:0 0 10px;font-size:12px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.4px;">REC >24h por CF</h3><div class="summaryBars" id="tblSummary6"></div></div>
+        <div class="summaryPanel"><h3 id="sumTitle7" style="margin:0 0 10px;font-size:12px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.4px;">REC >24h por UF</h3><div class="summaryBars" id="tblSummary7"></div></div>
+        <div class="summaryPanel"><h3 id="sumTitle8" style="margin:0 0 10px;font-size:12px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.4px;">REC >24h por pirâmide</h3><div class="summaryBars" id="tblSummary8"></div></div>
+        <div class="summaryPanel"><h3 id="sumTitle9" style="margin:0 0 10px;font-size:12px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.4px;">REC 16h-24h por responsável</h3><div class="summaryBars" id="tblSummary9"></div></div>
+        <div class="summaryPanel"><h3 id="sumTitle10" style="margin:0 0 10px;font-size:12px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.4px;">REC 16h-24h por CF</h3><div class="summaryBars" id="tblSummary10"></div></div>
+        <div class="summaryPanel"><h3 id="sumTitle15" style="margin:0 0 10px;font-size:12px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.4px;">REC 16h-24h por UF</h3><div class="summaryBars" id="tblSummary15"></div></div>
+        <div class="summaryPanel"><h3 id="sumTitle16" style="margin:0 0 10px;font-size:12px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.4px;">REC 16h-24h por pirâmide</h3><div class="summaryBars" id="tblSummary16"></div></div>`;
+    }
+
+    if(hasRAL){
+      const topPair = (pairs) => pairs && pairs.length ? pairs[0] : ['Sem dados',0];
+      const topRalResp = topPair(countByRows(rals24,r=>r.responsavel||'(sem responsável)'));
+      const topRalCF = topPair(countByRows(rals24,r=>r.x.cf||'(n/d)'));
+      const topRal16Resp = topPair(countByRows(rals16_24,r=>r.responsavel||'(sem responsável)'));
+      const topRal16CF = topPair(countByRows(rals16_24,r=>r.x.cf||'(n/d)'));
+      html += `
+        <div class="summaryPanel" style="grid-column:1/-1;">
+          <h3 style="margin:0 0 10px;font-size:12px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.4px;">📌 Painel executivo RAL - backlog vencido</h3>
+          <div class="warStrip">
+            <div class="warCard"><div class="warLabel">RAL >24h por responsável</div><div class="warValue" title="${escapeHtml(topRalResp[0])}">${escapeHtml(topRalResp[0])}</div><div class="warSub">${topRalResp[1]} registro(s)</div></div>
+            <div class="warCard"><div class="warLabel">RAL >24h por CF</div><div class="warValue" title="${escapeHtml(topRalCF[0])}">${escapeHtml(topRalCF[0])}</div><div class="warSub">${topRalCF[1]} registro(s)</div></div>
+            <div class="warCard warn"><div class="warLabel">RAL 16-24h por responsável</div><div class="warValue" title="${escapeHtml(topRal16Resp[0])}">${escapeHtml(topRal16Resp[0])}</div><div class="warSub">${topRal16Resp[1]} registro(s)</div></div>
+            <div class="warCard warn"><div class="warLabel">RAL 16-24h por CF</div><div class="warValue" title="${escapeHtml(topRal16CF[0])}">${escapeHtml(topRal16CF[0])}</div><div class="warSub">${topRal16CF[1]} registro(s)</div></div>
+          </div>
+        </div>
+        <div class="summaryPanel"><h3 id="sumTitle1" style="margin:0 0 10px;font-size:12px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.4px;">RAL >24h por responsável</h3><div class="summaryBars" id="tblSummary1"></div></div>
+        <div class="summaryPanel"><h3 id="sumTitle2" style="margin:0 0 10px;font-size:12px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.4px;">RAL >24h por CF</h3><div class="summaryBars" id="tblSummary2"></div></div>
+        <div class="summaryPanel"><h3 id="sumTitle3" style="margin:0 0 10px;font-size:12px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.4px;">RAL >24h por UF</h3><div class="summaryBars" id="tblSummary3"></div></div>
+        <div class="summaryPanel"><h3 id="sumTitle4" style="margin:0 0 10px;font-size:12px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.4px;">RAL &gt;24h por pirâmide</h3><div class="summaryBars" id="tblSummary4"></div></div>
+        <div class="summaryPanel"><h3 id="sumTitle11" style="margin:0 0 10px;font-size:12px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.4px;">RAL 16h-24h por responsável</h3><div class="summaryBars" id="tblSummary11"></div></div>
+        <div class="summaryPanel"><h3 id="sumTitle12" style="margin:0 0 10px;font-size:12px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.4px;">RAL 16h-24h por CF</h3><div class="summaryBars" id="tblSummary12"></div></div>
+        <div class="summaryPanel"><h3 id="sumTitle13" style="margin:0 0 10px;font-size:12px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.4px;">RAL 16h-24h por UF</h3><div class="summaryBars" id="tblSummary13"></div></div>
+        <div class="summaryPanel"><h3 id="sumTitle14" style="margin:0 0 10px;font-size:12px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.4px;">RAL 16h-24h por pirâmide</h3><div class="summaryBars" id="tblSummary14"></div></div>`;
+    }
+
+    grid.innerHTML = html;
+
+    if(hasREC){
+      renderSummaryTable('tblSummary5','sumTitle5','REC >24h por responsável', countByRows(recs24,r=>r.responsavel||'(sem responsável)'), 'color-red');
+      renderSummaryTable('tblSummary6','sumTitle6','REC >24h por CF', countByRows(recs24,r=>r.x.cf||'(n/d)'), 'color-red');
+      renderSummaryTable('tblSummary7','sumTitle7','REC >24h por UF', countByRows(recs24,r=>r.uf||'(n/d)'), 'color-red');
+      renderSummaryTable('tblSummary8','sumTitle8','REC >24h por pirâmide', countByRows(recs24,r=>r.piramide||'NÃO CLASSIFICADO'), 'color-red');
+      renderSummaryTable('tblSummary9','sumTitle9','REC 16h-24h por responsável', countByRows(recs16_24,r=>r.responsavel||'(sem responsável)'), 'color-orange');
+      renderSummaryTable('tblSummary10','sumTitle10','REC 16h-24h por CF', countByRows(recs16_24,r=>r.x.cf||'(n/d)'), 'color-orange');
+      renderSummaryTable('tblSummary15','sumTitle15','REC 16h-24h por UF', countByRows(recs16_24,r=>r.uf||'(n/d)'), 'color-orange');
+      renderSummaryTable('tblSummary16','sumTitle16','REC 16h-24h por pirâmide', countByRows(recs16_24,r=>r.piramide||'NÃO CLASSIFICADO'), 'color-orange');
+    }
+    if(hasRAL){
+      renderSummaryTable('tblSummary1','sumTitle1','RAL >24h por responsável', countByRows(rals24,r=>r.responsavel||'(sem responsável)'), 'color-red');
+      renderSummaryTable('tblSummary2','sumTitle2','RAL >24h por CF', countByRows(rals24,r=>r.x.cf||'(n/d)'), 'color-red');
+      renderSummaryTable('tblSummary3','sumTitle3','RAL >24h por UF', countByRows(rals24,r=>r.uf||'(n/d)'), 'color-red');
+      renderSummaryTable('tblSummary11','sumTitle11','RAL 16h-24h por responsável', countByRows(rals16_24,r=>r.responsavel||'(sem responsável)'), 'color-orange');
+      renderSummaryTable('tblSummary12','sumTitle12','RAL 16h-24h por CF', countByRows(rals16_24,r=>r.x.cf||'(n/d)'), 'color-orange');
+      renderSummaryTable('tblSummary13','sumTitle13','RAL 16h-24h por UF', countByRows(rals16_24,r=>r.uf||'(n/d)'), 'color-orange');
+      renderSummaryTable('tblSummary4','sumTitle4','RAL >24h por pirâmide', countByRows(rals24,r=>r.piramide||'N/D'), 'color-red');
+      renderSummaryTable('tblSummary14','sumTitle14','RAL 16h-24h por pirâmide', countByRows(rals16_24,r=>r.piramide||'N/D'), 'color-orange');
+    }
+  }
+
+  function renderChart(){
+    const arr=currentItems();
+    const rows=arr.map(x=>{ const a=ageHuman(new Date(x.aberturaISO)), key=rangeKeyForHours(a.totalHours); return { key, a }; });
+    const counts={}; getAgeRanges().forEach(r=>counts[r.key]=0); rows.forEach(r=>counts[r.key]=(counts[r.key]||0)+1);
+    const max=Math.max(1, ...Object.values(counts));
+    const total=arr.length;
+    const critical = MODE==='REC' ? rows.filter(r=>r.a.totalHours>=24).length : rows.filter(r=>r.a.totalHours>=72).length;
+    const chart=el('chart');
+    chart.className='chart hardChart';
+    chart.innerHTML=`<div class="hardChartHeader"><div><div class="hardChartTitle">Mapa de idade</div><div class="hardLegend"><span><b>${critical}</b> crítico(s)</span><span>${selectedRangeKey ? 'Filtro ativo' : 'Clique para filtrar'}</span></div></div><div class="hardChartTotal">${total}</div></div>`;
+
+    for(const range of getAgeRanges()){
+      const n=counts[range.key]||0;
+      const pct=Math.round((n/max)*100);
+      const color=manchesterColor(range.manchester);
+      const row=document.createElement('button');
+      row.type='button';
+      row.className='hardRow';
+      if(selectedRangeKey===range.key) row.classList.add('selected');
+      if(n===0) row.classList.add('isZero');
+      if((MODE==='RAL' && range.key==='ACIMA_72') || (MODE==='REC' && range.key==='ACIMA_24')) row.classList.add('isCritical');
+      row.setAttribute('data-range', range.key);
+      row.title = `${range.label}: ${n} ${n===1?currentLabel():currentPlural()}`;
+      row.innerHTML=`
+        <div class="hardLabel"><span class="hardDot" style="background:${color}"></span><span>${escapeHtml(range.label)}</span></div>
+        <div class="hardTrack"><div class="hardFill" style="width:${pct}%;background:${color}"></div></div>
+        <div class="hardValue mono">${n}</div>
       `;
-      outTbody.appendChild(tr);
-    }
-
-    // Status: dropdown na célula (reflete nas exportações)
-    outTbody.querySelectorAll(".statusSel").forEach(sel => {
-      sel.addEventListener("change", (e) => {
-        const ral = sel.getAttribute("data-ral");
-        setStatusForRal(ral, sel.value);
-        const tr = sel.closest("tr");
-        const ageKey = tr ? tr.getAttribute("data-agekey") : "";
-        if (tr) applySlaHighlight(tr, ageKey, sel.value);
-        render();
-      });
-    });
-    
-
-// PRAZO: calendário (módulo isolado) — input[type=date] por cima de um botão 📅 (persistido em localStorage)
-(function bindPrazoControls(scope){
-  scope.querySelectorAll(".prazoField").forEach(field=>{
-    const inp = field.querySelector(".prazoInput");
-    const btn = field.querySelector(".prazoBtn");
-    const txtEl = field.querySelector(".prazoBtnText");
-    if(!inp || !btn) return;
-
-    const setBtnLabel = () => {
-      const label = fmtPrazoBR(inp.value || "");
-      if(txtEl){
-        txtEl.textContent = label || "";
-        if(!label){
-          txtEl.classList.add("prazoBtnEmpty");
-        }else{
-          txtEl.classList.remove("prazoBtnEmpty");
-        }
-      }
-    };
-
-    const openPicker = () => {
-      try{ if(typeof inp.showPicker === "function") inp.showPicker(); }catch(_e){}
-      inp.focus();
-      inp.click();
-    };
-
-    // Clique no botão ou na célula abre o calendário
-    btn.addEventListener("click", openPicker);
-    field.addEventListener("click", (e)=>{
-      // evita duplo-disparo quando clicar no próprio botão
-      if(e.target && (e.target.closest && e.target.closest(".prazoBtn"))) return;
-      openPicker();
-    });
-
-    inp.addEventListener("change", () => {
-      const ral = inp.getAttribute("data-ral");
-      setPrazoForRal(ral, inp.value || "");
-      setBtnLabel();
-    });
-
-    setBtnLabel();
-  });
-})(outTbody);
-
-outBox.style.display = "block";
-    try{ outBox.scrollIntoView({behavior:"smooth", block:"start"}); }catch(_e){}
-  }
-
-  function buildExcelHtmlTable(){
-    // Excel abre HTML como planilha, sem drama.
-    const rows = buildDerivedRows();
-    const head = ["RAL","PIRÂMIDE","UF","CF","FAIXA DE IDADE","RESPONSÁVEL","PRAZO","STATUS"];
-    const escape = (s)=> (s??"").toString()
-      .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");
-
-    let h = '<html><head><meta charset="utf-8"><style>table{border-collapse:collapse;font-family:Calibri,Arial,sans-serif;font-size:10pt;}th,td{padding:6px 8px;vertical-align:top;}td{white-space:normal;word-break:break-word;}</style></head><body>';
-    h += '<table border="1"><thead><tr>' + head.map(c=>`<th>${escape(c)}</th>`).join("") + '</tr></thead><tbody>';
-    for (const r of rows){
-      const cols = [ralNumeric(r.x.ral),r.piramide,r.uf,r.x.cf,r.faixa,r.responsavel,getPrazoForRalBR(r.x.ral),getStatusForRal(r.x.ral)];
-      h += "<tr>" + cols.map(v=>`<td>${escape(v)}</td>`).join("") + "</tr>";
-    }
-    h += '</tbody></table></body></html>';
-    return h;
-  }
-
-  function downloadXls(){
-    const rows = buildDerivedRows();
-    if (!rows.length) { alert("Nada para baixar."); return; }
-    const htmlTable = buildExcelHtmlTable();
-    downloadFile(htmlTable, "application/vnd.ms-excel;charset=utf-8", stampName("rals_planilha", "xls"));
-  }
-
-  function copyOut(){
-    const isTxt = outTxt.style.display !== "none";
-    if (isTxt){
-      navigator.clipboard.writeText(outTxt.value || "")
-        .then(()=>alert("Copiado."))
-        .catch(()=>alert("Não consegui acessar a área de transferência. Copie manualmente."));
-    }else{
-      // copia TSV (mais útil)
-      const tsv = buildTsv8();
-      navigator.clipboard.writeText(tsv)
-        .then(()=>alert("Copiado (TSV)."))
-        .catch(()=>alert("Não consegui acessar a área de transferência. Copie manualmente."));
-    }
-  }
-
-  
-
-// ====== TSV (para copiar/colar no Excel) ======
-function tsvEscape(v){
-  const s = (v ?? "").toString();
-  // Excel/Sheets: tab separa colunas; remove tabs internas pra não bagunçar
-  return s.replace(/\t/g, " ").replace(/\r?\n/g, " ");
-}
-
-function buildTsv8(){
-  const rows = buildDerivedRows();
-  const head = ["RAL","PIRÂMIDE","UF","CF","FAIXA DE IDADE","RESPONSÁVEL","PRAZO","STATUS"];
-  const lines = [];
-  lines.push(head.join("\t"));
-  for(const r of rows){
-    lines.push([
-      ralNumeric(r.x.ral),
-      r.piramide,
-      r.uf,
-      r.x.cf,
-      r.faixa,
-      r.responsavel,
-      getPrazoForRalBR(r.x.ral),
-      getStatusForRal(r.x.ral),
-    ].map(tsvEscape).join("\t"));
-  }
-  return lines.join("\n");
-}
-
-// ====== CSV (download) agora com 8 colunas também ======
-  function csvEscape(value) {
-    const s = (value ?? "").toString();
-    if (/[",\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
-    return s;
-  }
-
-  function exportCsv() {
-    const rows = buildDerivedRows();
-    if (!rows.length) { alert("Nada para exportar."); return; }
-
-    const lines = [];
-    lines.push("RAL,PIRÂMIDE,UF,CF,FAIXA DE IDADE,RESPONSÁVEL,PRAZO,STATUS");
-    for (const r of rows) {
-      lines.push([
-        csvEscape(r.x.ral),
-        csvEscape(r.piramide),
-        csvEscape(r.uf),
-        csvEscape(r.x.cf),
-        csvEscape(r.faixa),
-        csvEscape(r.responsavel),
-        csvEscape(getPrazoForRalBR(r.x.ral)),
-        csvEscape(getStatusForRal(r.x.ral)),
-      ].join(","));
-    }
-    downloadFile(lines.join("\n"), "text/csv;charset=utf-8", stampName("rals", "csv"));
-  }
-
-  function renderChart(rows){
-    // rows já vem filtrado (sem filtro de faixa), porque o chart deve mostrar o "mapa inteiro"
-    const counts = {};
-    AGE_RANGES.forEach(r => counts[r.key] = 0);
-    for (const r of rows){
-      counts[r.key] = (counts[r.key] || 0) + 1;
-    }
-    const max = Math.max(1, ...Object.values(counts));
-
-    chart.innerHTML = "";
-    for (const range of AGE_RANGES){
-      const n = counts[range.key] || 0;
-      const pct = Math.round((n / max) * 100);
-
-      const row = document.createElement("div");
-      row.className = "barRow";
-
-      const btn = document.createElement("button");
-      btn.className = "barBtn";
-      if (selectedRangeKey === range.key) btn.classList.add("selected");
-      btn.setAttribute("data-range", range.key);
-
-      const label = document.createElement("div");
-      label.className = "barLabel";
-      label.innerHTML = `<span class="dot" style="background:${manchesterColor(range.manchester)}"></span>${escapeHtml(range.label)}`;
-
-      const track = document.createElement("div");
-      track.className = "barTrack";
-
-      const fill = document.createElement("div");
-      fill.className = "barFill";
-      fill.style.width = `${pct}%`;
-      fill.style.background = manchesterColor(range.manchester);
-      track.appendChild(fill);
-
-      const meta = document.createElement("div");
-      meta.className = "barMeta";
-      meta.textContent = n === 1 ? "1 RAL" : `${n} RALs`;
-
-      btn.appendChild(label);
-      btn.appendChild(track);
-      btn.appendChild(meta);
-
-      const right = document.createElement("div");
-      right.className = "mono";
-      right.style.textAlign = "right";
-      right.textContent = String(n);
-
-      row.appendChild(btn);
-      row.appendChild(document.createElement("div")); // spacer
-      row.appendChild(right);
+      row.addEventListener('click',()=>{ selectedRangeKey = selectedRangeKey===range.key ? '' : range.key; render(); });
       chart.appendChild(row);
-
-      btn.addEventListener("click", () => {
-        const key = btn.getAttribute("data-range");
-        selectedRangeKey = (selectedRangeKey === key) ? "" : key;
-        render();
-      });
     }
   }
 
-  function render() {
-    count.textContent = String(items.length);
-
-    // Coleta é sobre o conjunto total (não filtrado), como você pediu
-    updateColetaPill(items);
-
-    const filtered = applyFilters(items);
-
-    // Contadores e pílulas extras foram removidos do cabeçalho para deixar a UI mais limpa.
-    // Se quiser reativar KPIs no futuro, é só recolocar os elementos no header e plugar aqui.
-
-
-    // Chart deve ignorar o filtro de faixa (senão ele vira "espelho" do próprio clique)
-    const chartBase = items.map(x => {
-      const dt = new Date(x.aberturaISO);
-      const a = ageHuman(dt);
-      const key = rangeKeyForHours(a.totalHours);
-      const meta = rangeMeta(key);
-      return { x, a, key, meta, ageMs: ageMs(dt) };
-    });
-    renderChart(chartBase);
-
-    // Table
-    const rows = filtered.map(x => {
-      const dt = new Date(x.aberturaISO);
-      const a = ageHuman(dt);
-      const key = rangeKeyForHours(a.totalHours);
-      const meta = rangeMeta(key);
-      return { x, a, key, meta, ageMs: ageMs(dt) };
-    });
-
-    rows.sort((p,q) => {
-      const byRange = rangeOrderIndex(p.key) - rangeOrderIndex(q.key);
-      if (byRange !== 0) return byRange;
-      return q.ageMs - p.ageMs;
-    });
-
-    tbody.innerHTML = "";
-    if (rows.length === 0) {
-      const tr = document.createElement("tr");
-      const td = document.createElement("td");
-      td.colSpan = 5;
-      td.className = "muted";
-      td.style.padding = "14px";
-      td.textContent = "Sem registros para mostrar (ou filtros apertaram demais).";
-      tr.appendChild(td);
-      tbody.appendChild(tr);
+  function exportAgeClass(ageKey){
+    if(MODE==='REC'){
+      if(ageKey==='1_2') return 'age-1a2';
+      if(ageKey==='2_4') return 'age-2a4';
+      if(ageKey==='4_8') return 'age-rec-4a8';
+      if(ageKey==='8_16') return 'age-rec-8a16';
+      if(ageKey==='16_24') return 'age-rec-16a24';
+      return '';
+    }
+    if(ageKey==='ATE_4') return 'age-ate4';
+    if(ageKey==='4_8') return 'age-4a8';
+    if(ageKey==='8_16') return 'age-8a16';
+    if(ageKey==='16_24') return 'age-16a24';
+    return '';
+  }
+  function excelAgeBg(ageKey){
+    if(MODE==='REC'){
+      if(ageKey==='1_2') return '#e8f3ff';
+      if(ageKey==='2_4') return '#edf8ee';
+      if(ageKey==='4_8') return '#fff8d6';
+      if(ageKey==='8_16') return '#fff0e1';
+      if(ageKey==='16_24') return '#ffebee';
+      return '';
+    }
+    if(ageKey==='ATE_4') return '#e8f3ff';
+    if(ageKey==='4_8') return '#edf8ee';
+    if(ageKey==='8_16') return '#fff8d6';
+    if(ageKey==='16_24') return '#fff0e1';
+    return '';
+  }
+  function applySlaHighlight(tr,ageKey,status,ticket){
+    tr.classList.remove('sla24','sla48','sla72','prazo-vencido','age-ate4','age-4a8','age-8a16','age-16a24');
+    const exportCls = exportAgeClass(ageKey); if(exportCls) tr.classList.add(exportCls);
+    if(MODE==='RAL'){
+      if(isPrazoVencido(ticket) && status==='ABERTA'){ tr.classList.add('prazo-vencido'); return; }
+      if(status!=='ABERTA') return;
+      if(ageKey==='24_48') tr.classList.add('sla24'); else if(ageKey==='48_72') tr.classList.add('sla48'); else if(ageKey==='ACIMA_72') tr.classList.add('sla72');
       return;
     }
+    if(MODE==='REC'){
+      // Na planilha, REC só fica vermelha quando atinge 24h+.
+      // 16h-24h é atenção; 8h-16h não pode receber destaque vermelho.
+      if(ageKey==='24_48') tr.classList.add('sla24');
+      else if(ageKey==='48_72') tr.classList.add('sla48');
+      else if(ageKey==='ACIMA_72') tr.classList.add('sla72');
+    }
+  }
+  function buildPrazoWidget(ral){ const val=getPrazoForRal(ral), labelBR=fmtPrazoBR(val), vencido=isPrazoVencido(ral); return `<div class="prazoWrap"><div class="prazoField"><input type="date" class="prazoInput" data-ral="${escapeHtml(ral)}" value="${escapeHtml(val)}"><button type="button" class="prazoBtn${vencido?' vencido':''}">📅 <span class="prazoBtnText${!labelBR?' prazoBtnEmpty':''}">${escapeHtml(labelBR)||'dd/mm/aaaa'}</span>${vencido?'<span class="vencido-badge">VENCIDO</span>':''}</button></div></div>`; }
+  function bindPrazoControls(scope){ scope.querySelectorAll('.prazoField').forEach(field=>{ const inp=field.querySelector('.prazoInput'), btn=field.querySelector('.prazoBtn'), txt=field.querySelector('.prazoBtnText'); if(!inp||!btn) return; const refresh=()=>{ const label=fmtPrazoBR(inp.value||''); if(txt){ txt.textContent=label||'dd/mm/aaaa'; txt.classList.toggle('prazoBtnEmpty',!label); } const v=isPrazoVencido(inp.dataset.ral||''); btn.classList.toggle('vencido',v); let bd=btn.querySelector('.vencido-badge'); if(v&&!bd){ bd=document.createElement('span'); bd.className='vencido-badge'; bd.textContent='VENCIDO'; btn.appendChild(bd); } if(!v&&bd) bd.remove(); }; btn.addEventListener('click',()=>{ try{ if(typeof inp.showPicker==='function') inp.showPicker(); }catch{} inp.focus(); inp.click(); }); inp.addEventListener('change',()=>{ setPrazoForRal(inp.dataset.ral, inp.value||''); refresh(); render(); }); refresh(); }); }
+  function applyStatusClass(sel){ sel.classList.remove('st-aberta','st-fechada','st-normalizada'); if(sel.value==='ABERTA') sel.classList.add('st-aberta'); else if(sel.value==='FECHADA') sel.classList.add('st-fechada'); else sel.classList.add('st-normalizada'); }
 
-    for (const r of rows) {
-      const dotColor = manchesterColor(r.meta.manchester);
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>
-          <span class="badge">
-            <span class="dot" style="background:${dotColor}"></span>
-            ${escapeHtml(r.meta.label)}
-          </span>
-          <div class="ageSub mono">${escapeHtml(formatAgeShort(r.a))}</div>
-        </td>
-        <td class="mono">${escapeHtml(ralNumeric(r.x.ral))}</td>
-        <td>${escapeHtml(r.x.designacao)}</td>
-        <td class="mono">${escapeHtml(r.x.cf)}</td>
-        <td><button class="danger small" data-del="${r.x.id}">Remover</button></td>
-      `;
-      tbody.appendChild(tr);
+  function renderMainTable(){
+    const rows=buildDerivedRows(), tbody=el('tbody');
+    el('mainThead').innerHTML = '';
+    tbody.innerHTML='';
+
+    if(!rows.length){
+      const tr=document.createElement('tr'), td=document.createElement('td');
+      td.colSpan=12; td.className='muted'; td.style.padding='14px'; td.textContent=`Sem registros para mostrar.`;
+      tr.appendChild(td); tbody.appendChild(tr); return;
     }
 
-    tbody.querySelectorAll("button[data-del]").forEach(btn => {
-      btn.addEventListener("click", () => removeItem(btn.getAttribute("data-del")));
+    const ralRows = rows.filter(r => itemMode(r.x)==='RAL');
+    const recRows = rows.filter(r => itemMode(r.x)==='REC');
+
+    function idadeCell(r){
+      const dotColor=manchesterColor(r.meta.manchester);
+      const pr = priorityInfo(r.a.totalHours, itemMode(r.x));
+      return `<span class="badge"><span class="dot" style="background:${dotColor}"></span>${escapeHtml(r.meta.label)}</span><div class="ageSub mono">${escapeHtml(formatAgeShort(r.a))}</div>${pr?`<div style="margin-top:6px;"><span class="priority-badge ${pr.cls}">${pr.label}</span></div>`:''}`;
+    }
+
+    function renderRalSection(list){
+      if(!list.length) return '';
+      return `<div class="smartSection">
+        <div class="smartSectionTitle"><strong>RALs</strong><span class="smartHint">layout enxuto: sem CLIENTE</span><span>${list.length} registro(s)</span></div>
+        <div class="smartTableWrap"><table class="smartTable ralSmartTable">
+          <thead><tr><th class="c-ral">RAL</th><th class="c-des">DESIGNAÇÃO</th><th class="c-cf">CF</th><th class="c-pir">PIRÂMIDE</th><th class="c-uf">UF</th><th class="c-idade">IDADE</th><th class="c-resp">RESPONSÁVEL</th><th class="c-prazo">PRAZO</th><th class="c-status">STATUS</th><th class="c-act">🗑️</th></tr></thead>
+          <tbody>${list.map(r=>{
+            const trClass = [];
+            const exportCls = exportAgeClass(r.key); if(exportCls) trClass.push(exportCls);
+            if(isPrazoVencido(r.x.ral) && r.status==='ABERTA') trClass.push('prazo-vencido');
+            else if(r.status==='ABERTA'){
+              if(r.key==='24_48') trClass.push('sla24');
+              else if(r.key==='48_72') trClass.push('sla48');
+              else if(r.key==='ACIMA_72') trClass.push('sla72');
+            }
+            const statusHtml = `<select class="statusSel" data-ral="${escapeHtml(r.x.ral)}"><option value="ABERTA"${r.status==='ABERTA'?' selected':''}>ABERTA</option><option value="FECHADA"${r.status==='FECHADA'?' selected':''}>FECHADA</option><option value="NORMALIZADA"${r.status==='NORMALIZADA'?' selected':''}>NORMALIZADA</option></select>`;
+            return `<tr class="${trClass.join(' ')}" data-ticket="${escapeHtml(r.x.ral)}" data-agekey="${escapeHtml(r.key)}">
+              <td class="c-ral" title="${escapeHtml(r.x.ral)}">${escapeHtml(r.x.ral)}</td>
+              <td class="c-des" title="${escapeHtml(r.x.designacao)}">${escapeHtml(r.x.designacao)}</td>
+              <td class="c-cf" title="${escapeHtml(r.x.cf)}">${escapeHtml(r.x.cf)}</td>
+              <td class="c-pir" title="${escapeHtml(r.piramide)}">${escapeHtml(r.piramide)}</td>
+              <td class="c-uf">${escapeHtml(r.uf)}</td>
+              <td class="c-idade" title="${escapeHtml(formatAgeShort(r.a))}">${idadeCell(r)}</td>
+              <td class="c-resp" title="${escapeHtml(r.responsavel || '')}">${escapeHtml(r.responsavel || '')}</td>
+              <td class="c-prazo prazoCell">${buildPrazoWidget(r.x.ral)}</td>
+              <td class="c-status">${statusHtml}</td>
+              <td class="c-act"><button class="danger small" data-del="${escapeHtml(r.x.id)}">✕</button></td>
+            </tr>`;
+          }).join('')}</tbody>
+        </table></div>
+      </div>`;
+    }
+
+    function renderRecSection(list){
+      if(!list.length) return '';
+      return `<div class="smartSection">
+        <div class="smartSectionTitle"><strong>RECs</strong><span class="smartHint">layout completo: CLIENTE visível</span><span>${list.length} registro(s)</span></div>
+        <div class="smartTableWrap"><table class="smartTable recSmartTable">
+          <thead><tr><th class="c-rec">REC</th><th class="c-des">DESIGNAÇÃO</th><th class="c-cliente">CLIENTE</th><th class="c-cf">CF</th><th class="c-pir">PIRÂMIDE</th><th class="c-uf">UF</th><th class="c-idade">IDADE</th><th class="c-resp">RESPONSÁVEL</th><th class="c-status">STATUS</th><th class="c-act">🗑️</th></tr></thead>
+          <tbody>${list.map(r=>{
+            const trClass = [];
+            const exportCls = exportAgeClass(r.key); if(exportCls) trClass.push(exportCls);
+            // REC: vermelho somente para 24h+; 16h-24h fica como atenção e 8h-16h sem vermelho.
+            if(r.key==='24_48') trClass.push('sla24');
+            else if(r.key==='48_72') trClass.push('sla48');
+            else if(r.key==='ACIMA_72') trClass.push('sla72');
+            return `<tr class="${trClass.join(' ')}" data-ticket="${escapeHtml(r.x.rec)}" data-agekey="${escapeHtml(r.key)}">
+              <td class="c-rec" title="${escapeHtml(r.x.rec)}">${escapeHtml(r.x.rec)}</td>
+              <td class="c-des" title="${escapeHtml(r.x.designacao)}">${escapeHtml(r.x.designacao)}</td>
+              <td class="c-cliente" title="${escapeHtml(r.x.cliente || '')}">${escapeHtml(r.x.cliente || '')}</td>
+              <td class="c-cf" title="${escapeHtml(r.x.cf)}">${escapeHtml(r.x.cf)}</td>
+              <td class="c-pir" title="${escapeHtml(r.piramide)}">${escapeHtml(r.piramide)}</td>
+              <td class="c-uf">${escapeHtml(r.uf)}</td>
+              <td class="c-idade" title="${escapeHtml(formatAgeShort(r.a))}">${idadeCell(r)}</td>
+              <td class="c-resp" title="${escapeHtml(r.responsavel || '')}">${escapeHtml(r.responsavel || '')}</td>
+              <td class="c-status">${escapeHtml(r.status)}</td>
+              <td class="c-act"><button class="danger small" data-del="${escapeHtml(r.x.id)}">✕</button></td>
+            </tr>`;
+          }).join('')}</tbody>
+        </table></div>
+      </div>`;
+    }
+
+    const tr=document.createElement('tr');
+    const td=document.createElement('td');
+    td.colSpan=12;
+    td.style.padding='0';
+    td.style.borderBottom='none';
+    td.innerHTML = `<div class="smartTables">${renderRalSection(ralRows)}${renderRecSection(recRows)}</div>`;
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+
+    tbody.querySelectorAll('.statusSel').forEach(sel=>{ applyStatusClass(sel); sel.addEventListener('change',()=>{ statusByRal.set(sel.dataset.ral, sel.value); persistStatusMap(); render(); }); });
+    bindPrazoControls(tbody);
+    tbody.querySelectorAll('button[data-del]').forEach(btn=>btn.addEventListener('click',()=>{ if(!confirm(`Remover este registro?`)) return; items=items.filter(x=>x.id!==btn.dataset.del); save(); render(); }));
+  }
+
+
+  function exportHeaders(){ return ['RAL/REC','DESIGNAÇÃO','CLIENTE','CF','PIRÂMIDE','UF','IDADE','RESPONSÁVEL','PRAZO','STATUS']; }
+  function exportHeadersRAL(){ return ['RAL','DESIGNAÇÃO','CF','PIRÂMIDE','UF','IDADE','RESPONSÁVEL','PRAZO','STATUS']; }
+  function exportHeadersREC(){ return ['REC','DESIGNAÇÃO','CLIENTE','CF','PIRÂMIDE','UF','IDADE','RESPONSÁVEL','STATUS']; }
+  function exportRow(r){ const tipo=itemMode(r.x), ticket=itemTicket(r.x); return [ticket, r.x.designacao, r.x.cliente||'', r.x.cf, r.piramide, r.uf, formatAgeShort(r.a), r.responsavel||'', tipo==='RAL'?getPrazoForRalBR(r.x.ral):'', r.status]; }
+  function exportRowRAL(r){ return [r.x.ral, r.x.designacao, r.x.cf, r.piramide, r.uf, formatAgeShort(r.a), r.responsavel||'', getPrazoForRalBR(r.x.ral), r.status]; }
+  function exportRowREC(r){ return [r.x.rec, r.x.designacao, r.x.cliente||'', r.x.cf, r.piramide, r.uf, formatAgeShort(r.a), r.responsavel||'', r.status]; }
+  function rowsByType(){ const rows=buildDerivedRows(); return { rows, ralRows: rows.filter(r=>itemMode(r.x)==='RAL'), recRows: rows.filter(r=>itemMode(r.x)==='REC') }; }
+  function buildAlignedTable(head, dataRows){
+    const all=[head,...dataRows], widths=head.map(()=>0);
+    all.forEach(row=>row.forEach((v,i)=>widths[i]=Math.max(widths[i], String(v??'').length)));
+    const pad=(s,n)=>String(s??'').padEnd(n,' ');
+    return all.map(row=>row.map((v,i)=>pad(v,widths[i])).join('  ')).join('\n');
+  }
+  function buildTxtAligned(){
+    const {rows, ralRows, recRows}=rowsByType();
+    const parts=[...montarCabecalhoRelatorio(rows, 'RALSCOPE • TXT operacional híbrido')];
+    if(ralRows.length){ parts.push(buildAlignedTable(exportHeadersRAL(), ralRows.map(exportRowRAL))); }
+    if(recRows.length){ if(ralRows.length) parts.push(''); parts.push(buildAlignedTable(exportHeadersREC(), recRows.map(exportRowREC))); }
+    return parts.join('\n');
+  }
+  function showOutTxt(){ document.body.classList.remove('excel-visual-mode'); const host=document.querySelector('.rawLeft'); if(host && el('outBox').parentElement!==host) host.appendChild(el('outBox')); const rows=buildDerivedRows(); if(!rows.length){ showToast('warn','Vazio',`Não há registros visíveis com os filtros atuais.`); return; } el('outTitle').textContent='TXT (layout inteligente)'; el('outHint').textContent='Cabeçalho com data/hora de emissão; RAL sem CLIENTE; REC com CLIENTE.'; el('outTxt').style.display='block'; el('outTableWrap').style.display='none'; el('outTxt').value=buildTxtAligned(); el('outBox').style.display='block'; }
+  function smartColClass(header){
+    const h = String(header || '').toUpperCase();
+    if(h === 'RAL') return 'c-ral';
+    if(h === 'REC') return 'c-rec';
+    if(h === 'DESIGNAÇÃO') return 'c-des';
+    if(h === 'CLIENTE') return 'c-cliente';
+    if(h === 'CF') return 'c-cf';
+    if(h === 'PIRÂMIDE') return 'c-pir';
+    if(h === 'UF') return 'c-uf';
+    if(h === 'IDADE') return 'c-idade';
+    if(h === 'RESPONSÁVEL') return 'c-resp';
+    if(h === 'PRAZO') return 'c-prazo';
+    if(h === 'STATUS') return 'c-status';
+    return '';
+  }
+  function showOutExcel(){
+    // Mantém a Planilha Visual Inteligente no local original, abaixo dos botões do campo bruto.
+    // Agora o campo PRAZO das RALs volta a ser interativo com o calendário.
+    document.body.classList.remove('excel-visual-mode');
+    const host=document.querySelector('.rawLeft');
+    if(host && el('outBox').parentElement!==host) host.appendChild(el('outBox'));
+    const {rows, ralRows, recRows}=rowsByType();
+    if(!rows.length){ showToast('warn','Vazio',`Não há registros visíveis com os filtros atuais.`); return; }
+    el('outTitle').textContent='Planilha visual inteligente';
+    el('outHint').textContent='Cabeçalho com data/hora de emissão; RAL sem CLIENTE; REC com CLIENTE. O prazo das RALs é editável no ícone de calendário.';
+    el('outTxt').style.display='none';
+    el('outTableWrap').style.display='block';
+    el('outThead').innerHTML = '';
+    const out=el('outTbody');
+    out.innerHTML='';
+    const tr=document.createElement('tr');
+    const td=document.createElement('td');
+    td.colSpan=12; td.style.padding='0'; td.style.borderBottom='none';
+
+    function visualCell(head, value, r){
+      const cls = smartColClass(head);
+      if(head === 'PRAZO' && itemMode(r.x) === 'RAL'){
+        return `<td class="${cls} prazoCell" title="Prazo">${buildPrazoWidget(r.x.ral)}</td>`;
+      }
+      return `<td class="${cls}${head==='CF'?' mono':''}" title="${escapeHtml(value)}">${escapeHtml(value)}</td>`;
+    }
+
+    const section = (head, bodyRows, rowFn, tableKind) => {
+      if(!bodyRows.length) return '';
+      const tableClass = tableKind === 'REC' ? 'smartTable recSmartTable' : 'smartTable ralSmartTable';
+      return `<div class="smartSection"><div class="smartTableWrap"><table class="${tableClass}"><thead><tr>${head.map(h=>`<th class="${smartColClass(h)}">${escapeHtml(h)}</th>`).join('')}</tr></thead><tbody>${bodyRows.map(r=>`<tr>${rowFn(r).map((v,i)=>visualCell(head[i], v, r)).join('')}</tr>`).join('')}</tbody></table></div></div>`;
+    };
+
+    td.innerHTML = `<div class="smartTables"><div class="smartSectionTitle"><strong>${escapeHtml(cabecalhoRelatorioLinha())}</strong></div>${section(exportHeadersRAL(),ralRows,exportRowRAL,'RAL')}${section(exportHeadersREC(),recRows,exportRowREC,'REC')}</div>`;
+    tr.appendChild(td); out.appendChild(tr);
+    bindPrazoControls(out);
+    el('outBox').style.display='block';
+  }
+  function tsvEscape(v){ return String(v??'').replace(/\t/g,' ').replace(/\r?\n/g,' '); }
+  function buildTsv(){
+    const {ralRows, recRows}=rowsByType();
+    const parts=[cabecalhoRelatorioLinha(), ''];
+    if(ralRows.length){ parts.push(exportHeadersRAL().join('\t')); parts.push(...ralRows.map(r=>exportRowRAL(r).map(tsvEscape).join('\t'))); }
+    if(recRows.length){ if(ralRows.length) parts.push(''); parts.push(exportHeadersREC().join('\t')); parts.push(...recRows.map(r=>exportRowREC(r).map(tsvEscape).join('\t'))); }
+    return parts.join('\n');
+  }
+  function copyOut(){ const text = el('outTxt').style.display !== 'none' ? el('outTxt').value : buildTsv(); navigator.clipboard.writeText(text||'').then(()=>showToast('ok','Copiado!','Conteúdo copiado para a área de transferência.')).catch(()=>showToast('err','Erro','Não consegui acessar a área de transferência.')); }
+  function csvEscape(v){ const s=String(v??''); return /[",\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s; }
+  function buildCsvContent(){
+    const {ralRows, recRows}=rowsByType();
+    const parts=[csvEscape(cabecalhoRelatorioLinha()), ''];
+    if(ralRows.length){ parts.push(exportHeadersRAL().join(',')); parts.push(...ralRows.map(r=>exportRowRAL(r).map(csvEscape).join(','))); }
+    if(recRows.length){ if(ralRows.length) parts.push(''); parts.push(exportHeadersREC().join(',')); parts.push(...recRows.map(r=>exportRowREC(r).map(csvEscape).join(','))); }
+    return parts.join('\n');
+  }
+  function exportCsv(withBom=false){ if(!buildDerivedRows().length){ showToast('warn','Vazio','Nada para exportar.'); return; } const content=(withBom?'\uFEFF':'') + buildCsvContent(); downloadFile(content,'text/csv;charset=utf-8', stampName('ralscope_layout_inteligente','csv')); showToast('ok', withBom ? 'CSV UTF-8 BOM exportado' : 'CSV exportado','Arquivo baixado com sucesso.'); }
+  function buildExcelHtmlTable(){
+    const {ralRows, recRows}=rowsByType();
+    const esc=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const table=(head, dataRows, rowFn)=> dataRows.length ? `<table border="1"><thead><tr>${head.map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${dataRows.map(r=>`<tr>${rowFn(r).map(v=>`<td>${esc(v)}</td>`).join('')}</tr>`).join('')}</tbody></table>` : '';
+    let h='<html><head><meta charset="utf-8"><style>body{font-family:Calibri,Arial;font-size:10pt;}table{border-collapse:collapse;margin-bottom:18px;}th{background:#1e3a5f;color:#fff;padding:6px 8px;}td{padding:5px 8px;vertical-align:top;border:1px solid #ccc;}.reportTitle{font-weight:bold;font-size:12pt;border:none!important;padding:8px 0 14px 0;}</style></head><body>';
+    h+=`<table><tr><td colspan="10" class="reportTitle">${esc(cabecalhoRelatorioLinha())}</td></tr></table>`;
+    h+=table(exportHeadersRAL(), ralRows, exportRowRAL);
+    h+=table(exportHeadersREC(), recRows, exportRowREC);
+    h+='</body></html>'; return h;
+  }
+  function downloadXls(){ if(!buildDerivedRows().length){ showToast('warn','Vazio','Nada para baixar.'); return; } downloadFile(buildExcelHtmlTable(),'application/vnd.ms-excel;charset=utf-8', stampName('ralscope_layout_inteligente_planilha','xls')); showToast('ok','XLS baixado','Abra no Excel ou Calc.'); }
+
+  function showParseModal(errors){ el('parseModalContent').innerHTML = `<p style="color:var(--muted);font-size:13px;margin-bottom:12px;">${errors.length} linha(s) ignorada(s):</p><table class="modal-table"><thead><tr><th>#</th><th>Motivo</th><th>Linha</th></tr></thead><tbody>${errors.map((e,i)=>`<tr><td style="color:var(--muted)">${i+1}</td><td class="reason">${escapeHtml(e.reason)}</td><td class="line-cell">${escapeHtml(e.line.slice(0,140))}${e.line.length>140?'…':''}</td></tr>`).join('')}</tbody></table>`; el('parseModal').style.display='flex'; }
+  function clearAll(){ document.body.classList.remove('excel-visual-mode'); if(!confirm('Apagar TODOS os registros e dados salvos?')) return; statusByRal.clear(); persistStatusMap(); prazoByRal.clear(); persistPrazoMap(); items=[]; selectedRangeKey=''; el('raw').value=''; el('fDesignacao').value=''; el('fCliente').value=''; el('fCF').value=''; el('fTicket').value=''; el('outTxt').value=''; el('outBox').style.display='none'; save(); render(); showToast('ok','Tudo limpo','Dados, status e prazos foram removidos.'); }
+  function initTheme(){ const s=localStorage.getItem(THEME_KEY); document.body.setAttribute('data-theme', (s==='light'||s==='dark')?s:'dark'); }
+  function toggleTheme(){ const cur=document.body.getAttribute('data-theme')==='light' ? 'light' : 'dark'; const next=cur==='light'?'dark':'light'; document.body.setAttribute('data-theme',next); localStorage.setItem(THEME_KEY,next); renderChart(); }
+
+  function slaLimitForRow(r){
+    return itemMode(r.x)==='REC' ? 24 : 24;
+  }
+
+  function criticalLimitForRow(r){
+    return itemMode(r.x)==='REC' ? 24 : 72;
+  }
+
+  function buildResponsavelRanking(rows){
+    const map = {};
+    rows.forEach(r => {
+      if(r.status !== 'ABERTA') return;
+      if(r.a.totalHours < slaLimitForRow(r)) return;
+      const nome = r.responsavel || '(sem responsável)';
+      if(!map[nome]) map[nome] = { total:0, ral:0, rec:0, criticas:0, maiorIdade:0 };
+      const tipo = itemMode(r.x);
+      map[nome].total += 1;
+      if(tipo === 'RAL') map[nome].ral += 1;
+      if(tipo === 'REC') map[nome].rec += 1;
+      if(r.a.totalHours >= criticalLimitForRow(r)) map[nome].criticas += 1;
+      map[nome].maiorIdade = Math.max(map[nome].maiorIdade, r.a.totalHours || 0);
     });
+    return Object.entries(map).sort((a,b) => b[1].total - a[1].total || b[1].criticas - a[1].criticas);
   }
 
-  // ====== Theme ======
-  function initTheme(){
-    const saved = localStorage.getItem(THEME_KEY);
-    const theme = (saved === "light" || saved === "dark") ? saved : "dark";
-    document.body.setAttribute("data-theme", theme === "light" ? "light" : "dark");
+  function buildCFImpact(rows){
+    const map = {};
+    rows.forEach(r => {
+      if(r.status !== 'ABERTA') return;
+      const cf = r.x.cf || 'N/D';
+      if(!map[cf]) map[cf] = { total:0, ral:0, rec:0, criticas:0, responsavel:r.responsavel||'', uf:r.uf||'', piramide:r.piramide||'' };
+      const tipo = itemMode(r.x);
+      map[cf].total += 1;
+      if(tipo === 'RAL') map[cf].ral += 1;
+      if(tipo === 'REC') map[cf].rec += 1;
+      if(r.a.totalHours >= slaLimitForRow(r)) map[cf].criticas += 1;
+      if(!map[cf].responsavel && r.responsavel) map[cf].responsavel = r.responsavel;
+    });
+    return Object.entries(map).sort((a,b) => b[1].total - a[1].total || b[1].criticas - a[1].criticas);
   }
 
-  function toggleTheme(){
-    const current = document.body.getAttribute("data-theme") === "light" ? "light" : "dark";
-    const next = current === "light" ? "dark" : "light";
-    document.body.setAttribute("data-theme", next);
-    localStorage.setItem(THEME_KEY, next);
-    render(); // refaz cores do chart
+  function buildTipoMix(rows){
+    const total = rows.length;
+    const ral = rows.filter(r => itemMode(r.x)==='RAL').length;
+    const rec = rows.filter(r => itemMode(r.x)==='REC').length;
+    return { total, ral, rec };
   }
 
-  el("btnTheme").addEventListener("click", toggleTheme);
+  function buildRelatorioN3(){
+    const rows = buildDerivedRows();
+    const abertas = rows.filter(r => r.status === 'ABERTA');
+    const ofensoras = abertas.filter(r => r.a.totalHours >= slaLimitForRow(r));
+    const criticas = abertas.filter(r => r.a.totalHours >= criticalLimitForRow(r));
+    const mix = buildTipoMix(rows);
+    const ranking = buildResponsavelRanking(rows).slice(0,10);
+    const cfImpact = buildCFImpact(rows).slice(0,10);
+    const porUF = countByRows(ofensoras, r => r.uf || '(n/d)').slice(0,10);
+    const porPiramide = countByRows(ofensoras, r => r.piramide || 'N/D').slice(0,10);
 
-  // ====== Events ======
-  el("btnParse").addEventListener("click", () => {
-    const text = raw.value || "";
-    if (!text.trim()) { alert("Cole os dados brutos primeiro."); return; }
+    const linhas = montarCabecalhoRelatorio(rows, 'RALSCOPE NÍVEL 3 • RELATÓRIO EXECUTIVO OPERACIONAL');
+    linhas.push('VISÃO GERAL');
+    linhas.push(`Total de registros visíveis: ${mix.total}`);
+    linhas.push(`RALs: ${mix.ral}`);
+    linhas.push(`RECs: ${mix.rec}`);
+    linhas.push(`Abertos: ${abertas.length}`);
+    linhas.push(`Ofensores de SLA: ${ofensoras.length}`);
+    linhas.push(`Críticos: ${criticas.length}`);
+    linhas.push('');
+    linhas.push('TOP RESPONSÁVEIS - OFENSORES DE SLA');
+    if(ranking.length){
+      ranking.forEach(([nome,d],i)=>{
+        linhas.push(`${String(i+1).padStart(2,'0')}. ${nome} | Total: ${d.total} | RAL: ${d.ral} | REC: ${d.rec} | Críticas: ${d.criticas}`);
+      });
+    }else{
+      linhas.push('Nenhum responsável com ofensora de SLA nos filtros atuais.');
+    }
+    linhas.push('');
+    linhas.push('CFs MAIS IMPACTADOS - CORRELAÇÃO RAL + REC');
+    if(cfImpact.length){
+      cfImpact.forEach(([cf,d],i)=>{
+        linhas.push(`${String(i+1).padStart(2,'0')}. ${cf} | Total: ${d.total} | RAL: ${d.ral} | REC: ${d.rec} | Resp.: ${d.responsavel || '(sem responsável)'} | UF: ${d.uf || '-'} | ${d.piramide || 'N/D'}`);
+      });
+    }else{
+      linhas.push('Nenhum CF impactado nos filtros atuais.');
+    }
+    linhas.push('');
+    linhas.push('OFENSORAS POR UF');
+    linhas.push(porUF.length ? porUF.map(([uf,c])=>`• ${uf}: ${c}`).join('\n') : '• Nenhuma');
+    linhas.push('');
+    linhas.push('OFENSORAS POR PIRÂMIDE');
+    linhas.push(porPiramide.length ? porPiramide.map(([p,c])=>`• ${p}: ${c}`).join('\n') : '• Nenhuma');
+    linhas.push('');
+    linhas.push('RECOMENDAÇÃO OPERACIONAL');
+    if(cfImpact.length || ranking.length){
+      linhas.push('Priorizar cobrança nos responsáveis e CFs com maior concentração de ofensores. Quando houver RAL e REC no mesmo CF, tratar como possível causa raiz comum e escalar como incidente operacional consolidado.');
+    }else{
+      linhas.push('Sem concentração crítica nos filtros atuais. Manter acompanhamento.');
+    }
+    return linhas.join('\n');
+  }
 
-    const { parsed, errors } = parseLines(text);
-    const added = mergeNoDuplicates(parsed);
+  function showReportN3(){
+    const report = buildRelatorioN3();
+    el('outTitle').textContent = 'Relatório Nível 3 - Executivo operacional';
+    el('outHint').textContent = 'Ranking de responsáveis, correlação por CF, mix RAL/REC e recomendação operacional.';
+    el('outTxt').style.display = 'block';
+    el('outTableWrap').style.display = 'none';
+    el('outTxt').value = report;
+    el('outBox').style.display = 'block';
+    try{ el('outBox').scrollIntoView({behavior:'smooth', block:'start'}); }catch(_e){}
+  }
 
+  function showOperationalReport(){
+    const report = buildOperationalReport();
+    el('outTitle').textContent = 'Relatório operacional';
+    el('outHint').textContent = MODE==='REC' ? 'Texto pronto para repasse de REC acima de 24h.' : 'Texto pronto para repasse de RAL acima do SLA de 24h.';
+    el('outTxt').style.display = 'block';
+    el('outTableWrap').style.display = 'none';
+    el('outTxt').value = report;
+    el('outBox').style.display = 'block';
+  }
+  function applyNocMode(){ document.body.classList.toggle('noc-mode', !!nocMode); }
+  function exitNocMode(){ nocMode = false; applyNocMode(); render(); }
+  function toggleNocMode(){ nocMode = !nocMode; applyNocMode(); render(); }
+
+  function setMode(next){
+    const newMode = next === 'REC' ? 'REC' : 'RAL';
+    const changed = MODE !== newMode;
+    MODE = newMode;
+    localStorage.setItem(MODE_KEY, MODE);
+    selectedRangeKey='';
+    const modeRalBtn = el('modeRAL');
+    const modeRecBtn = el('modeREC');
+    if(modeRalBtn) modeRalBtn.classList.toggle('active', MODE==='RAL');
+    if(modeRecBtn) modeRecBtn.classList.toggle('active', MODE==='REC');
+    if(modeRalBtn) modeRalBtn.classList.toggle('primary', MODE==='RAL');
+    if(modeRecBtn) modeRecBtn.classList.toggle('primary', MODE==='REC');
+    el('raw').placeholder = 'Cole aqui os dados brutos misturados: RAL e REC no mesmo campo, sem trocar modo...';
+    el('rawLabel').textContent = 'Cole RALs e/ou RECs no mesmo bloco';
+    el('fTicket').placeholder = MODE==='REC' ? 'REC' : 'RAL';
+    el('chartTitleText').textContent = MODE==='REC' ? 'Gráfico: RECs por idade' : 'Gráfico: registros por idade';
+    el('btnResetStatus').style.display = MODE==='REC' ? 'none' : '';
+    if(changed){
+      el('outTxt').value='';
+      el('outBox').style.display='none';
+      showToast('info','Visualização alterada', MODE==='REC' ? 'Você está vendo as RECs. O campo bruto continua híbrido e aceita RAL + REC juntos.' : 'Você está vendo as RALs. O campo bruto continua híbrido e aceita RAL + REC juntos.', 2600);
+    }
+    render();
+  }
+
+  function render(){ const arr=currentItems(); applyNocMode(); el('count').textContent=String(arr.length); updateColetaPill(arr); checkStorageUsage(); renderChart(); renderKPIs(); renderMainTable(); const btnNoc=el('btnNoc'); if(btnNoc) btnNoc.textContent = nocMode ? '↩️ Sair do Modo NOC' : '🖥️ Modo NOC'; const btnNocFloat=el('btnNocFloat'); if(btnNocFloat) btnNocFloat.style.display = nocMode ? 'inline-flex' : 'none'; }
+
+  el('btnTheme').addEventListener('click', toggleTheme);
+  el('btnPrint').addEventListener('click', ()=>window.print());
+  const btnPrintInline = el('btnPrintInline'); if(btnPrintInline) btnPrintInline.addEventListener('click', ()=>window.print());
+  const btnPrintTable = el('btnPrintTable'); if(btnPrintTable) btnPrintTable.addEventListener('click', ()=>window.print());
+  const btnNoc = el('btnNoc'); if(btnNoc) btnNoc.addEventListener('click', toggleNocMode);
+  const btnNocFloat = el('btnNocFloat'); if(btnNocFloat) btnNocFloat.addEventListener('click', exitNocMode);
+  el('closeParseModal').addEventListener('click', ()=>{ el('parseModal').style.display='none'; });
+  el('parseModal').addEventListener('click', e=>{ if(e.target===el('parseModal')) el('parseModal').style.display='none'; });
+  el('btnParse').addEventListener('click', ()=>{
+    const raw=el('raw').value||'';
+    if(!raw.trim()){ showToast('warn','Vazio','Cole os dados brutos de RAL e/ou REC primeiro.'); return; }
+    const {parsed,errors}=parseLines(raw);
+    const added=mergeNoDuplicates(parsed);
     save();
     render();
+    const addedRals = parsed.filter(x => (x.mode||'RAL')==='RAL' && items.some(it=>it.id===x.id)).length;
+    const addedRecs = parsed.filter(x => (x.mode||'RAL')==='REC' && items.some(it=>it.id===x.id)).length;
+    const totalRalParsed = parsed.filter(x => (x.mode||'RAL')==='RAL').length;
+    const totalRecParsed = parsed.filter(x => (x.mode||'RAL')==='REC').length;
+    const ignoredDup = Math.max(0, parsed.length - added);
+    const msg = `Detectadas: ${totalRalParsed} RAL(s) e ${totalRecParsed} REC(s). Duplicadas ignoradas: ${ignoredDup}.`;
+    showToast('ok', `${added} REGISTRO(S) IMPORTADO(S)`, msg, 4200);
+    if(errors.length) showParseModal(errors);
+  });
+  el('btnTxt').addEventListener('click', showOutTxt);
+  el('btnXls').addEventListener('click', showOutExcel);
+  el('btnCsv').addEventListener('click', ()=>exportCsv(false));
+  el('btnCsvBom').addEventListener('click', ()=>exportCsv(true));
+  el('btnReport').addEventListener('click', showOperationalReport);
+  el('btnReportN3').addEventListener('click', showReportN3);
+  el('btnCopyOut').addEventListener('click', copyOut);
+  el('btnDownloadXls').addEventListener('click', downloadXls);
+  el('btnCloseOut').addEventListener('click', ()=>{ document.body.classList.remove('excel-visual-mode'); el('outBox').style.display='none'; const host=document.querySelector('.rawLeft'); if(host && el('outBox').parentElement!==host) host.appendChild(el('outBox')); });
+  el('btnClear').addEventListener('click', clearAll);
+  el('btnResetStatus').addEventListener('click', ()=>{ if(!confirm('Apagar todos os STATUS salvos e voltar para ABERTA?')) return; statusByRal.clear(); persistStatusMap(); render(); showToast('ok','Status resetados','Todos voltaram para ABERTA.'); });
+  el('btnResetFilters').addEventListener('click', ()=>{ el('fDesignacao').value=''; el('fCliente').value=''; el('fCF').value=''; el('fTicket').value=''; render(); });
+  el('btnClearRange').addEventListener('click', ()=>{ selectedRangeKey=''; render(); });
+  [el('fDesignacao'), el('fCliente'), el('fCF'), el('fTicket')].forEach(inp=>inp.addEventListener('input', render));
 
-    const msg = [];
-    msg.push("Importação concluída.");
-    msg.push(`Adicionados: ${added}`);
-    msg.push(`Ignorados (duplicados): ${parsed.length - added}`);
-    msg.push(`Linhas ignoradas (erro): ${errors.length}`);
-
-    if (errors.length) {
-      msg.push("");
-      msg.push("Amostra (até 5):");
-      errors.slice(0,5).forEach(e => msg.push(`- ${e.reason}: ${e.line}`));
+  document.addEventListener('keydown', e=>{
+    if(e.ctrlKey || e.metaKey){
+      switch(e.key.toLowerCase()){
+        case 'i': e.preventDefault(); el('btnParse').click(); break;
+        case 't': e.preventDefault(); el('btnTxt').click(); break;
+        case 'e': e.preventDefault(); el('btnXls').click(); break;
+        case 'd': e.preventDefault(); toggleTheme(); break;
+        case 'm': e.preventDefault(); showToast('info','Campo híbrido','Não há chaveamento: RAL e REC ficam juntos.'); break;
+        case 'n': e.preventDefault(); toggleNocMode(); break;
+        case 'r': e.preventDefault(); showOperationalReport(); break;
+      }
     }
-    alert(msg.join("\n"));
+    if(e.key==='Escape'){ document.body.classList.remove('excel-visual-mode'); el('parseModal').style.display='none'; el('outBox').style.display='none'; const host=document.querySelector('.rawLeft'); if(host && el('outBox').parentElement!==host) host.appendChild(el('outBox')); if(nocMode){ nocMode = false; render(); } }
   });
 
-  el("btnTxt").addEventListener("click", showOutTxt);
-  el("btnXls").addEventListener("click", () => {
-    try{ showOutExcel(); }
-    catch(e){
-      console.error(e);
-      alert("Erro ao gerar Planilha (visual): " + (e && e.message ? e.message : e));
-    }
-  });
-  el("btnCsv").addEventListener("click", exportCsv);
+  window.__ralscopeShowReport = showOperationalReport;
+  window.__ralscopeShowReportN3 = showReportN3;
+  window.__ralscopeExitNoc = exitNocMode;
+  window.__ralscopeToggleNoc = toggleNocMode;
 
-  el("btnCopyOut").addEventListener("click", copyOut);
-  el("btnDownloadXls").addEventListener("click", downloadXls);
-  el("btnCloseOut").addEventListener("click", () => { outBox.style.display = "none"; });
-
-  el("btnClear").addEventListener("click", clearAll);
-
-  el("btnResetStatus").addEventListener("click", () => {
-    const ok = confirm("Isso vai apagar todos os STATUS salvos (localStorage) e voltar tudo para ABERTA. Confirma?");
-    if(!ok) return;
-    try{ localStorage.removeItem(LS_STATUS_KEY); }catch(e){}
-    statusByRal.clear();
-    // Atualiza UI atual (se houver tabela aberta)
-    document.querySelectorAll(".statusSel").forEach(sel => { sel.value = "ABERTA"; });
-  });
-
-  el("btnResetFilters").addEventListener("click", () => {
-    fDesignacao.value = "";
-    fCF.value = "";
-    fRAL.value = "";
-    render();
-  });
-
-  el("btnClearRange").addEventListener("click", () => {
-    selectedRangeKey = "";
-    render();
-  });
-
-  [fDesignacao, fCF, fRAL].forEach(inp => inp.addEventListener("input", render));
-
+  items = load();
+  loadStatusMap();
+  loadPrazoMap();
+  initTheme();
   render();
 })();
-
 </script>
 </body>
 </html>
