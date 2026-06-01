@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="pt-BR">
 <head>
@@ -823,6 +824,29 @@ body.excel-visual-mode .smartTableWrap{
   max-width:none !important;
 }
 
+
+/* ====== PATCH XLSX LEGIBILIDADE ====== */
+.smartTable{
+  table-layout:auto !important;
+}
+.smartTable th,
+.smartTable td{
+  white-space:normal !important;
+  overflow:visible !important;
+  text-overflow:unset !important;
+  line-height:1.35 !important;
+  padding:8px 10px !important;
+  word-break:break-word !important;
+}
+.smartTable .c-ral,
+.smartTable .c-rec{ min-width:130px !important; width:130px !important; }
+.smartTable .c-des{ min-width:260px !important; width:260px !important; }
+.smartTable .c-cf{ min-width:240px !important; width:240px !important; }
+.smartTable .c-pir{ min-width:170px !important; width:170px !important; }
+.smartTable .c-resp{ min-width:180px !important; width:180px !important; }
+.smartTable .c-idade{ min-width:95px !important; width:95px !important; }
+.smartTable .c-status{ min-width:95px !important; width:95px !important; }
+
 </style>
 </head>
 
@@ -894,7 +918,7 @@ body.excel-visual-mode .smartTableWrap{
               <div class="muted" id="outTitle" style="font-weight:900;">Saída</div>
               <div class="outActions">
                 <button id="btnCopyOut">📋 Copiar</button>
-                <button id="btnDownloadXls" title="Baixar como arquivo Excel compatível">⬇️ Baixar XLS</button>
+                <button id="btnDownloadXls" title="Baixar como arquivo Excel compatível (.xlsx)">⬇️ Baixar XLSXXXX</button>
                 <button id="btnCloseOut" class="ghost">✕ Fechar</button>
               </div>
             </div>
@@ -1985,17 +2009,145 @@ function renderKPIs(){
     return parts.join('\n');
   }
   function exportCsv(withBom=false){ if(!buildDerivedRows().length){ showToast('warn','Vazio','Nada para exportar.'); return; } const content=(withBom?'\uFEFF':'') + buildCsvContent(); downloadFile(content,'text/csv;charset=utf-8', stampName('ralscope_layout_inteligente','csv')); showToast('ok', withBom ? 'CSV UTF-8 BOM exportado' : 'CSV exportado','Arquivo baixado com sucesso.'); }
-  function buildExcelHtmlTable(){
-    const {ralRows, recRows}=rowsByType();
-    const esc=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    const table=(head, dataRows, rowFn)=> dataRows.length ? `<table border="1"><thead><tr>${head.map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${dataRows.map(r=>`<tr>${rowFn(r).map(v=>`<td>${esc(v)}</td>`).join('')}</tr>`).join('')}</tbody></table>` : '';
-    let h='<html><head><meta charset="utf-8"><style>body{font-family:Calibri,Arial;font-size:10pt;}table{border-collapse:collapse;margin-bottom:18px;}th{background:#1e3a5f;color:#fff;padding:6px 8px;}td{padding:5px 8px;vertical-align:top;border:1px solid #ccc;}.reportTitle{font-weight:bold;font-size:12pt;border:none!important;padding:8px 0 14px 0;}</style></head><body>';
-    h+=`<table><tr><td colspan="10" class="reportTitle">${esc(cabecalhoRelatorioLinha())}</td></tr></table>`;
-    h+=table(exportHeadersRAL(), ralRows, exportRowRAL);
-    h+=table(exportHeadersREC(), recRows, exportRowREC);
-    h+='</body></html>'; return h;
+  function xmlEscape(v){
+    return String(v??'')
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;')
+      .replace(/'/g,'&apos;');
   }
-  function downloadXls(){ if(!buildDerivedRows().length){ showToast('warn','Vazio','Nada para baixar.'); return; } downloadFile(buildExcelHtmlTable(),'application/vnd.ms-excel;charset=utf-8', stampName('ralscope_layout_inteligente_planilha','xls')); showToast('ok','XLS baixado','Abra no Excel ou Calc.'); }
+  function colLetter(n){
+    let s='';
+    while(n>0){ const m=(n-1)%26; s=String.fromCharCode(65+m)+s; n=Math.floor((n-1)/26); }
+    return s;
+  }
+  function sheetXml(head, dataRows){
+    const rows=[head, ...dataRows];
+    const body=rows.map((row,ri)=>`<row r="${ri+1}">${row.map((v,ci)=>{
+      const ref=`${colLetter(ci+1)}${ri+1}`;
+      const style = ri===0 ? ' s="1"' : '';
+      return `<c r="${ref}" t="inlineStr"${style}><is><t>${xmlEscape(v)}</t></is></c>`;
+    }).join('')}</row>`).join('');
+    return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>
+  <sheetData>${body}</sheetData>
+  <autoFilter ref="A1:${colLetter(head.length)}${Math.max(rows.length,1)}"/>
+</worksheet>`;
+  }
+  function crc32Table(){
+    const table=[];
+    for(let n=0;n<256;n++){
+      let c=n;
+      for(let k=0;k<8;k++) c = (c&1) ? (0xEDB88320 ^ (c>>>1)) : (c>>>1);
+      table[n]=c>>>0;
+    }
+    return table;
+  }
+  const __crcTable = crc32Table();
+  function crc32(bytes){
+    let c=0xffffffff;
+    for(let i=0;i<bytes.length;i++) c = __crcTable[(c ^ bytes[i]) & 0xff] ^ (c>>>8);
+    return (c ^ 0xffffffff) >>> 0;
+  }
+  function u16(n){ const a=new Uint8Array(2); new DataView(a.buffer).setUint16(0,n,true); return a; }
+  function u32(n){ const a=new Uint8Array(4); new DataView(a.buffer).setUint32(0,n>>>0,true); return a; }
+  function concatBytes(parts){
+    const total=parts.reduce((s,p)=>s+p.length,0);
+    const out=new Uint8Array(total); let off=0;
+    for(const p of parts){ out.set(p,off); off+=p.length; }
+    return out;
+  }
+  function textBytes(str){ return new TextEncoder().encode(str); }
+  function zipStore(files){
+    const localParts=[], centralParts=[];
+    let offset=0;
+    for(const f of files){
+      const name=textBytes(f.name), data=textBytes(f.content), crc=crc32(data);
+      const local=concatBytes([
+        u32(0x04034b50), u16(20), u16(0x0800), u16(0), u16(0), u16(0),
+        u32(crc), u32(data.length), u32(data.length), u16(name.length), u16(0), name, data
+      ]);
+      localParts.push(local);
+      const central=concatBytes([
+        u32(0x02014b50), u16(20), u16(20), u16(0x0800), u16(0), u16(0), u16(0),
+        u32(crc), u32(data.length), u32(data.length), u16(name.length), u16(0), u16(0), u16(0), u16(0),
+        u32(0), u32(offset), name
+      ]);
+      centralParts.push(central);
+      offset += local.length;
+    }
+    const centralStart=offset;
+    const central=concatBytes(centralParts);
+    const end=concatBytes([u32(0x06054b50), u16(0), u16(0), u16(files.length), u16(files.length), u32(central.length), u32(centralStart), u16(0)]);
+    return new Blob([concatBytes([...localParts, central, end])], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  }
+  function buildXlsxBlob(){
+    const {ralRows, recRows}=rowsByType();
+    const sheets=[];
+    if(ralRows.length) sheets.push({name:'RAL', head:exportHeadersRAL(), rows:ralRows.map(exportRowRAL)});
+    if(recRows.length) sheets.push({name:'REC', head:exportHeadersREC(), rows:recRows.map(exportRowREC)});
+    if(!sheets.length) sheets.push({name:'RALSCOPE', head:['INFO'], rows:[[cabecalhoRelatorioLinha()]]});
+
+    const sheetOverrides=sheets.map((_,i)=>`<Override PartName="/xl/worksheets/sheet${i+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join('');
+    const workbookSheets=sheets.map((s,i)=>`<sheet name="${xmlEscape(s.name)}" sheetId="${i+1}" r:id="rId${i+1}"/>`).join('');
+    const workbookRels=sheets.map((_,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i+1}.xml"/>`).join('') + `<Relationship Id="rId${sheets.length+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>`;
+    const nowIso=new Date().toISOString();
+
+    const files=[
+      {name:'[Content_Types].xml', content:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
+  <Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>
+  <Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>
+  <Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>
+  ${sheetOverrides}
+</Types>`},
+      {name:'_rels/.rels', content:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/>
+  <Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties" Target="docProps/app.xml"/>
+</Relationships>`},
+      {name:'docProps/core.xml', content:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dcmitype="http://purl.org/dc/dcmitype/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <dc:creator>RALSCOPE</dc:creator><cp:lastModifiedBy>RALSCOPE</cp:lastModifiedBy>
+  <dcterms:created xsi:type="dcterms:W3CDTF">${nowIso}</dcterms:created><dcterms:modified xsi:type="dcterms:W3CDTF">${nowIso}</dcterms:modified>
+</cp:coreProperties>`},
+      {name:'docProps/app.xml', content:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties" xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes"><Application>RALSCOPE</Application></Properties>`},
+      {name:'xl/workbook.xml', content:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>${workbookSheets}</sheets></workbook>`},
+      {name:'xl/_rels/workbook.xml.rels', content:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${workbookRels}</Relationships>`},
+      {name:'xl/styles.xml', content:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Calibri"/></font></fonts>
+  <fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF1E3A5F"/><bgColor indexed="64"/></patternFill></fill></fills>
+  <borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders>
+  <cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>
+  <cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"/></cellXfs>
+</styleSheet>`}
+    ];
+    sheets.forEach((s,i)=>files.push({name:`xl/worksheets/sheet${i+1}.xml`, content:sheetXml(s.head, s.rows)}));
+    return zipStore(files);
+  }
+  function downloadXls(){
+    if(!buildDerivedRows().length){ showToast('warn','Vazio','Nada para baixar.'); return; }
+    const blob=buildXlsxBlob();
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.download=stampName('ralscope_layout_inteligente_planilha','xlsx');
+    a.href=url;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    showToast('ok','XLSX baixado','Arquivo compatível com Excel, WPS e celulares.');
+  }
 
   function showParseModal(errors){ el('parseModalContent').innerHTML = `<p style="color:var(--muted);font-size:13px;margin-bottom:12px;">${errors.length} linha(s) ignorada(s):</p><table class="modal-table"><thead><tr><th>#</th><th>Motivo</th><th>Linha</th></tr></thead><tbody>${errors.map((e,i)=>`<tr><td style="color:var(--muted)">${i+1}</td><td class="reason">${escapeHtml(e.reason)}</td><td class="line-cell">${escapeHtml(e.line.slice(0,140))}${e.line.length>140?'…':''}</td></tr>`).join('')}</tbody></table>`; el('parseModal').style.display='flex'; }
   function clearAll(){
@@ -2241,6 +2393,126 @@ function renderKPIs(){
   loadPrazoMap();
   initTheme();
   render();
+
+/* ====== PATCH SEGURO XLSX REAL - COLUNAS AJUSTADAS ====== */
+(function(){
+  function xmlEsc(v){
+    return String(v ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
+  }
+  function colName(n){
+    let s='';
+    while(n>0){ const m=(n-1)%26; s=String.fromCharCode(65+m)+s; n=Math.floor((n-1)/26); }
+    return s;
+  }
+  function bytes(str){ return new TextEncoder().encode(str); }
+  function crc32(data){
+    let c=0xffffffff;
+    for(let i=0;i<data.length;i++){
+      c ^= data[i];
+      for(let k=0;k<8;k++) c = (c>>>1) ^ (0xedb88320 & -(c&1));
+    }
+    return (c^0xffffffff)>>>0;
+  }
+  function u16(n){ return [n&255,(n>>>8)&255]; }
+  function u32(n){ return [n&255,(n>>>8)&255,(n>>>16)&255,(n>>>24)&255]; }
+  function dos(){
+    const d=new Date();
+    return {
+      time:(d.getHours()<<11)|(d.getMinutes()<<5)|Math.floor(d.getSeconds()/2),
+      date:((d.getFullYear()-1980)<<9)|((d.getMonth()+1)<<5)|d.getDate()
+    };
+  }
+  function zip(files){
+    const parts=[], central=[];
+    let offset=0;
+    const dt=dos();
+    files.forEach(f=>{
+      const name=bytes(f.name), data=bytes(f.data), crc=crc32(data);
+      const lh=new Uint8Array([...u32(0x04034b50),...u16(20),...u16(2048),...u16(0),...u16(dt.time),...u16(dt.date),...u32(crc),...u32(data.length),...u32(data.length),...u16(name.length),...u16(0)]);
+      parts.push(lh,name,data);
+      const ch=new Uint8Array([...u32(0x02014b50),...u16(20),...u16(20),...u16(2048),...u16(0),...u16(dt.time),...u16(dt.date),...u32(crc),...u32(data.length),...u32(data.length),...u16(name.length),...u16(0),...u16(0),...u16(0),...u16(0),...u32(0),...u32(offset)]);
+      central.push(ch,name);
+      offset += lh.length + name.length + data.length;
+    });
+    const csize=central.reduce((a,b)=>a+b.length,0);
+    const end=new Uint8Array([...u32(0x06054b50),...u16(0),...u16(0),...u16(files.length),...u16(files.length),...u32(csize),...u32(offset),...u16(0)]);
+    return new Blob([...parts,...central,end],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  }
+  function sheetXml(headers, rows, widths){
+    const cols=widths.map((w,i)=>`<col min="${i+1}" max="${i+1}" width="${w}" customWidth="1"/>`).join('');
+    const header=`<row r="1" ht="24" customHeight="1">${headers.map((h,i)=>`<c r="${colName(i+1)}1" t="inlineStr" s="1"><is><t>${xmlEsc(h)}</t></is></c>`).join('')}</row>`;
+    const body=rows.map((row,ri)=>{
+      const rn=ri+2;
+      return `<row r="${rn}" ht="22" customHeight="1">${headers.map((_,ci)=>`<c r="${colName(ci+1)}${rn}" t="inlineStr" s="2"><is><t>${xmlEsc(row[ci] ?? '')}</t></is></c>`).join('')}</row>`;
+    }).join('');
+    return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><sheetFormatPr defaultRowHeight="18"/><cols>${cols}</cols><sheetData>${header}${body}</sheetData><autoFilter ref="A1:${colName(headers.length)}${Math.max(1,rows.length+1)}"/></worksheet>`;
+  }
+  function saveBlob(blob, filename){
+    const url=URL.createObjectURL(blob), a=document.createElement('a');
+    a.href=url; a.download=filename; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+  }
+  window.__ralscopeDownloadRealXlsx = function(){
+    try{
+      const derived = (typeof buildDerivedRows === 'function') ? buildDerivedRows() : [];
+      if(!derived.length){ if(typeof showToast==='function') showToast('warn','Vazio','Nada para baixar.'); return; }
+
+      const ralRows=derived.filter(r=>(r.x.mode || (r.x.rec ? 'REC':'RAL'))==='RAL');
+      const recRows=derived.filter(r=>(r.x.mode || (r.x.rec ? 'REC':'RAL'))==='REC');
+
+      const sheets=[];
+      if(ralRows.length){
+        sheets.push({
+          name:'RAL',
+          headers:['RAL','DESIGNAÇÃO','CF','PIRÂMIDE','UF','IDADE','RESPONSÁVEL','PRAZO','STATUS'],
+          rows:ralRows.map(r=>[r.x.ral, r.x.designacao, r.x.cf, r.piramide, r.uf, formatAgeShort(r.a), r.responsavel||'', getPrazoForRalBR(r.x.ral), r.status]),
+          widths:[16,36,32,22,8,12,26,14,14]
+        });
+      }
+      if(recRows.length){
+        sheets.push({
+          name:'REC',
+          headers:['REC','DESIGNAÇÃO','CLIENTE','CF','PIRÂMIDE','UF','IDADE','RESPONSÁVEL','STATUS'],
+          rows:recRows.map(r=>[r.x.rec, r.x.designacao, r.x.cliente||'', r.x.cf, r.piramide, r.uf, formatAgeShort(r.a), r.responsavel||'', r.status]),
+          widths:[16,36,24,32,22,8,12,26,14]
+        });
+      }
+
+      const overrides=sheets.map((_,i)=>`<Override PartName="/xl/worksheets/sheet${i+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join('');
+      const sheetList=sheets.map((s,i)=>`<sheet name="${xmlEsc(s.name)}" sheetId="${i+1}" r:id="rId${i+1}"/>`).join('');
+      const relList=sheets.map((_,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i+1}.xml"/>`).join('');
+
+      const files=[
+        {name:'[Content_Types].xml',data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>${overrides}</Types>`},
+        {name:'_rels/.rels',data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`},
+        {name:'xl/workbook.xml',data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>${sheetList}</sheets></workbook>`},
+        {name:'xl/_rels/workbook.xml.rels',data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${relList}<Relationship Id="rId${sheets.length+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`},
+        {name:'xl/styles.xml',data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="10"/><name val="Calibri"/></font><font><b/><sz val="10"/><color rgb="FFFFFFFF"/><name val="Calibri"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF1F4E78"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border><border><left style="thin"><color rgb="FFD9E2F3"/></left><right style="thin"><color rgb="FFD9E2F3"/></right><top style="thin"><color rgb="FFD9E2F3"/></top><bottom style="thin"><color rgb="FFD9E2F3"/></bottom><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="3"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="49" fontId="1" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf><xf numFmtId="49" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment vertical="center" wrapText="0"/></xf></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`}
+      ];
+      sheets.forEach((s,i)=>files.push({name:`xl/worksheets/sheet${i+1}.xml`,data:sheetXml(s.headers,s.rows,s.widths)}));
+
+      const d=new Date(), p=n=>String(n).padStart(2,'0');
+      const filename=`ralscope_layout_inteligente_planilha_${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}_${p(d.getHours())}${p(d.getMinutes())}.xlsx`;
+      saveBlob(zip(files), filename);
+      if(typeof showToast==='function') showToast('ok','XLSX baixado','Arquivo real com colunas ajustadas para Excel/WPS mobile.');
+    }catch(err){
+      console.error(err);
+      if(typeof showToast==='function') showToast('err','Erro no XLSX', String(err && err.message ? err.message : err));
+    }
+  };
+
+  window.addEventListener('DOMContentLoaded', function(){
+    const b=document.getElementById('btnDownloadXls');
+    if(b){
+      const clone=b.cloneNode(true);
+      clone.id='btnDownloadXls';
+      clone.textContent='⬇️ Baixar XLSXX';
+      clone.title='Baixar XLSX real com colunas ajustadas';
+      b.parentNode.replaceChild(clone,b);
+      clone.addEventListener('click', window.__ralscopeDownloadRealXlsx);
+    }
+  });
+})();
+
 })();
 </script>
 </body>
